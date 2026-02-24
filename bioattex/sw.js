@@ -1,227 +1,73 @@
-/**
- * Bioattex Service Worker - MortZKey Version
- * Version: 2.3-mortzkey
- * 
- * IMPORTANT: Server must serve this file with:
- * Cache-Control: no-cache, no-store, must-revalidate
- */
-
-const CACHE_VERSION = 'bioattex-v2.3-mortzkey';
-const STATIC_CACHE = CACHE_VERSION + '-static';
-const DYNAMIC_CACHE = CACHE_VERSION + '-dynamic';
-
-// Essential assets to pre-cache
-const PRE_CACHE_ASSETS = [
-    './index.html',
-    './manifest.json',
-    './bioattex-icons/favicon.ico',
-    './bioattex-icons/favicon-16x16.png',
-    './bioattex-icons/favicon-32x32.png',
-    './bioattex-icons/apple-touch-icon.png',
-    './bioattex-icons/android-chrome-192x192.png',
-    './bioattex-icons/android-chrome-512x512.png'
+// Bioattex Service Worker v2.1
+const CACHE_NAME = 'bioattex-v2.1';
+const ASSETS_TO_CACHE = [
+    '/bioattex/',
+    '/bioattex/index.html',
+    '/bioattex/bioattex-icons/favicon.ico',
+    '/bioattex/bioattex-icons/favicon-16x16.png',
+    '/bioattex/bioattex-icons/favicon-32x32.png',
+    '/bioattex/bioattex-icons/apple-touch-icon.png',
+    '/bioattex/bioattex-icons/android-chrome-192x192.png',
+    '/bioattex/bioattex-icons/android-chrome-512x512.png'
 ];
 
-// External CDN assets to cache
-const CDN_ASSETS = [
-    'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js'
-];
-
-// Face-API models to cache
-const MODEL_ASSETS = [
-    'https://justadudewhohacks.github.io/face-api.js/models/tiny_face_detector_model-weights_manifest.json',
-    'https://justadudewhohacks.github.io/face-api.js/models/tiny_face_detector_model-shard1',
-    'https://justadudewhohacks.github.io/face-api.js/models/face_landmark_68_tiny_model-weights_manifest.json',
-    'https://justadudewhohacks.github.io/face-api.js/models/face_landmark_68_tiny_model-shard1',
-    'https://justadudewhohacks.github.io/face-api.js/models/face_recognition_model-weights_manifest.json',
-    'https://justadudewhohacks.github.io/face-api.js/models/face_recognition_model-shard1',
-    'https://justadudewhohacks.github.io/face-api.js/models/face_recognition_model-shard2'
-];
-
-// =====================================================
-// INSTALL EVENT - Pre-cache essential assets
-// =====================================================
+// Install event - cache assets
 self.addEventListener('install', (event) => {
-    console.log('[SW] Installing version:', CACHE_VERSION);
-    
     event.waitUntil(
-        Promise.all([
-            caches.open(STATIC_CACHE).then((cache) => {
-                console.log('[SW] Pre-caching static assets');
-                return cache.addAll(PRE_CACHE_ASSETS).catch(err => {
-                    console.log('[SW] Some static assets failed to cache:', err);
-                });
-            }),
-            caches.open(DYNAMIC_CACHE).then((cache) => {
-                console.log('[SW] Pre-caching CDN assets');
-                return Promise.all(
-                    [...CDN_ASSETS, ...MODEL_ASSETS].map(url =>
-                        fetch(url, { mode: 'cors' })
-                            .then(response => {
-                                if (response.ok) {
-                                    return cache.put(url, response);
-                                }
-                            })
-                            .catch(() => {
-                                console.log('[SW] Failed to cache:', url);
-                            })
-                    )
-                );
+        caches.open(CACHE_NAME)
+            .then((cache) => {
+                console.log('Bioattex: Caching assets');
+                return cache.addAll(ASSETS_TO_CACHE);
             })
-        ]).then(() => {
-            console.log('[SW] Skip waiting - forcing activation');
-            return self.skipWaiting();
-        })
+            .then(() => self.skipWaiting())
     );
 });
 
-// =====================================================
-// ACTIVATE EVENT - Clean old caches & take control
-// =====================================================
+// Activate event - clean old caches
 self.addEventListener('activate', (event) => {
-    console.log('[SW] Activating version:', CACHE_VERSION);
-    
     event.waitUntil(
-        Promise.all([
-            caches.keys().then((cacheNames) => {
-                return Promise.all(
-                    cacheNames.map((cacheName) => {
-                        if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-                            console.log('[SW] Deleting old cache:', cacheName);
-                            return caches.delete(cacheName);
-                        }
-                    })
-                );
-            }),
-            self.clients.claim().then(() => {
-                console.log('[SW] Claimed all clients');
-            })
-        ]).then(() => {
-            console.log('[SW] Activation complete');
-        })
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (cacheName !== CACHE_NAME) {
+                        console.log('Bioattex: Removing old cache', cacheName);
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        }).then(() => self.clients.claim())
     );
 });
 
-// =====================================================
-// FETCH EVENT - Cache-first with background update
-// =====================================================
+// Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
-    const { request } = event;
-    const url = new URL(request.url);
+    // Skip non-GET requests
+    if (event.request.method !== 'GET') return;
     
-    if (request.method !== 'GET') return;
-    if (!url.protocol.startsWith('http')) return;
+    // Skip API calls - always go to network
+    if (event.request.url.includes('/api/')) return;
     
-    // For navigation requests (HTML pages) - Network first
-    if (request.mode === 'navigate') {
-        event.respondWith(
-            fetch(request)
-                .then((response) => {
-                    const responseClone = response.clone();
-                    caches.open(STATIC_CACHE).then((cache) => {
-                        cache.put(request, responseClone);
-                    });
-                    return response;
-                })
-                .catch(() => {
-                    return caches.match(request).then((cachedResponse) => {
-                        return cachedResponse || caches.match('./index.html');
-                    });
-                })
-        );
-        return;
-    }
-    
-    // For face-api models and CDN - Cache first
-    if (url.href.includes('face-api') || url.href.includes('cdn.jsdelivr') || url.href.includes('cdnjs.cloudflare')) {
-        event.respondWith(
-            caches.match(request).then((cachedResponse) => {
+    event.respondWith(
+        caches.match(event.request)
+            .then((cachedResponse) => {
                 if (cachedResponse) {
-                    fetch(request)
-                        .then(response => {
-                            if (response.ok) {
-                                caches.open(DYNAMIC_CACHE).then(cache => {
-                                    cache.put(request, response);
-                                });
-                            }
-                        })
-                        .catch(() => {});
                     return cachedResponse;
                 }
-                
-                return fetch(request)
+                return fetch(event.request)
                     .then((response) => {
-                        if (response.ok) {
+                        // Cache successful responses
+                        if (response.status === 200) {
                             const responseClone = response.clone();
-                            caches.open(DYNAMIC_CACHE).then((cache) => {
-                                cache.put(request, responseClone);
+                            caches.open(CACHE_NAME).then((cache) => {
+                                cache.put(event.request, responseClone);
                             });
                         }
                         return response;
+                    })
+                    .catch(() => {
+                        // Return offline page if available
+                        return caches.match('/bioattex/index.html');
                     });
             })
-        );
-        return;
-    }
-    
-    // For other requests - Cache-first strategy
-    event.respondWith(
-        caches.match(request).then((cachedResponse) => {
-            if (cachedResponse) {
-                fetch(request)
-                    .then(response => {
-                        if (response.ok) {
-                            caches.open(DYNAMIC_CACHE).then(cache => {
-                                cache.put(request, response);
-                            });
-                        }
-                    })
-                    .catch(() => {});
-                return cachedResponse;
-            }
-            
-            return fetch(request)
-                .then((response) => {
-                    if (response.ok) {
-                        const responseClone = response.clone();
-                        caches.open(DYNAMIC_CACHE).then((cache) => {
-                            cache.put(request, responseClone);
-                        });
-                    }
-                    return response;
-                })
-                .catch(() => {
-                    if (request.destination === 'image') {
-                        return new Response(
-                            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="#f1f5f9" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="#64748b" font-size="10">Offline</text></svg>',
-                            { headers: { 'Content-Type': 'image/svg+xml' } }
-                        );
-                    }
-                    return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
-                });
-        })
     );
 });
-
-// =====================================================
-// MESSAGE HANDLER
-// =====================================================
-self.addEventListener('message', (event) => {
-    if (event.data === 'skipWaiting') {
-        self.skipWaiting();
-    }
-    
-    if (event.data === 'clearCache') {
-        event.waitUntil(
-            caches.keys().then((cacheNames) => {
-                return Promise.all(
-                    cacheNames.map((cacheName) => caches.delete(cacheName))
-                );
-            })
-        );
-    }
-});
-
-console.log('[SW] Service Worker loaded - Version:', CACHE_VERSION);
