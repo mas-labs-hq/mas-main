@@ -31,31 +31,13 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/phein/phein-icons/favicon-32x32.png">
     <link rel="apple-touch-icon" href="/phein/phein-icons/apple-touch-icon.png">
     
-    <!-- PWA MANIFEST -->
-    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{
-        "name":"Phein Screener",
-        "short_name":"Phein",
-        "start_url":"/phein/",
-        "scope":"/phein/",
-        "display":"standalone",
-        "background_color":"%23f1f5f9",
-        "theme_color":"%232563eb",
-        "icons":[
-            {"src":"/phein/phein-icons/android-chrome-192x192.png","sizes":"192x192","type":"image/png"},
-            {"src":"/phein/phein-icons/android-chrome-512x512.png","sizes":"512x512","type":"image/png"}
-        ],
-        "screenshots":[
-            {
-                "src":"/phein/screenshot-wide.png",
-                "sizes":"1280x720",
-                "type":"image/png",
-                "form_factor":"wide",
-                "label":"Phein Smart CV Screener - Job criteria and CV upload"
-            }
-        ]
-    }'>
+    <!-- PWA MANIFEST - External file reference for better browser support -->
+    <link rel="manifest" href="/phein/manifest.json">
     
     <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Phein Screener">
     
     <!-- Title with MortApps Studios SEO Optimization -->
     <title>Phein | Smart CV Screener | AI-Powered Recruitment by MortApps Studios</title>
@@ -653,128 +635,27 @@
             40%, 60% { transform: translate3d(4px, 0, 0); }
         }
 
-        /* Install Guide Modal */
-        #install-guide-modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(8px);
+        /* Install Button in Header */
+        #install-header-btn {
             display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 20000;
-        }
-        .install-guide-card {
-            background: white;
-            max-width: 560px;
-            width: 90%;
-            border-radius: 28px;
-            padding: 2.25rem 2rem;
-            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.3);
-            animation: slideUp 0.4s cubic-bezier(0.16,1,0.3,1);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .install-guide-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-        .install-guide-header svg {
-            width: 32px;
-            height: 32px;
-            color: var(--primary);
-            stroke-width: 1.8;
-        }
-        .install-guide-title {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #0f172a;
-            letter-spacing: -0.01em;
-        }
-        .install-guide-steps {
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 1.75rem;
-            border-left: 4px solid var(--primary);
-        }
-        .step-item {
-            display: flex;
-            gap: 0.75rem;
-            margin-bottom: 0.9rem;
-            font-size: 0.98rem;
-            color: #1e293b;
-            align-items: baseline;
-        }
-        .step-marker {
-            background: var(--primary);
-            color: white;
-            width: 22px; height: 22px;
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: 700;
-            flex-shrink: 0;
-            margin-top: 0.1rem;
-        }
-        .step-text { line-height: 1.5; }
-        .step-text strong { color: var(--primary-dark); }
-        .guide-note {
-            background: #fffbeb;
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            margin-bottom: 1.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: #92400e;
-            font-size: 0.9rem;
-            border: 1px solid #fcd34d;
-        }
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.95rem;
-            color: #334155;
-        }
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary);
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .install-done-btn {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
-            padding: 0.9rem 2rem;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 1.05rem;
-            width: 100%;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.2s;
-            display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            box-shadow: 0 6px 14px rgba(37,99,235,0.3);
+            gap: 0.5rem;
         }
-        .install-done-btn:hover {
-            background: var(--primary-dark);
+        #install-header-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 20px -5px rgba(37,99,235,0.4);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
-
-        #find-btn {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 700;
+        #install-header-btn.show {
+            display: inline-flex;
         }
 
         /* Connection Status */
@@ -819,7 +700,7 @@
         <meta itemprop="applicationCategory" content="BusinessApplication, HRApplication">
         <meta itemprop="operatingSystem" content="Web">
         <meta itemprop="author" content="MortApps Studios">
-        <meta itemprop="softwareVersion" content="2.0">
+        <meta itemprop="softwareVersion" content="2.1">
     </div>
 
     <!-- INSTALL GATE - Backend License System -->
@@ -900,48 +781,6 @@
         </div>
     </div>
 
-    <!-- Install Guide Modal -->
-    <div id="install-guide-modal">
-        <div class="install-guide-card">
-            <div class="install-guide-header">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                <span class="install-guide-title">Install Phein as App</span>
-            </div>
-            <div class="install-guide-steps">
-                <div class="step-item">
-                    <span class="step-marker">1</span>
-                    <span class="step-text">Click the <strong>three dots (⋮)</strong> at the top‑left of your browser.</span>
-                </div>
-                <div class="step-item">
-                    <span class="step-marker">2</span>
-                    <span class="step-text">Select <strong>Cast, save, and share</strong> → then <strong>Install page as app</strong>.</span>
-                </div>
-                <div class="step-item">
-                    <span class="step-marker">3</span>
-                    <span class="step-text">A pop‑up appears at the top: click <strong>Install</strong>.</span>
-                </div>
-                <div class="step-item">
-                    <span class="step-marker">✓</span>
-                    <span class="step-text"><strong>Done.</strong> Phein will now launch like a native application.</span>
-                </div>
-            </div>
-            <div class="guide-note">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                <span>Installing gives you a dedicated window, offline access, and a cleaner experience.</span>
-            </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="dont-remind-install">
-                <label for="dont-remind-install">Do not remind me again</label>
-            </div>
-            <button class="install-done-btn" id="install-guide-done">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                Done
-            </button>
-        </div>
-    </div>
-
     <!-- Loading Screen -->
     <div id="loading-screen">
         <div class="loader-logo">Phein Screener</div>
@@ -1001,6 +840,11 @@
         </div>
         <div style="display:flex; gap:0.5rem; align-items: center;">
             <span class="license-badge" id="header-license-badge">Unlicensed</span>
+            <!-- INSTALL BUTTON - Shows when PWA install is available -->
+            <button id="install-header-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Install App
+            </button>
             <button class="btn btn-outline" onclick="window.location.href='mailto:mortapps.studios@gmail.com'">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                 Contact
@@ -1115,11 +959,13 @@
 
     <script>
     // ============================================================================
-    // Phein Backend License System - v2.0
-    // YOUR LICENSE SERVER URL:
+    // Phein Backend License System - v2.2 (FIXED - NO FREEZE)
     // ============================================================================
 
     const API_BASE_URL = 'https://phein-license-server.vercel.app';
+    const API_TIMEOUT = 8000; // 8 second timeout
+    const LICENSE_CACHE_KEY = 'phein_license_cache';
+    const LICENSE_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
     // ============================================================================
 
@@ -1187,13 +1033,10 @@
         function dismissLoader() {
             if (loader) {
                 loader.style.opacity = '0';
-                setTimeout(() => { loader.style.display = 'none'; }, 600);
+                setTimeout(() => { 
+                    loader.style.display = 'none'; 
+                }, 600);
             }
-        }
-
-        function ensureLoaderVisible() {
-            loader.style.display = 'flex';
-            loader.style.opacity = '1';
         }
 
         function updateHeaderBadge(licenseInfo) {
@@ -1237,12 +1080,56 @@
             infoBox.style.display = 'block';
         }
 
-        // API Calls
+        // Cache management
+        function getCachedLicense() {
+            try {
+                const cached = localStorage.getItem(LICENSE_CACHE_KEY);
+                if (cached) {
+                    const data = JSON.parse(cached);
+                    if (Date.now() - data.timestamp < LICENSE_CACHE_DURATION) {
+                        return data.license;
+                    }
+                }
+            } catch (e) {
+                console.log('Cache read error:', e);
+            }
+            return null;
+        }
+
+        function setCachedLicense(license) {
+            try {
+                localStorage.setItem(LICENSE_CACHE_KEY, JSON.stringify({
+                    license: license,
+                    timestamp: Date.now()
+                }));
+            } catch (e) {
+                console.log('Cache write error:', e);
+            }
+        }
+
+        // API Calls with timeout
+        async function fetchWithTimeout(url, options, timeout) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                return await response.json();
+            } catch (error) {
+                clearTimeout(timeoutId);
+                throw error;
+            }
+        }
+
         async function validateLicense(licenseKey, companyName) {
             const fingerprint = getDeviceFingerprint();
             
             try {
-                const response = await fetch(`${API_BASE_URL}/api/validate`, {
+                return await fetchWithTimeout(`${API_BASE_URL}/api/validate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1250,9 +1137,7 @@
                         deviceFingerprint: fingerprint,
                         companyName: companyName
                     })
-                });
-                
-                return await response.json();
+                }, API_TIMEOUT);
             } catch (error) {
                 console.error('Validation error:', error);
                 return {
@@ -1267,16 +1152,14 @@
             const fingerprint = getDeviceFingerprint();
             
             try {
-                const response = await fetch(`${API_BASE_URL}/api/check`, {
+                return await fetchWithTimeout(`${API_BASE_URL}/api/check`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         licenseKey: licenseKey,
                         deviceFingerprint: fingerprint
                     })
-                });
-                
-                return await response.json();
+                }, API_TIMEOUT);
             } catch (error) {
                 console.error('Check error:', error);
                 return {
@@ -1287,44 +1170,103 @@
             }
         }
 
-        // Initialization
+        // ========== CRITICAL FIX: Loading Screen Handler ==========
+        // This function GUARANTEES the loading screen is dismissed
+        function proceedToApp(licenseInfo) {
+            // Hide gate immediately
+            gate.style.display = 'none';
+            
+            // ALWAYS dismiss loader - no waiting for animation
+            dismissLoader();
+            
+            // Update badge
+            updateHeaderBadge(licenseInfo);
+            
+            // Schedule install popup
+            scheduleInstallGuidePopup();
+        }
+
+        // ========== CRITICAL FIX: Offline/Timeout Handling ==========
         async function initializeLicense() {
             const savedKey = localStorage.getItem(STORAGE_KEYS.key);
             
+            // No saved key - show gate
             if (!savedKey) {
                 gate.style.display = 'flex';
                 loader.style.display = 'none';
                 return;
             }
 
-            const status = await checkLicenseStatus(savedKey);
-            
-            if (status.success) {
-                gate.style.display = 'none';
-                ensureLoaderVisible();
+            // Check for cached license (works offline)
+            const cachedLicense = getCachedLicense();
+            if (cachedLicense && cachedLicense.success) {
+                console.log('Using cached license');
+                proceedToApp(cachedLicense);
+                return;
+            }
+
+            // Try to validate with server
+            try {
+                const status = await checkLicenseStatus(savedKey);
                 
-                window.addEventListener('load', () => {
-                    setTimeout(() => {
-                        dismissLoader();
-                        updateHeaderBadge(status);
-                        scheduleInstallGuidePopup();
-                    }, 3200);
-                });
-            } else {
-                gate.style.display = 'flex';
-                loader.style.display = 'none';
-                
-                if (status.error === 'EXPIRED') {
-                    showError('Your license has expired. Please renew to continue using Phein.');
-                } else if (status.error === 'NOT_ACTIVATED') {
-                    localStorage.removeItem(STORAGE_KEYS.key);
-                    localStorage.removeItem(STORAGE_KEYS.company);
+                if (status.success) {
+                    // Cache the successful result
+                    setCachedLicense(status);
+                    proceedToApp(status);
                 } else {
-                    showError(status.message || 'License validation failed.');
+                    // Server said invalid/expired
+                    gate.style.display = 'flex';
+                    loader.style.display = 'none';
+                    
+                    if (status.error === 'EXPIRED') {
+                        showError('Your license has expired. Please renew to continue using Phein.');
+                    } else if (status.error === 'NOT_ACTIVATED') {
+                        localStorage.removeItem(STORAGE_KEYS.key);
+                        localStorage.removeItem(STORAGE_KEYS.company);
+                    } else {
+                        // Network error - but we have a saved key
+                        // Let them in with cached data if available
+                        const company = localStorage.getItem(STORAGE_KEYS.company);
+                        if (company) {
+                            // Create a basic license object for offline access
+                            const offlineLicense = {
+                                success: true,
+                                tier_name: 'Starter (Offline)',
+                                tier_code: 'ST',
+                                company: company,
+                                days_remaining: '?',
+                                is_perpetual: false
+                            };
+                            proceedToApp(offlineLicense);
+                        } else {
+                            showError('Connection error. Please check your internet and try again.');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('License check failed:', error);
+                
+                // Network error - try offline mode
+                const company = localStorage.getItem(STORAGE_KEYS.company);
+                if (company) {
+                    const offlineLicense = {
+                        success: true,
+                        tier_name: 'Starter (Offline)',
+                        tier_code: 'ST',
+                        company: company,
+                        days_remaining: '?',
+                        is_perpetual: false
+                    };
+                    proceedToApp(offlineLicense);
+                } else {
+                    gate.style.display = 'flex';
+                    loader.style.display = 'none';
+                    showError('Connection error. Please check your internet and try again.');
                 }
             }
         }
 
+        // Start initialization
         initializeLicense();
 
         // Activation Handler
@@ -1353,20 +1295,14 @@
                 
                 localStorage.setItem(STORAGE_KEYS.key, keyVal.toUpperCase());
                 localStorage.setItem(STORAGE_KEYS.company, companyVal);
+                setCachedLicense(result);
                 
                 setTimeout(() => {
                     gate.style.transition = 'opacity 0.5s ease-out';
                     gate.style.opacity = '0';
                     
                     setTimeout(() => {
-                        gate.style.display = 'none';
-                        ensureLoaderVisible();
-                        
-                        setTimeout(() => {
-                            dismissLoader();
-                            updateHeaderBadge(result);
-                            scheduleInstallGuidePopup();
-                        }, 3200);
+                        proceedToApp(result);
                     }, 500);
                 }, 1000);
             } else {
@@ -1401,32 +1337,97 @@
             const hideFlag = localStorage.getItem('phein_hide_install_popup');
             if (isRunningStandalone() || hideFlag === 'true') return;
             
+            // Show install prompt after a delay if not already installed
             setTimeout(() => {
-                document.getElementById('install-guide-modal').style.display = 'flex';
-            }, 6000);
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('install-guide-modal');
-            const doneBtn = document.getElementById('install-guide-done');
-            const checkbox = document.getElementById('dont-remind-install');
-
-            if (doneBtn) {
-                doneBtn.addEventListener('click', function() {
-                    if (checkbox && checkbox.checked) {
-                        localStorage.setItem('phein_hide_install_popup', 'true');
+                if (!isRunningStandalone() && !localStorage.getItem('phein_hide_install_popup')) {
+                    // Check if browser supports PWA install
+                    if (window.deferredInstallPrompt) {
+                        // Show our custom install button in header
+                        document.getElementById('install-header-btn').classList.add('show');
                     }
-                    modal.style.display = 'none';
-                });
-            }
-
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) modal.style.display = 'none';
-            });
-        });
+                }
+            }, 3000);
+        }
 
     })();
     // === END License System ===
+
+    // ============================================================================
+    // Service Worker Registration & PWA Install Handling
+    // ============================================================================
+    
+    (function() {
+        'use strict';
+        
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/phein/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registered:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+        
+        // Handle PWA Install Prompt
+        let deferredInstallPrompt = null;
+        const installHeaderBtn = document.getElementById('install-header-btn');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredInstallPrompt = e;
+            // Make it globally accessible for the license system
+            window.deferredInstallPrompt = e;
+            
+            // Show our custom install button
+            installHeaderBtn.classList.add('show');
+            
+            console.log('PWA install prompt available');
+        });
+        
+        // Install button click handler
+        installHeaderBtn.addEventListener('click', async () => {
+            if (!deferredInstallPrompt) {
+                // Fallback: show install instructions
+                alert('To install Phein:\n\n1. Click the three dots (⋮) in your browser\n2. Select "Cast, save, and share"\n3. Click "Install page as app"');
+                return;
+            }
+            
+            // Show the install prompt
+            deferredInstallPrompt.prompt();
+            
+            // Wait for the user to respond to the prompt
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            console.log(`User response to install prompt: ${outcome}`);
+            
+            // Clear the deferred prompt
+            deferredInstallPrompt = null;
+            window.deferredInstallPrompt = null;
+            
+            // Hide the install button
+            installHeaderBtn.classList.remove('show');
+            
+            // Save that user has installed
+            if (outcome === 'accepted') {
+                localStorage.setItem('phein_hide_install_popup', 'true');
+            }
+        });
+        
+        // Track successful installation
+        window.addEventListener('appinstalled', () => {
+            console.log('Phein was installed successfully');
+            deferredInstallPrompt = null;
+            window.deferredInstallPrompt = null;
+            installHeaderBtn.classList.remove('show');
+            localStorage.setItem('phein_hide_install_popup', 'true');
+        });
+        
+    })();
 
     // === ORIGINAL APPLICATION JAVASCRIPT ===
     
