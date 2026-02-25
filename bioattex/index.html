@@ -929,18 +929,32 @@
     <script>
         // =====================================================
         // BIOATTEX - PROFESSIONAL BIOMETRIC ATTENDANCE SYSTEM
-        // Version 3.0 - Backend License Integration
+        // Version 3.0 - PRODUCTION READY License System
+        // =====================================================
+        // CHANGES FROM v2.1:
+        // - REMOVED 24-hour cache - now checks server EVERY app start
+        // - IMMEDIATE kick-out when license is REVOKED or EXPIRED
+        // - Proper day counter in header badge
+        // - Limited offline access (7 days max, then require online check)
         // =====================================================
 
         'use strict';
 
         // =====================================================
-        // LICENSE SERVER CONFIGURATION - v2.1 FIXED
+        // LICENSE SERVER CONFIGURATION - v3.0 PRODUCTION READY
         // =====================================================
         const API_BASE_URL = 'https://phein-license-server.vercel.app';
-        const API_TIMEOUT = 8000; // 8 second timeout
-        const LICENSE_CACHE_KEY = 'bioattex_license_cache';
-        const LICENSE_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+        const API_TIMEOUT = 10000; // 10 second timeout
+        const MAX_OFFLINE_DAYS = 7; // Max days allowed offline before requiring online check
+
+        // Storage Keys
+        const STORAGE_KEYS = {
+            key: 'bioattex_license_key',
+            fingerprint: 'bioattex_device_fingerprint',
+            company: 'bioattex_company_name',
+            lastOnlineCheck: 'bioattex_last_online_check',
+            cachedLicense: 'bioattex_cached_license'
+        };
         // =====================================================
 
         // --- CONSTANTS ---
@@ -1154,15 +1168,9 @@
         };
 
         // =====================================================
-        // BACKEND LICENSE SYSTEM - v2.1 FIXED (NO FREEZE)
+        // BACKEND LICENSE SYSTEM - v3.0 PRODUCTION READY
         // =====================================================
         const licenseSystem = {
-            STORAGE_KEYS: {
-                key: 'bioattex_license_key',
-                fingerprint: 'bioattex_device_fingerprint',
-                company: 'bioattex_company_name'
-            },
-            
             TIERS: {
                 'ST':  { name: 'Starter',        days: 90 },
                 'PR':  { name: 'Professional',   days: 365 },
@@ -1170,7 +1178,7 @@
                 'EPX': { name: 'Enterprise Plus', days: null }
             },
 
-            // ========== CRITICAL FIX: Fetch with Timeout ==========
+            // Fetch with timeout
             fetchWithTimeout: async function(url, options, timeout) {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -1188,15 +1196,12 @@
                 }
             },
 
-            // ========== CRITICAL FIX: License Cache (Offline Support) ==========
+            // Cache management
             getCachedLicense: function() {
                 try {
-                    const cached = localStorage.getItem(LICENSE_CACHE_KEY);
+                    const cached = localStorage.getItem(STORAGE_KEYS.cachedLicense);
                     if (cached) {
-                        const data = JSON.parse(cached);
-                        if (Date.now() - data.timestamp < LICENSE_CACHE_DURATION) {
-                            return data.license;
-                        }
+                        return JSON.parse(cached);
                     }
                 } catch (e) {
                     console.log('Cache read error:', e);
@@ -1206,19 +1211,36 @@
 
             setCachedLicense: function(license) {
                 try {
-                    localStorage.setItem(LICENSE_CACHE_KEY, JSON.stringify({
-                        license: license,
-                        timestamp: Date.now()
-                    }));
+                    localStorage.setItem(STORAGE_KEYS.cachedLicense, JSON.stringify(license));
+                    localStorage.setItem(STORAGE_KEYS.lastOnlineCheck, Date.now().toString());
                 } catch (e) {
                     console.log('Cache write error:', e);
                 }
             },
 
-            // ========== CRITICAL FIX: Init with Offline Fallback ==========
+            getLastOnlineCheck: function() {
+                const lastCheck = localStorage.getItem(STORAGE_KEYS.lastOnlineCheck);
+                return lastCheck ? parseInt(lastCheck) : 0;
+            },
+
+            hasBeenOfflineTooLong: function() {
+                const lastCheck = this.getLastOnlineCheck();
+                const daysSinceLastCheck = (Date.now() - lastCheck) / (1000 * 60 * 60 * 24);
+                return daysSinceLastCheck > MAX_OFFLINE_DAYS;
+            },
+
+            // Clear all license data (for revocation/expiration)
+            clearLicenseData: function() {
+                localStorage.removeItem(STORAGE_KEYS.key);
+                localStorage.removeItem(STORAGE_KEYS.company);
+                localStorage.removeItem(STORAGE_KEYS.lastOnlineCheck);
+                localStorage.removeItem(STORAGE_KEYS.cachedLicense);
+            },
+
+            // ========== MAIN LICENSE INITIALIZATION ==========
             init: async function() {
                 const licenseScreen = document.getElementById('license-screen');
-                const savedKey = localStorage.getItem(this.STORAGE_KEYS.key);
+                const savedKey = localStorage.getItem(STORAGE_KEYS.key);
                 
                 // No saved key - show gate
                 if (!savedKey) {
@@ -1226,33 +1248,13 @@
                     return;
                 }
 
-                // Check for cached license (works offline)
-                const cachedLicense = this.getCachedLicense();
-                if (cachedLicense && cachedLicense.success) {
-                    console.log('Using cached license');
-                    const licenseInfo = {
-                        tier: { name: cachedLicense.tier_name },
-                        daysRemaining: cachedLicense.days_remaining,
-                        isPerpetual: cachedLicense.is_perpetual,
-                        company: cachedLicense.company
-                    };
-                    this.bootSystem(licenseInfo, false);
-                    return;
-                }
-
-                // Show loading while we check license status with server
-                licenseScreen.style.display = 'none';
-                const loadingScreen = document.getElementById('loading-screen');
-                loadingScreen.style.display = 'flex';
-                
+                // ALWAYS try to check with server first
                 try {
-                    // Call server with timeout
                     const status = await this.checkLicenseStatus(savedKey);
                     
                     if (status.success) {
-                        // Cache the successful result
+                        // Server confirmed license is valid
                         this.setCachedLicense(status);
-                        // License valid - boot with real data
                         const licenseInfo = {
                             tier: { name: status.tier_name },
                             daysRemaining: status.days_remaining,
@@ -1260,50 +1262,85 @@
                             company: status.company
                         };
                         this.bootSystem(licenseInfo, false);
+                        return;
                     } else {
-                        // License invalid/expired - show license screen
-                        loadingScreen.style.display = 'none';
-                        licenseScreen.style.display = 'flex';
-                        
-                        if (status.error === 'EXPIRED') {
+                        // Server returned an error
+                        if (status.error === 'REVOKED') {
+                            // LICENSE REVOKED - Clear data and show gate
+                            this.clearLicenseData();
+                            licenseScreen.style.display = 'flex';
+                            document.getElementById('license-error').textContent = 'Your license has been revoked. Please contact support.';
+                            return;
+                        } else if (status.error === 'EXPIRED') {
+                            // LICENSE EXPIRED - Clear data and show gate
+                            this.clearLicenseData();
+                            licenseScreen.style.display = 'flex';
                             document.getElementById('license-error').textContent = 'Your license has expired. Please renew to continue.';
+                            return;
                         } else if (status.error === 'NOT_ACTIVATED') {
-                            localStorage.removeItem(this.STORAGE_KEYS.key);
-                            localStorage.removeItem(this.STORAGE_KEYS.company);
-                        } else {
-                            // Network error - try offline mode
-                            const company = localStorage.getItem(this.STORAGE_KEYS.company);
-                            if (company) {
-                                const offlineLicense = {
-                                    tier: { name: 'Starter (Offline)' },
-                                    daysRemaining: '?',
-                                    isPerpetual: false,
-                                    company: company
-                                };
-                                this.bootSystem(offlineLicense, false);
-                            } else {
-                                document.getElementById('license-error').textContent = 'Connection error. Please check your internet and try again.';
-                            }
+                            // Key exists but not activated on this device - let them re-activate
+                            localStorage.removeItem(STORAGE_KEYS.key);
+                            localStorage.removeItem(STORAGE_KEYS.company);
+                            licenseScreen.style.display = 'flex';
+                            return;
+                        } else if (status.error === 'INVALID_KEY') {
+                            // Invalid key - clear and show gate
+                            this.clearLicenseData();
+                            licenseScreen.style.display = 'flex';
+                            document.getElementById('license-error').textContent = 'Invalid license key.';
+                            return;
                         }
+                        // Other errors fall through to offline check
                     }
                 } catch (error) {
-                    console.error('License check failed:', error);
-                    // Network error - try offline mode
-                    const company = localStorage.getItem(this.STORAGE_KEYS.company);
-                    if (company) {
-                        const offlineLicense = {
-                            tier: { name: 'Starter (Offline)' },
-                            daysRemaining: '?',
-                            isPerpetual: false,
-                            company: company
-                        };
-                        this.bootSystem(offlineLicense, false);
-                    } else {
-                        loadingScreen.style.display = 'none';
-                        licenseScreen.style.display = 'flex';
-                        document.getElementById('license-error').textContent = 'Connection error. Please check your internet and try again.';
-                    }
+                    console.log('Server check failed, trying offline mode:', error);
                 }
+
+                // Network error or other issue - try offline mode
+                const cachedLicense = this.getCachedLicense();
+                
+                if (cachedLicense && cachedLicense.success) {
+                    // Check if offline too long
+                    if (this.hasBeenOfflineTooLong()) {
+                        // Been offline too long - require online check
+                        licenseScreen.style.display = 'flex';
+                        document.getElementById('license-error').textContent = 'Please connect to the internet to verify your license.';
+                        return;
+                    }
+                    
+                    // Use cached license (offline mode)
+                    console.log('Using cached license (offline mode)');
+                    
+                    // Calculate simulated days remaining based on cache time
+                    const offlineLicense = {
+                        tier: { name: cachedLicense.tier_name },
+                        daysRemaining: cachedLicense.days_remaining,
+                        isPerpetual: cachedLicense.is_perpetual,
+                        company: cachedLicense.company
+                    };
+                    
+                    if (!offlineLicense.isPerpetual && offlineLicense.daysRemaining !== null) {
+                        const daysSinceCache = Math.floor((Date.now() - this.getLastOnlineCheck()) / (1000 * 60 * 60 * 24));
+                        offlineLicense.daysRemaining = Math.max(0, (offlineLicense.daysRemaining || 0) - daysSinceCache);
+                        
+                        // Check if would be expired now
+                        if (offlineLicense.daysRemaining <= 0) {
+                            this.clearLicenseData();
+                            licenseScreen.style.display = 'flex';
+                            document.getElementById('license-error').textContent = 'Your license has expired. Please connect to the internet.';
+                            return;
+                        }
+                    }
+                    
+                    // Add offline indicator
+                    offlineLicense.tier.name = cachedLicense.tier_name + ' (Offline)';
+                    this.bootSystem(offlineLicense, false);
+                    return;
+                }
+
+                // No cached license and no server connection - show gate
+                licenseScreen.style.display = 'flex';
+                document.getElementById('license-error').textContent = 'Please connect to the internet to activate your license.';
             },
 
             // Generate Device Fingerprint
@@ -1336,10 +1373,10 @@
             },
 
             getDeviceFingerprint: function() {
-                let fingerprint = localStorage.getItem(this.STORAGE_KEYS.fingerprint);
+                let fingerprint = localStorage.getItem(STORAGE_KEYS.fingerprint);
                 if (!fingerprint) {
                     fingerprint = this.generateDeviceFingerprint();
-                    localStorage.setItem(this.STORAGE_KEYS.fingerprint, fingerprint);
+                    localStorage.setItem(STORAGE_KEYS.fingerprint, fingerprint);
                 }
                 return fingerprint;
             },
@@ -1391,23 +1428,10 @@
                 }
             },
 
-            isLicenseValid: function() {
-                const savedKey = localStorage.getItem(this.STORAGE_KEYS.key);
-                
-                if (!savedKey) return null;
-                
-                // For now, return a basic object - real validation happens async
-                // This is just for initial UI state
-                return {
-                    key: savedKey,
-                    company: localStorage.getItem(this.STORAGE_KEYS.company) || 'Not specified'
-                };
-            },
-
             storeLicense: function(key, company) {
-                localStorage.setItem(this.STORAGE_KEYS.key, key);
+                localStorage.setItem(STORAGE_KEYS.key, key);
                 if (company) {
-                    localStorage.setItem(this.STORAGE_KEYS.company, company);
+                    localStorage.setItem(STORAGE_KEYS.company, company);
                 }
             },
 
@@ -1551,23 +1575,27 @@
                 if (!badge || !licenseInfo) return;
                 
                 if (licenseInfo.tier) {
-                    badge.textContent = licenseInfo.tier.name;
-                    
                     if (licenseInfo.isPerpetual) {
+                        // Perpetual license - just show tier name
+                        badge.textContent = licenseInfo.tier.name;
                         badge.classList.remove('expiring', 'expired');
-                    } else if (licenseInfo.daysRemaining !== null) {
+                    } else if (licenseInfo.daysRemaining !== null && licenseInfo.daysRemaining !== undefined) {
                         if (licenseInfo.daysRemaining <= 0) {
                             badge.textContent = 'Expired';
                             badge.classList.add('expired');
                             badge.classList.remove('expiring');
                         } else if (licenseInfo.daysRemaining <= 14) {
-                            badge.textContent = `${licenseInfo.tier.name} - ${licenseInfo.daysRemaining}d`;
+                            badge.textContent = `${licenseInfo.tier.name} - ${licenseInfo.daysRemaining} days`;
                             badge.classList.add('expiring');
                             badge.classList.remove('expired');
                         } else {
-                            badge.textContent = `${licenseInfo.tier.name} - ${licenseInfo.daysRemaining}d`;
+                            badge.textContent = `${licenseInfo.tier.name} - ${licenseInfo.daysRemaining} days`;
                             badge.classList.remove('expiring', 'expired');
                         }
+                    } else {
+                        // Unknown days - just show tier
+                        badge.textContent = licenseInfo.tier.name || 'Licensed';
+                        badge.classList.remove('expiring', 'expired');
                     }
                 }
             }
