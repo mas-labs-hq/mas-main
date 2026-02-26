@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeLedger | Professional Accounting & Business Training</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== SYSTEM VARIABLES ===== */
+        :root {
+            /* COLOR PALETTE - SOPHISTICATED & AUTHORITATIVE */
+            --navy-deep: #0A192F;
+            --navy-dark: #112240;
+            --navy-medium: #233554;
+            --navy-light: #3A506B;
+            --gold-primary: #D4AF37;
+            --gold-secondary: #FFD700;
+            --gold-accent: #F7EF8A;
+            --white-pure: #FFFFFF;
+            --white-off: #F8F9FA;
+            --gray-light: #E9ECEF;
+            --gray-medium: #6C757D;
+            --gray-dark: #343A40;
+            --success: #28A745;
+            
+            /* TYPOGRAPHY */
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            /* SPACING */
+            --section-padding: 120px 0;
+            --container-max: 1400px;
+            
+            /* EFFECTS */
+            --shadow-subtle: 0 4px 20px rgba(10, 25, 47, 0.05);
+            --shadow-medium: 0 8px 32px rgba(10, 25, 47, 0.08);
+            --shadow-elevated: 0 16px 48px rgba(10, 25, 47, 0.12);
+            --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-radius-sm: 8px;
+            --border-radius-md: 12px;
+            --border-radius-lg: 20px;
+            
+            /* GRADIENTS */
+            --gradient-gold: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            --gradient-navy: linear-gradient(135deg, var(--navy-dark), var(--navy-deep));
+            --gradient-overlay: linear-gradient(to bottom, rgba(10, 25, 47, 0.9), rgba(10, 25, 47, 0.7));
+        }
+
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-weight: 400;
+            line-height: 1.7;
+            color: var(--gray-dark);
+            background-color: var(--white-pure);
+            overflow-x: hidden;
+            font-size: 16px;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--navy-deep);
+            margin-bottom: 1.5rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: var(--gray-medium);
+        }
+
+        .container {
+            width: 100%;
+            max-width: var(--container-max);
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ===== LOADING SCREEN ===== */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--navy-deep);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loading-content {
+            text-align: center;
+            position: relative;
+        }
+
+        .loading-logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .logo-circle {
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-top: 3px solid var(--gold-primary);
+            border-right: 3px solid var(--gold-primary);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .logo-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+            font-family: var(--font-heading);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--white-pure);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            opacity: 0.9;
+        }
+
+        .loading-subtext {
+            color: var(--gold-accent);
+            font-size: 0.9rem;
+            margin-top: 30px;
+            opacity: 0.7;
+            letter-spacing: 1px;
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loading-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: var(--gradient-gold);
+            animation: loading 3.5s ease-in-out forwards;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* ===== BUTTON SYSTEM ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 36px;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            border: none;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--gradient-gold);
+            color: var(--navy-deep);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--navy-deep);
+            border: 2px solid var(--navy-medium);
+        }
+
+        .btn-secondary:hover {
+            background: var(--navy-deep);
+            color: var(--white-pure);
+            transform: translateY(-3px);
+            border-color: var(--navy-deep);
+        }
+
+        .btn-small {
+            padding: 12px 24px;
+            font-size: 0.9rem;
+        }
+
+        /* ===== HEADER - ARCHITECTURAL ELEGANCE ===== */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-subtle);
+            z-index: 1000;
+            padding: 20px 0;
+            transition: var(--transition-smooth);
+        }
+
+        .header-scrolled {
+            padding: 15px 0;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-gold);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--navy-deep);
+            font-weight: 700;
+            font-size: 1.3rem;
+            font-family: var(--font-heading);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text h1 {
+            font-size: 1.6rem;
+            margin-bottom: 0;
+            color: var(--navy-deep);
+            letter-spacing: 0.5px;
+        }
+
+        .logo-text span {
+            font-size: 0.8rem;
+            color: var(--gray-medium);
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 45px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--navy-medium);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            position: relative;
+            transition: var(--transition-smooth);
+            padding: 5px 0;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-gold);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-link:hover {
+            color: var(--navy-deep);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            margin-left: 20px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--navy-deep);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--white-off);
+            transition: var(--transition-smooth);
+        }
+
+        .mobile-menu-btn:hover {
+            background: var(--gray-light);
+        }
+
+        /* ===== HERO SECTION - IMMERSIVE ELEGANCE ===== */
+        .hero {
+            padding: 200px 0 150px;
+            background: var(--gradient-overlay), url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--white-pure);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+        }
+
+        .hero-container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            max-width: 750px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--white-pure);
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+
+        .hero-content p {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 2.5rem;
+            max-width: 650px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 60px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+            font-family: var(--font-heading);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+
+        /* ===== TRUST SIGNAL STRIP - MINIMAL ELEGANCE ===== */
+        .trust-strip {
+            background: var(--white-pure);
+            padding: 40px 0;
+            position: relative;
+            z-index: 10;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .trust-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .trust-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--white-off);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            transition: var(--transition-smooth);
+        }
+
+        .trust-item:hover .trust-icon {
+            background: var(--gradient-gold);
+            color: var(--navy-deep);
+            transform: rotateY(180deg);
+        }
+
+        .trust-text {
+            font-weight: 600;
+            color: var(--navy-dark);
+            line-height: 1.4;
+            font-size: 1rem;
+        }
+
+        /* ===== PROGRAMS SECTION - ARCHITECTURAL GRID ===== */
+        .programs {
+            padding: var(--section-padding);
+            background: var(--white-off);
+            position: relative;
+        }
+
+        .programs::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to bottom, var(--white-pure), transparent);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--gradient-gold);
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray-medium);
+            max-width: 700px;
+            margin: 2rem auto 0;
+        }
+
+        .programs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 40px;
+        }
+
+        .program-card {
+            background: var(--white-pure);
+            border-radius: var(--border-radius-md);
+            padding: 50px 40px;
+            box-shadow: var(--shadow-subtle);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--gray-light);
+        }
+
+        .program-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-gold);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+
+        .program-card:hover {
+            transform: translateY(-15px);
+            box-shadow: var(--shadow-elevated);
+            border-color: transparent;
+        }
+
+        .program-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .program-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--white-off);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-primary);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            transition: var(--transition-smooth);
+        }
+
+        .program-card:hover .program-icon {
+            background: var(--gradient-gold);
+            color: var(--navy-deep);
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .program-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            min-height: 60px;
+        }
+
+        .program-card p {
+            color: var(--gray-medium);
+            margin-bottom: 30px;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .program-duration {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--white-off);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--navy-medium);
+            margin-bottom: 30px;
+        }
+
+        /* ===== PATHWAY SECTION - VISUAL STORYTELLING ===== */
+        .pathway {
+            padding: var(--section-padding);
+            background: var(--white-pure);
+            position: relative;
+        }
+
+        .pathway::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--gray-light), transparent);
+        }
+
+        .pathway-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .pathway-visual {
+            position: relative;
+            margin: 80px auto;
+            max-width: 1000px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pathway-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: var(--white-pure);
+            border: 3px solid var(--gold-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--navy-deep);
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 3;
+            transition: var(--transition-smooth);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .pathway-step:hover .step-number {
+            background: var(--gradient-gold);
+            color: var(--navy-deep);
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .step-content {
+            text-align: center;
+            max-width: 220px;
+        }
+
+        .step-content h4 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            color: var(--navy-dark);
+        }
+
+        .step-content p {
+            font-size: 0.95rem;
+            color: var(--gray-medium);
+            margin-bottom: 0;
+            line-height: 1.6;
+        }
+
+        .pathway-line {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, var(--gold-primary), var(--navy-light), var(--gold-primary));
+            z-index: 1;
+        }
+
+        .pathway-line::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: 0;
+            width: 100%;
+            height: 9px;
+            background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.2), transparent);
+        }
+
+        /* ===== WHY CHOOSE US - AUTHORITY ARCHITECTURE ===== */
+        .why-choose {
+            padding: var(--section-padding);
+            background: var(--white-off);
+            position: relative;
+        }
+
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 50px;
+            margin-top: 80px;
+        }
+
+        .why-card {
+            background: var(--white-pure);
+            padding: 50px 40px;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-subtle);
+            transition: var(--transition-smooth);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .why-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-gold);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 1;
+        }
+
+        .why-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .why-card > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .why-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--white-off);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-primary);
+            font-size: 1.8rem;
+            margin: 0 auto 30px;
+            transition: var(--transition-smooth);
+        }
+
+        .why-card:hover .why-icon {
+            background: var(--gradient-gold);
+            color: var(--navy-deep);
+            transform: translateY(-10px);
+        }
+
+        .why-card h4 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--navy-dark);
+        }
+
+        .why-card p {
+            color: var(--gray-medium);
+            font-size: 1rem;
+            margin-bottom: 0;
+            line-height: 1.7;
+        }
+
+        /* ===== ENROLLMENT SECTION - CONVERSION TEMPLE ===== */
+        .enrollment {
+            padding: var(--section-padding);
+            background: var(--gradient-navy);
+            position: relative;
+            color: var(--white-pure);
+        }
+
+        .enrollment::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            mix-blend-mode: overlay;
+        }
+
+        .enrollment-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 100px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .enrollment-content h2 {
+            font-size: 2.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--white-pure);
+        }
+
+        .enrollment-content p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 2.5rem;
+        }
+
+        .enrollment-features {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .enrollment-feature {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-primary);
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .feature-text {
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.5;
+        }
+
+        .enrollment-form {
+            background: var(--white-pure);
+            padding: 50px 40px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-elevated);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enrollment-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-gold);
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            margin-bottom: 35px;
+            color: var(--navy-deep);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--navy-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius-sm);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            color: var(--gray-dark);
+            transition: var(--transition-smooth);
+            background: var(--white-off);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+            background: var(--white-pure);
+        }
+
+        .select-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%230A192F' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+            background-size: 16px;
+            padding-right: 50px;
+        }
+
+        .form-note {
+            font-size: 0.9rem;
+            color: var(--gray-medium);
+            margin-top: 25px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .whatsapp-option {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .whatsapp-option p {
+            font-size: 1rem;
+            color: var(--gray-medium);
+            margin-bottom: 20px;
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+            border: none;
+        }
+
+        .btn-whatsapp:hover {
+            background: #128C7E;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+        }
+
+        /* ===== FOOTER - ARCHITECTURAL ELEGANCE ===== */
+        footer {
+            background: var(--navy-deep);
+            color: var(--white-pure);
+            padding: 100px 0 50px;
+            position: relative;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--gold-primary), transparent);
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 70px;
+            margin-bottom: 80px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.3rem;
+            color: var(--white-pure);
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--gradient-gold);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-links a:hover {
+            color: var(--gold-primary);
+            padding-left: 10px;
+        }
+
+        .footer-links a i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .footer-logo .logo-icon {
+            width: 50px;
+            height: 50px;
+        }
+
+        .footer-logo h3 {
+            margin-bottom: 0;
+            font-size: 1.6rem;
+            padding-bottom: 0;
+        }
+
+        .footer-logo h3::after {
+            display: none;
+        }
+
+        .footer-about p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            background: var(--gradient-gold);
+            color: var(--navy-deep);
+            transform: translateY(-5px);
+        }
+
+        .footer-bottom {
+            padding-top: 50px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .footer-bottom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: var(--gradient-gold);
+        }
+
+        .powered-by {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .powered-by:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--gold-primary);
+            transform: translateY(-3px);
+        }
+
+        .powered-by i {
+            color: var(--gold-primary);
+        }
+
+        /* ===== FLOATING WHATSAPP - FUNCTIONAL ART ===== */
+        .floating-whatsapp {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 70px;
+            height: 70px;
+            background: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.4);
+            z-index: 999;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 8px 30px rgba(37, 211, 102, 0.4); }
+            50% { box-shadow: 0 8px 40px rgba(37, 211, 102, 0.6); }
+            100% { box-shadow: 0 8px 30px rgba(37, 211, 102, 0.4); }
+        }
+
+        .floating-whatsapp:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 12px 40px rgba(37, 211, 102, 0.6);
+        }
+
+        .whatsapp-tooltip {
+            position: absolute;
+            right: 80px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--navy-deep);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .floating-whatsapp:hover .whatsapp-tooltip {
+            opacity: 1;
+        }
+
+        /* ===== RESPONSIVE DESIGN - MOBILE PERFECTION ===== */
+        @media (max-width: 1200px) {
+            .hero-content h1 {
+                font-size: 3.2rem;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+            }
+            
+            .trust-container {
+                gap: 30px;
+            }
+            
+            .enrollment-container {
+                gap: 70px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero-container {
+                text-align: center;
+            }
+            
+            .hero-content h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero-content p {
+                font-size: 1.2rem;
+            }
+            
+            .trust-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .programs-grid {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            }
+            
+            .enrollment-container {
+                grid-template-columns: 1fr;
+                gap: 80px;
+            }
+            
+            .pathway-visual {
+                flex-direction: column;
+                height: auto;
+                gap: 80px;
+            }
+            
+            .pathway-line {
+                display: none;
+            }
+            
+            .footer-container {
+                gap: 50px;
+            }
+            
+            .nav-menu {
+                position: fixed;
+                top: 90px;
+                left: 0;
+                right: 0;
+                background: var(--white-pure);
+                flex-direction: column;
+                padding: 40px 30px;
+                box-shadow: var(--shadow-elevated);
+                gap: 30px;
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: var(--transition-smooth);
+                z-index: 999;
+                border-top: 1px solid var(--gray-light);
+            }
+            
+            .nav-menu.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-cta {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --section-padding: 100px 0;
+            }
+            
+            .hero {
+                padding: 180px 0 120px;
+                background-attachment: scroll;
+            }
+            
+            .hero-content h1 {
+                font-size: 2.4rem;
+            }
+            
+            .hero-content p {
+                font-size: 1.1rem;
+            }
+            
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero-stats {
+                justify-content: center;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .programs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .trust-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .why-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .enrollment-form {
+                padding: 40px 30px;
+            }
+            
+            .floating-whatsapp {
+                bottom: 30px;
+                right: 30px;
+                width: 60px;
+                height: 60px;
+                font-size: 1.8rem;
+            }
+            
+            .footer-container {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .program-card {
+                padding: 40px 30px;
+            }
+            
+            .enrollment-form {
+                padding: 35px 25px;
+            }
+            
+            .form-control {
+                padding: 14px 16px;
+            }
+            
+            .floating-whatsapp {
+                bottom: 20px;
+                right: 20px;
+                width: 55px;
+                height: 55px;
+                font-size: 1.6rem;
+            }
+            
+            .loading-logo {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .loading-text {
+                font-size: 1rem;
+            }
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .text-center { text-align: center; }
+        .text-gold { color: var(--gold-primary); }
+        .text-navy { color: var(--navy-deep); }
+        .mb-0 { margin-bottom: 0; }
+        .mt-40 { margin-top: 40px; }
+        .mt-60 { margin-top: 60px; }
+    </style>
+</head>
+<body>
+    <!-- ===== LOADING SCREEN ===== -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <div class="logo-circle"></div>
+                <div class="logo-inner">PL</div>
+            </div>
+            <div class="loading-text">PRIME LEDGER</div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <div class="loading-subtext">Powered By MortApps Studios</div>
+        </div>
+    </div>
+
+    <!-- ===== HEADER ===== -->
+    <header id="main-header">
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <div class="logo-icon">PL</div>
+                <div class="logo-text">
+                    <h1>PrimeLedger</h1>
+                    <span>Professional Training Hub</span>
+                </div>
+            </a>
+            
+            <nav class="nav-menu" id="navMenu">
+                <a href="#programs" class="nav-link">Programs</a>
+                <a href="#pathway" class="nav-link">Pathways</a>
+                <a href="#why" class="nav-link">Why Choose Us</a>
+                <a href="#enrollment" class="nav-link">Enrollment</a>
+                <div class="nav-cta">
+                    <a href="#enrollment" class="btn btn-primary btn-small">Apply Now</a>
+                </div>
+            </nav>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="hero" id="home">
+        <div class="container hero-container">
+            <div class="hero-content">
+                <h1>Professional Accounting & Business Skills, Built for Real Careers</h1>
+                <p>Structured short courses and certification pathways designed for students and working professionals seeking practical, market-relevant skills.</p>
+                <div class="hero-actions">
+                    <a href="#enrollment" class="btn btn-primary">Apply / Enquire Now</a>
+                    <a href="#programs" class="btn btn-secondary">View Our Programs</a>
+                </div>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">98%</div>
+                        <div class="stat-label">Practical Skills Focus</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Learning Support</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Career-Focused</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TRUST SIGNAL STRIP ===== -->
+    <section class="trust-strip">
+        <div class="container trust-container">
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div class="trust-text">Industry-aligned curriculum</div>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <i class="fas fa-hands"></i>
+                </div>
+                <div class="trust-text">Practical, hands-on training</div>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="trust-text">Flexible learning schedules</div>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="trust-text">Career-focused outcomes</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PROGRAMS SECTION ===== -->
+    <section class="programs" id="programs">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Our Training Programs</h2>
+                <p class="section-subtitle">Choose from focused short courses or structured professional pathways tailored to today's business and accounting environment.</p>
+            </div>
+            
+            <div class="programs-grid">
+                <div class="program-card">
+                    <div class="program-icon">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <h3>Advanced Excel for Business & Finance</h3>
+                    <p>Master financial modeling, reporting, and data analysis used in real workplaces. Build skills that directly translate to workplace productivity and decision-making.</p>
+                    <div class="program-duration">
+                        <i class="far fa-clock"></i>
+                        <span>4-6 Weeks Intensive</span>
+                    </div>
+                    <a href="#enrollment" class="btn btn-secondary btn-small">View Details & Enroll</a>
+                </div>
+                
+                <div class="program-card">
+                    <div class="program-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3>QuickBooks Accounting Systems</h3>
+                    <p>Gain practical experience managing accounts, transactions, and financial reports. Learn the software used by small and medium businesses for efficient financial management.</p>
+                    <div class="program-duration">
+                        <i class="far fa-clock"></i>
+                        <span>6 Weeks Mastery</span>
+                    </div>
+                    <a href="#enrollment" class="btn btn-secondary btn-small">View Details & Enroll</a>
+                </div>
+                
+                <div class="program-card">
+                    <div class="program-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3>Sage & Tally Accounting Software</h3>
+                    <p>Learn industry-standard accounting tools used by firms and institutions. Develop proficiency in enterprise accounting systems that power modern businesses.</p>
+                    <div class="program-duration">
+                        <i class="far fa-clock"></i>
+                        <span>8 Weeks Comprehensive</span>
+                    </div>
+                    <a href="#enrollment" class="btn btn-secondary btn-small">View Details & Enroll</a>
+                </div>
+                
+                <div class="program-card">
+                    <div class="program-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3>Tax Compliance & iTax Training</h3>
+                    <p>Understand taxation processes, compliance, and filing procedures. Master the Kenya Revenue Authority's iTax platform for seamless tax management.</p>
+                    <div class="program-duration">
+                        <i class="far fa-clock"></i>
+                        <span>5 Weeks Specialized</span>
+                    </div>
+                    <a href="#enrollment" class="btn btn-secondary btn-small">View Details & Enroll</a>
+                </div>
+                
+                <div class="program-card">
+                    <div class="program-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Professional Accounting Pathways</h3>
+                    <p>Structured progression for learners aiming to advance into higher professional certification. Build a comprehensive accounting foundation for career growth.</p>
+                    <div class="program-duration">
+                        <i class="far fa-clock"></i>
+                        <span>12-24 Weeks Pathway</span>
+                    </div>
+                    <a href="#enrollment" class="btn btn-secondary btn-small">View Details & Enroll</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PATHWAY SECTION ===== -->
+    <section class="pathway" id="pathway">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Clear Learning Pathways</h2>
+                <p class="section-subtitle">We believe in structured progression. Our programs are designed to guide learners step-by-step—building confidence, competence, and career readiness.</p>
+            </div>
+            
+            <div class="pathway-content">
+                <div class="pathway-visual">
+                    <div class="pathway-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Start with foundational skills</h4>
+                            <p>Build core competencies in accounting principles and software applications through hands-on exercises.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pathway-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Advance into professional certification</h4>
+                            <p>Progress to specialized training and industry-recognized certification paths that validate your expertise.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pathway-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Apply knowledge in real-world scenarios</h4>
+                            <p>Implement learned skills through practical projects, case studies, and simulated business environments.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pathway-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Strengthen employability and credibility</h4>
+                            <p>Develop portfolio, interview skills, and professional networks for sustainable career advancement.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pathway-line"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== WHY CHOOSE US ===== -->
+    <section class="why-choose" id="why">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Why Train With Us</h2>
+                <p class="section-subtitle">Our approach is designed to deliver measurable results through structured, practical learning experiences that translate directly to career advancement.</p>
+            </div>
+            
+            <div class="why-grid">
+                <div class="why-card">
+                    <div class="why-icon">
+                        <i class="fas fa-sitemap"></i>
+                    </div>
+                    <h4>Structured, Well-Defined Course Delivery</h4>
+                    <p>Clear learning objectives, organized modules, and measurable outcomes for every program, ensuring systematic progression.</p>
+                </div>
+                
+                <div class="why-card">
+                    <div class="why-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h4>Practical, Skills-Based Learning Approach</h4>
+                    <p>Hands-on exercises, real-world projects, and application-focused assessments that build immediately usable skills.</p>
+                </div>
+                
+                <div class="why-card">
+                    <div class="why-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h4>Experienced Instructors with Industry Insight</h4>
+                    <p>Learn from professionals who understand current market demands and workplace requirements, bringing real-world context.</p>
+                </div>
+                
+                <div class="why-card">
+                    <div class="why-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h4>Flexible Schedules for Working Learners</h4>
+                    <p>Evening, weekend, and online options designed to accommodate professional commitments without compromising quality.</p>
+                </div>
+                
+                <div class="why-card">
+                    <div class="why-icon">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <h4>Supportive and Professional Learning Environment</h4>
+                    <p>Dedicated support, clear communication channels, and constructive feedback throughout your learning journey.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== ENROLLMENT SECTION ===== -->
+    <section class="enrollment" id="enrollment">
+        <div class="container">
+            <div class="enrollment-container">
+                <div class="enrollment-content">
+                    <h2>Ready to Take the Next Step?</h2>
+                    <p>Speak with our admissions team to identify the right program for your goals and schedule. We'll help you choose the pathway that aligns with your career objectives.</p>
+                    
+                    <div class="enrollment-features">
+                        <div class="enrollment-feature">
+                            <div class="feature-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="feature-text">Personalized guidance based on your background and career goals</div>
+                        </div>
+                        
+                        <div class="enrollment-feature">
+                            <div class="feature-icon">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <div class="feature-text">Clear information about course requirements, outcomes, and investment</div>
+                        </div>
+                        
+                        <div class="enrollment-feature">
+                            <div class="feature-icon">
+                                <i class="fas fa-user-clock"></i>
+                            </div>
+                            <div class="feature-text">Flexible scheduling options to fit your professional and personal life</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="enrollment-form">
+                    <h3 class="form-title">Request Admission Guidance</h3>
+                    <form id="enrollmentForm">
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phoneNumber">Phone Number</label>
+                            <input type="tel" id="phoneNumber" class="form-control" placeholder="0719 525 000" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="courseInterest">Course of Interest</label>
+                            <select id="courseInterest" class="form-control select-control" required>
+                                <option value="">Select a course</option>
+                                <option value="excel">Advanced Excel for Business & Finance</option>
+                                <option value="quickbooks">QuickBooks Accounting Systems</option>
+                                <option value="sage">Sage & Tally Accounting Software</option>
+                                <option value="tax">Tax Compliance & iTax Training</option>
+                                <option value="pathway">Professional Accounting Pathways</option>
+                                <option value="unsure">Not sure - need guidance</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="studyTime">Preferred Study Time</label>
+                            <select id="studyTime" class="form-control select-control" required>
+                                <option value="">Select preferred time</option>
+                                <option value="weekday">Weekday Mornings (9AM - 1PM)</option>
+                                <option value="evening">Weekday Evenings (6PM - 9PM)</option>
+                                <option value="weekend">Weekends (9AM - 4PM)</option>
+                                <option value="flexible">Flexible / Online Learning</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-paper-plane"></i> Submit Enquiry
+                        </button>
+                        
+                        <p class="form-note">We respond during working hours (8AM - 6PM). You'll hear from our admissions team within 24 hours.</p>
+                    </form>
+                    
+                    <div class="whatsapp-option">
+                        <p>Prefer to chat immediately?<br>Connect with Admissions on WhatsApp</p>
+                        <a href="https://wa.me/254719525000" class="btn btn-whatsapp" style="width: 100%;">
+                            <i class="fab fa-whatsapp"></i> WhatsApp Admissions
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-column">
+                    <div class="footer-logo">
+                        <div class="logo-icon">PL</div>
+                        <h3>PrimeLedger</h3>
+                    </div>
+                    <div class="footer-about">
+                        <p>Professional training programs designed to equip learners with practical, career-ready skills in accounting, business, and financial systems. We bridge the gap between academic knowledge and workplace requirements.</p>
+                    </div>
+                    
+                    <div class="footer-social">
+                        <a href="#" class="social-link">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Training Programs</h3>
+                    <ul class="footer-links">
+                        <li><a href="#programs"><i class="fas fa-chevron-right"></i> Advanced Excel Training</a></li>
+                        <li><a href="#programs"><i class="fas fa-chevron-right"></i> QuickBooks Certification</a></li>
+                        <li><a href="#programs"><i class="fas fa-chevron-right"></i> Sage & Tally Training</a></li>
+                        <li><a href="#programs"><i class="fas fa-chevron-right"></i> Tax Compliance Courses</a></li>
+                        <li><a href="#programs"><i class="fas fa-chevron-right"></i> Professional Pathways</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="#programs"><i class="fas fa-chevron-right"></i> Programs</a></li>
+                        <li><a href="#pathway"><i class="fas fa-chevron-right"></i> Learning Pathways</a></li>
+                        <li><a href="#why"><i class="fas fa-chevron-right"></i> Why Choose Us</a></li>
+                        <li><a href="#enrollment"><i class="fas fa-chevron-right"></i> Enrollment</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Information</h3>
+                    <ul class="footer-links">
+                        <li><a href="tel:+254719525000"><i class="fas fa-phone"></i> +254 719 525 000</a></li>
+                        <li><a href="https://wa.me/254719525000"><i class="fab fa-whatsapp"></i> +254 719 525 000</a></li>
+                        <li><a href="mailto:admissions@primeledger.co.ke"><i class="fas fa-envelope"></i> admissions@primeledger.co.ke</a></li>
+                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</a></li>
+                        <li><a href="#"><i class="fas fa-clock"></i> Mon-Fri: 8AM-6PM | Sat: 9AM-1PM</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 PrimeLedger Professional Training Hub. All rights reserved.</p>
+                <a href="https://mortappsstudios.com" target="_blank" class="powered-by">
+                    <i class="fas fa-code"></i>
+                    <span>Powered By MortApps Studios</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== FLOATING WHATSAPP ===== -->
+    <a href="https://wa.me/254719525000" class="floating-whatsapp">
+        <i class="fab fa-whatsapp"></i>
+        <div class="whatsapp-tooltip">Chat with Admissions</div>
+    </a>
+
+    <script>
+        // ===== LOADING SCREEN =====
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loading-screen');
+                loadingScreen.style.opacity = '0';
+                loadingScreen.style.visibility = 'hidden';
+                
+                // Show header animation
+                const header = document.getElementById('main-header');
+                header.style.opacity = '0';
+                header.style.transform = 'translateY(-20px)';
+                
+                setTimeout(function() {
+                    header.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                    header.style.opacity = '1';
+                    header.style.transform = 'translateY(0)';
+                }, 100);
+                
+            }, 3500); // 3.5 second loading screen
+        });
+
+        // ===== DOM ELEMENTS =====
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.getElementById('navMenu');
+        const enrollmentForm = document.getElementById('enrollmentForm');
+        const header = document.getElementById('main-header');
+
+        // ===== INITIALIZE SYSTEM =====
+        function init() {
+            setupEventListeners();
+            setupAnimations();
+            setupSmoothScrolling();
+        }
+
+        // ===== EVENT LISTENERS =====
+        function setupEventListeners() {
+            // Mobile menu toggle
+            mobileMenuBtn.addEventListener('click', function() {
+                navMenu.classList.toggle('active');
+                this.innerHTML = navMenu.classList.contains('active') 
+                    ? '<i class="fas fa-times"></i>' 
+                    : '<i class="fas fa-bars"></i>';
+            });
+            
+            // Close mobile menu when clicking on a link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function() {
+                    navMenu.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                });
+            });
+            
+            // Enrollment form submission
+            enrollmentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form data
+                const fullName = document.getElementById('fullName').value;
+                const phoneNumber = document.getElementById('phoneNumber').value;
+                const courseInterestSelect = document.getElementById('courseInterest');
+                const studyTimeSelect = document.getElementById('studyTime');
+                
+                const courseInterest = courseInterestSelect.options[courseInterestSelect.selectedIndex].text;
+                const studyTime = studyTimeSelect.options[studyTimeSelect.selectedIndex].text;
+                
+                // Create structured WhatsApp message
+                let whatsappMessage = `*NEW ENROLLMENT INQUIRY - PRIMELEDGER*\n\n`;
+                whatsappMessage += `👤 *Name:* ${fullName}\n`;
+                whatsappMessage += `📱 *Phone:* ${phoneNumber}\n`;
+                whatsappMessage += `📚 *Course Interest:* ${courseInterest}\n`;
+                whatsappMessage += `⏰ *Preferred Study Time:* ${studyTime}\n\n`;
+                whatsappMessage += `📍 *Submitted via PrimeLedger Website*\n`;
+                whatsappMessage += `🕒 *Timestamp:* ${new Date().toLocaleString()}`;
+                
+                // Encode message for WhatsApp URL
+                const encodedMessage = encodeURIComponent(whatsappMessage);
+                
+                // Open WhatsApp with pre-filled message
+                window.open(`https://wa.me/254719525000?text=${encodedMessage}`, '_blank');
+                
+                // Reset form
+                enrollmentForm.reset();
+                
+                // Show success message
+                setTimeout(function() {
+                    alert('✅ Inquiry submitted successfully!\n\nWe have opened WhatsApp for you to send your details to our admissions team. They will contact you within 24 hours during working hours.');
+                }, 300);
+            });
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!navMenu.contains(e.target) && !mobileMenuBtn.contains(e.target) && navMenu.classList.contains('active')) {
+                    navMenu.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            });
+        }
+
+        // ===== ANIMATIONS =====
+        function setupAnimations() {
+            // Header scroll effect
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 100) {
+                    header.classList.add('header-scrolled');
+                } else {
+                    header.classList.remove('header-scrolled');
+                }
+                
+                // Animate elements on scroll
+                animateOnScroll();
+            });
+            
+            // Initial animation trigger
+            setTimeout(animateOnScroll, 500);
+        }
+
+        // ===== SMOOTH SCROLLING =====
+        function setupSmoothScrolling() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    
+                    if (href === '#home') {
+                        e.preventDefault();
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                        return;
+                    }
+                    
+                    if (href === '#') return;
+                    
+                    e.preventDefault();
+                    
+                    const targetElement = document.querySelector(href);
+                    if (targetElement) {
+                        const headerOffset = 90;
+                        const elementPosition = targetElement.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        }
+
+        // ===== SCROLL ANIMATIONS =====
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('.program-card, .why-card, .trust-item, .step');
+            
+            elements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.2;
+                
+                if (elementPosition < screenPosition) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        }
+
+        // Set initial animation states
+        document.querySelectorAll('.program-card, .why-card, .trust-item, .step').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        });
+
+        // ===== MOBILE TOUCH OPTIMIZATIONS =====
+        document.addEventListener('touchstart', function() {}, {passive: true});
+        
+        // Prevent zoom on double-tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // ===== INITIALIZE =====
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
