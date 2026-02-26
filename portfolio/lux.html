@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="en" itemscope itemtype="https://schema.org/RealEstateAgent">
+<head>
+    <!-- ============================================
+         MORTAPPS STUDIOS 2026 - ELITE REAL ESTATE
+         PREMIUM PROPERTY PORTFOLIO | NAIROBI KENYA
+         ============================================ -->
+    <meta name="generator" content="MortApps Studios 2026 | Luxury Real Estate Solutions">
+    <meta name="author" content="MortApps Studios | Nairobi, Kenya">
+    <meta name="copyright" content="© 2026 MortApps Studios. Premium real estate web design.">
+    <meta name="web_author" content="https://mortappsstudios.com">
+    <link rel="author" href="https://mortappsstudios.com">
+    
+    <!-- Primary Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxuria Estate Group | Elite Real Estate Nairobi Kenya</title>
+    <meta name="description" content="Luxuria Estate Group - Curating Kenya's most exclusive properties. Premium villas, luxury apartments, and elite estates in Nairobi, Karen, Runda & Muthaiga.">
+    
+    <!-- Performance Optimizations -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* 
+        ============================================
+        LUXURIA ESTATE GROUP - ELITE REAL ESTATE
+        MortApps Studios 2026 Black & Gold Edition
+        ============================================
+        */
+        
+        :root {
+            /* Elite Black & Gold Palette */
+            --primary-black: #000000;
+            --secondary-black: #1A1A1A;
+            --accent-gold: #D4AF37;
+            --accent-gold-light: #E6C158;
+            --accent-gold-dark: #B8941F;
+            --pure-white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --text-dark: #1A1A1A;
+            --text-light: #666666;
+            
+            /* Performance Design System */
+            --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.15);
+            --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-radius: 8px;
+            --border-radius-lg: 16px;
+        }
+
+        /* CRITICAL: Performance First */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            background-color: var(--pure-white);
+            overflow-x: hidden;
+            transform: translate3d(0, 0, 0);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--text-dark);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .section-padding {
+            padding: 100px 0;
+        }
+
+        /* ===== ELITE HEADER ===== */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            z-index: 1000;
+            transition: var(--transition);
+            transform: translate3d(0, 0, 0);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-black);
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            color: var(--pure-white);
+            line-height: 1;
+            letter-spacing: 1px;
+        }
+
+        .logo-text span {
+            font-size: 0.7rem;
+            color: var(--accent-gold);
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--pure-white);
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 1rem;
+            position: relative;
+            transition: var(--transition);
+            letter-spacing: 0.5px;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-gold);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: var(--accent-gold);
+            transition: var(--transition);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: var(--accent-gold);
+            color: var(--primary-black);
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            letter-spacing: 0.5px;
+            font-size: 0.95rem;
+        }
+
+        .nav-cta:hover {
+            background: var(--accent-gold-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--pure-white);
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        /* ===== LUXURY HERO ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)),
+                        url('https://cdn.i-scmp.com/sites/default/files/styles/1020x680/public/d8/images/methode/2020/11/27/51bece82-1a60-11eb-8f67-a484f6db61a1_image_hires_091308.jpg?itok=MuZQM5KO&v=1606439625');
+            background-size: cover;
+            background-position: center;
+            color: var(--pure-white);
+            padding: 140px 0 80px;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid var(--accent-gold);
+            padding: 12px 25px;
+            border-radius: 50px;
+            margin-bottom: 40px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            backdrop-filter: blur(5px);
+        }
+
+        .hero-badge i {
+            color: var(--accent-gold);
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            margin-bottom: 25px;
+            line-height: 1.1;
+            color: var(--pure-white);
+        }
+
+        .hero-title span {
+            color: var(--accent-gold);
+            display: block;
+            font-style: italic;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 50px;
+            opacity: 0.9;
+            max-width: 600px;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 36px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transform: translate3d(0, 0, 0);
+            will-change: transform;
+        }
+
+        .btn-primary {
+            background: var(--accent-gold);
+            color: var(--primary-black);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-gold-light);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--pure-white);
+            border: 1px solid var(--accent-gold);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateY(-3px);
+        }
+
+        /* ===== ELITE PROPERTIES ===== */
+        .properties {
+            background-color: var(--pure-white);
+            position: relative;
+        }
+
+        .properties::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-title {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 2px;
+            background: var(--accent-gold);
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        /* Property Filter */
+        .property-filter {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid var(--text-light);
+            padding: 10px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--accent-gold);
+            color: var(--primary-black);
+            border-color: var(--accent-gold);
+        }
+
+        /* Property Cards */
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 30px;
+            transform: translate3d(0, 0, 0);
+        }
+
+        .property-card {
+            background: var(--pure-white);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            contain: content;
+            will-change: transform;
+        }
+
+        .property-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-float);
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .property-image {
+            height: 350px;
+            overflow: hidden;
+            position: relative;
+            background: var(--light-gray);
+        }
+
+        .property-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+            transform: translate3d(0, 0, 0);
+        }
+
+        .property-card:hover .property-image img {
+            transform: scale(1.05);
+        }
+
+        .property-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--accent-gold);
+            color: var(--primary-black);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 2;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .property-price {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--accent-gold);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            z-index: 2;
+            backdrop-filter: blur(5px);
+        }
+
+        .property-content {
+            padding: 30px;
+        }
+
+        .property-content h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .property-location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .property-location i {
+            font-size: 1rem;
+        }
+
+        .property-features {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature i {
+            color: var(--accent-gold);
+            font-size: 1.1rem;
+        }
+
+        .feature span {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .property-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--primary-black);
+            color: var(--pure-white);
+            padding: 12px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            width: 100%;
+            justify-content: center;
+            text-align: center;
+            transform: translate3d(0, 0, 0);
+            will-change: transform;
+        }
+
+        .property-cta:hover {
+            background: var(--accent-gold);
+            color: var(--primary-black);
+            transform: translateY(-2px);
+        }
+
+        /* ===== LUXURY GALLERY ===== */
+        .gallery {
+            background-color: var(--light-gray);
+            position: relative;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            height: 300px;
+            cursor: pointer;
+            transition: var(--transition);
+            transform: translate3d(0, 0, 0);
+            will-change: transform;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-float);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 30px 20px 20px;
+            color: white;
+            transform: translateY(5px);
+            transition: var(--transition);
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            transform: translateY(0);
+        }
+
+        .gallery-overlay h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            color: var(--pure-white);
+        }
+
+        .gallery-overlay p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* ===== ELITE SERVICES ===== */
+        .services {
+            background-color: var(--pure-white);
+            position: relative;
+        }
+
+        .services::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .service-card {
+            text-align: center;
+            padding: 40px 30px;
+            background: var(--pure-white);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            position: relative;
+            will-change: transform;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-gold);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-black);
+            font-size: 1.8rem;
+            margin: 0 auto 25px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .service-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .service-card p {
+            color: var(--text-light);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* ===== CONTACT ELEGANCE ===== */
+        .contact {
+            background: linear-gradient(135deg, var(--primary-black), var(--secondary-black));
+            color: var(--pure-white);
+            position: relative;
+        }
+
+        .contact .section-title {
+            color: var(--pure-white);
+        }
+
+        .contact .section-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .contact-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 50px;
+            margin-top: 60px;
+        }
+
+        .contact-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--pure-white);
+        }
+
+        .contact-details {
+            margin-bottom: 40px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .contact-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(212, 175, 55, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-gold);
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .contact-text h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: var(--pure-white);
+        }
+
+        .contact-text p,
+        .contact-text a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .contact-text a:hover {
+            color: var(--accent-gold);
+        }
+
+        /* ===== ELITE FOOTER ===== */
+        footer {
+            background-color: var(--primary-black);
+            color: var(--pure-white);
+            padding: 80px 0 40px;
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 50px;
+            margin-bottom: 60px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            color: var(--pure-white);
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--accent-gold);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-gold);
+            padding-left: 5px;
+        }
+
+        .footer-about p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .footer-logo .logo-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+        }
+
+        .footer-logo h3 {
+            font-size: 1.6rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .footer-logo h3::after {
+            display: none;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            background: var(--accent-gold);
+            color: var(--primary-black);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .powered-by {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 10px 22px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50px;
+            transition: var(--transition);
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .powered-by:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent-gold);
+            border-color: rgba(212, 175, 55, 0.2);
+        }
+
+        .powered-by i {
+            color: var(--accent-gold);
+        }
+
+        /* ===== FLOATING WHATSAPP ===== */
+        .floating-whatsapp {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            background: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+            z-index: 999;
+            transition: var(--transition);
+            text-decoration: none;
+            transform: translate3d(0, 0, 0);
+            will-change: transform;
+        }
+
+        .floating-whatsapp:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(37, 211, 102, 0.4);
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1200px) {
+            .container {
+                padding: 0 30px;
+            }
+            
+            .hero-title {
+                font-size: 3.5rem;
+            }
+            
+            .section-title {
+                font-size: 3rem;
+            }
+            
+            .properties-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+            
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .nav-menu {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.98);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                justify-content: center;
+                padding: 80px 30px 30px;
+                gap: 25px;
+                z-index: 1001;
+                transform: translateY(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .nav-menu.active {
+                display: flex;
+                transform: translateY(0);
+            }
+            
+            .nav-menu .nav-link {
+                font-size: 1.2rem;
+                padding: 15px 20px;
+                width: 100%;
+                text-align: center;
+                border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+            }
+            
+            .nav-menu .nav-cta {
+                margin-top: 20px;
+                justify-content: center;
+                font-size: 1.1rem;
+                padding: 15px 30px;
+                width: 100%;
+                max-width: 300px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .mobile-menu-btn.active i {
+                transform: rotate(90deg);
+            }
+            
+            .hero-title {
+                font-size: 3rem;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+            }
+            
+            .properties-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+            
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            
+            .services-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+            
+            .hero-cta {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .section-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .hero-cta {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .properties-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .property-filter {
+                gap: 10px;
+            }
+            
+            .filter-btn {
+                padding: 8px 20px;
+                font-size: 0.85rem;
+            }
+            
+            .floating-whatsapp {
+                bottom: 20px;
+                right: 20px;
+                width: 55px;
+                height: 55px;
+                font-size: 1.8rem;
+            }
+            
+            .section-padding {
+                padding: 80px 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 20px;
+            }
+            
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .property-content {
+                padding: 20px;
+            }
+            
+            .property-price {
+                font-size: 1rem;
+                padding: 6px 15px;
+            }
+            
+            .gallery-item {
+                height: 250px;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .floating-whatsapp {
+                bottom: 15px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.6rem;
+            }
+        }
+
+        /* Accessibility */
+        *:focus {
+            outline: 2px solid var(--accent-gold);
+            outline-offset: 2px;
+        }
+
+        /* Scrollbar styling */
+        body::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: var(--light-gray);
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary-black), var(--accent-gold));
+            border-radius: 5px;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--secondary-black), var(--accent-gold-light));
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header itemscope itemtype="https://schema.org/RealEstateAgent">
+        <div class="container nav-container">
+            <a href="#home" class="logo" itemprop="url">
+                <div class="logo-icon" itemprop="logo">L</div>
+                <div class="logo-text">
+                    <h1 itemprop="name">Luxuria Estate</h1>
+                    <span itemprop="description">Group | Nairobi</span>
+                </div>
+            </a>
+            
+            <nav class="nav-menu" id="navMenu">
+                <a href="#home" class="nav-link" itemprop="mainEntityOfPage">Home</a>
+                <a href="#properties" class="nav-link">Properties</a>
+                <a href="#gallery" class="nav-link">Gallery</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#contact" class="nav-link">Contact</a>
+                <a href="https://wa.me/254987654321" class="nav-cta" itemprop="telephone">
+                    <i class="fab fa-whatsapp"></i> Enquire Now
+                </a>
+            </nav>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-crown"></i>
+                    <span>Exclusive Real Estate</span>
+                </div>
+                <h1 class="hero-title">Curating Kenya's <span>Most Elite Properties</span></h1>
+                <p class="hero-subtitle">
+                    Luxuria Estate Group represents the pinnacle of luxury real estate in Nairobi. Discover exclusive villas, premium apartments, and elite estates curated for discerning clients.
+                </p>
+                <div class="hero-cta">
+                    <a href="#properties" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> View Properties
+                    </a>
+                    <a href="https://wa.me/254987654321" class="btn btn-secondary">
+                        <i class="fab fa-whatsapp"></i> Schedule Viewing
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Properties Section -->
+    <section class="properties section-padding" id="properties">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Elite Properties</h2>
+                <p class="section-subtitle">
+                    Our curated selection of premium properties in Nairobi's most exclusive neighborhoods.
+                </p>
+            </div>
+            
+            <div class="property-filter">
+                <button class="filter-btn active" data-filter="all">All Properties</button>
+                <button class="filter-btn" data-filter="villa">Villas</button>
+                <button class="filter-btn" data-filter="apartment">Apartments</button>
+                <button class="filter-btn" data-filter="estate">Estates</button>
+                <button class="filter-btn" data-filter="commercial">Commercial</button>
+            </div>
+            
+            <div class="properties-grid" id="propertiesContainer">
+                <!-- Properties loaded by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery section-padding" id="gallery">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Luxury Gallery</h2>
+                <p class="section-subtitle">
+                    A visual journey through our most exquisite properties and developments.
+                </p>
+            </div>
+            
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Karen Luxury Villa" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h3>Karen Villa</h3>
+                        <p>Exclusive 5-bedroom masterpiece</p>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="https://images.pexels.com/photos/29511872/pexels-photo-29511872.jpeg" alt="Runda Mansion" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h3>Runda Estate</h3>
+                        <p>7-bedroom architectural marvel</p>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="https://images.pexels.com/photos/30599842/pexels-photo-30599842.jpeg" alt="Muthaiga Residence" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h3>Muthaiga Home</h3>
+                        <p>Historic 6-bedroom residence</p>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="https://88nairobi.com/wp-content/uploads/88-Nairobi-Residence-Penthouse-bedroom-8.jpg" alt="Westlands Penthouse" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h3>Westlands Penthouse</h3>
+                        <p>360° city views, 4 bedrooms</p>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="https://d21tw07c6rnmp0.cloudfront.net/media/uploads/709/agents/2025/12/709_68b4a867bd534748b85b0ba094859e4e_t_w_1440_h_900.jpg" alt="Garden Estate" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h3>Garden Estate</h3>
+                        <p>2-acre landscaped paradise</p>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="https://images.nanawall.com/blog/2025-03/Pool_Houses_NanaAwards_Blog_Image_1.jpg?auto=format&sharp=20&fit=auto&w=2212&h=1475" alt="Pool & Entertainment" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h3>Entertainment Area</h3>
+                        <p>Olympic-sized pool & cabana</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services section-padding" id="services">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Elite Services</h2>
+                <p class="section-subtitle">
+                    Comprehensive real estate services for discerning clients.
+                </p>
+            </div>
+            
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <h3>Property Acquisition</h3>
+                    <p>Personalized search, negotiation, and acquisition of premium properties across Nairobi's elite neighborhoods.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Investment Advisory</h3>
+                    <p>Strategic investment guidance and portfolio management for high-net-worth real estate investors.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <h3>Vendor Management</h3>
+                    <p>End-to-end property management including maintenance, staff hiring, and vendor coordination.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                    <h3>Legal & Compliance</h3>
+                    <p>Comprehensive legal support including title verification, contracts, and regulatory compliance.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-paint-roller"></i>
+                    </div>
+                    <h3>Interior Design</h3>
+                    <p>Custom interior design services by top designers to match your lifestyle and aesthetic preferences.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Security Solutions</h3>
+                    <p>State-of-the-art security systems and protocols for your property and family's safety.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact section-padding" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Contact Us</h2>
+                <p class="section-subtitle">
+                    Begin your journey to acquiring Kenya's most exclusive properties.
+                </p>
+            </div>
+            
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Get In Touch</h3>
+                    <p>Our elite team is ready to assist you in finding your dream property.</p>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone-alt"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h4>Primary Phone</h4>
+                                <a href="tel:+254112345906">+254112345906</a>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h4>WhatsApp Business</h4>
+                                <a href="https://wa.me/254113400063">+254113400063</a>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h4>Email Address</h4>
+                                <a href="mailto:info@luxuriaestate.com">info@luxuriaestate.com</a>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-text">
+                                <h4>Head Office</h4>
+                                <p>Luxuria Towers, 5th Floor<br>Muthaiga Road, Nairobi<br>Kenya</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <div class="footer-logo">
+                        <div class="logo-icon">L</div>
+                        <h3>Luxuria Estate Group</h3>
+                    </div>
+                    <div class="footer-about">
+                        <p>Curating Kenya's most exclusive properties for discerning clients. Specializing in premium villas, luxury apartments, and elite estates in Nairobi's most prestigious neighborhoods.</p>
+                    </div>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="#properties"><i class="fas fa-chevron-right"></i> Properties</a></li>
+                        <li><a href="#gallery"><i class="fas fa-chevron-right"></i> Gallery</a></li>
+                        <li><a href="#services"><i class="fas fa-chevron-right"></i> Services</a></li>
+                        <li><a href="#contact"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Neighborhoods</h3>
+                    <ul class="footer-links">
+                        <li><a href="#properties"><i class="fas fa-chevron-right"></i> Karen</a></li>
+                        <li><a href="#properties"><i class="fas fa-chevron-right"></i> Runda</a></li>
+                        <li><a href="#properties"><i class="fas fa-chevron-right"></i> Muthaiga</a></li>
+                        <li><a href="#properties"><i class="fas fa-chevron-right"></i> Lavington</a></li>
+                        <li><a href="#properties"><i class="fas fa-chevron-right"></i> Westlands</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">
+                        <li><a href="tel:+254987654321"><i class="fas fa-phone"></i> +254113400063</a></li>
+                        <li><a href="https://wa.me/254113400063"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                        <li><a href="mailto:info@luxuriaestate.com"><i class="fas fa-envelope"></i> Email</a></li>
+                        <li><a href="#contact"><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2026 Luxuria Estate Group. All rights reserved. | Elite Real Estate Curators</p>
+                <a href="https://mortappsstudios.com" target="_blank" rel="noopener" class="powered-by" aria-label="Website developed by MortApps Studios">
+                    <i class="fas fa-code"></i>
+                    <span>Powered By MortApps Studios 2026</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp -->
+    <a href="https://wa.me/254987654321?text=Hello%20Luxuria%20Estate%20Group!%20I%20saw%20your%20portfolio%20and%20I'm%20interested%20in%20discussing%20premium%20real%20estate%20opportunities." class="floating-whatsapp" aria-label="Chat on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script>
+        // 🏡 ELITE REAL ESTATE DATA
+        const propertiesData = [
+            {
+                id: 1,
+                image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
+                title: "Karen Luxury Villa",
+                location: "Karen, Nairobi",
+                type: "villa",
+                price: "KES 85,000,000",
+                beds: 5,
+                baths: 6,
+                sqft: "8,500",
+                description: "Exclusive 5-bedroom villa with Olympic-sized pool, tennis court, and 2-acre manicured gardens."
+            },
+            {
+                id: 2,
+                image: "https://images.pexels.com/photos/29511872/pexels-photo-29511872.jpeg",
+                title: "Runda Mansion",
+                location: "Runda Estate, Nairobi",
+                type: "estate",
+                price: "KES 120,000,000",
+                beds: 7,
+                baths: 8,
+                sqft: "12,000",
+                description: "Architectural masterpiece with indoor pool, home theater, and 3-acre secure compound."
+            },
+            {
+                id: 3,
+                image: "https://images.pexels.com/photos/30599842/pexels-photo-30599842.jpeg",
+                title: "Muthaiga Residence",
+                location: "Muthaiga, Nairobi",
+                type: "villa",
+                price: "KES 95,000,000",
+                beds: 6,
+                baths: 7,
+                sqft: "9,500",
+                description: "Historic 6-bedroom residence with original hardwood floors, wine cellar, and staff quarters."
+            },
+            {
+                id: 4,
+                image: "https://88nairobi.com/wp-content/uploads/88-Nairobi-Residence-Penthouse-bedroom-8.jpg",
+                title: "Westlands Penthouse",
+                location: "Westlands, Nairobi",
+                type: "apartment",
+                price: "KES 65,000,000",
+                beds: 4,
+                baths: 5,
+                sqft: "5,200",
+                description: "360° city views, private rooftop pool, and smart home automation throughout."
+            },
+            {
+                id: 5,
+                image: "https://images.privatepropertykenya.com/large/five-bed-villas-in-mzima-spring-lavington-0819j-gKgKRS4iKwN8IYW8nAnF.jpg",
+                title: "Lavington Garden Estate",
+                location: "Lavington, Nairobi",
+                type: "estate",
+                price: "KES 110,000,000",
+                beds: 6,
+                baths: 6,
+                sqft: "10,500",
+                description: "2-acre landscaped paradise with waterfall, koi pond, and separate guest cottage."
+            },
+            {
+                id: 6,
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrVKmtQ6p7z_fFP6J1gqarsBA0bAMlcE2ubA&s",
+                title: "Kileleshwa Sky Villa",
+                location: "Kileleshwa, Nairobi",
+                type: "apartment",
+                price: "KES 55,000,000",
+                beds: 3,
+                baths: 4,
+                sqft: "4,800",
+                description: "Modern 3-bedroom penthouse with panoramic views, gym, and concierge service."
+            },
+            {
+                id: 7,
+                image: "https://pbs.twimg.com/media/GsEAqCKXQAAcuL9.jpg",
+                title: "Commercial Tower",
+                location: "CBD, Nairobi",
+                type: "commercial",
+                price: "KES 250,000,000",
+                beds: "Office",
+                baths: "Commercial",
+                sqft: "45,000",
+                description: "Grade A commercial tower with banking hall, conference facilities, and premium retail spaces."
+            },
+            {
+                id: 8,
+                image: "https://verdant-ventures.com/wp-content/uploads/2022/08/DH3WEEK94-4-1024x683.jpg",
+                title: "Rosslyn Luxury Apartments",
+                location: "Rosslyn, Nairobi",
+                type: "apartment",
+                price: "KES 45,000,000",
+                beds: 3,
+                baths: 3,
+                sqft: "3,800",
+                description: "Gated community with 24/7 security, gym, pool, and children's play area."
+            }
+        ];
+
+        // 🚀 PERFORMANCE VARIABLES
+        let propertiesContainer, filterBtns, currentFilter = 'all';
+
+        // INITIALIZATION
+        function init() {
+            propertiesContainer = document.getElementById('propertiesContainer');
+            filterBtns = document.querySelectorAll('.filter-btn');
+            
+            renderProperties();
+            setupEventListeners();
+            setupMobileMenu();
+            setupSmoothScrolling();
+        }
+
+        // RENDER PROPERTIES
+        function renderProperties() {
+            if (!propertiesContainer) return;
+            
+            const fragment = document.createDocumentFragment();
+            const filteredProperties = currentFilter === 'all' 
+                ? propertiesData 
+                : propertiesData.filter(property => property.type === currentFilter);
+            
+            filteredProperties.forEach(property => {
+                const propertyCard = createPropertyCard(property);
+                fragment.appendChild(propertyCard);
+            });
+            
+            propertiesContainer.innerHTML = '';
+            propertiesContainer.appendChild(fragment);
+            
+            // Show empty state if needed
+            if (filteredProperties.length === 0) {
+                propertiesContainer.innerHTML = createEmptyState();
+            }
+        }
+
+        // CREATE PROPERTY CARD
+        function createPropertyCard(property) {
+            const propertyCard = document.createElement('div');
+            propertyCard.className = 'property-card';
+            propertyCard.setAttribute('data-type', property.type);
+            propertyCard.setAttribute('data-id', property.id);
+            
+            // Professional WhatsApp message
+            const whatsappMessage = encodeURIComponent(
+`🏡 *LUXURIA ESTATE GROUP - PROPERTY ENQUIRY*
+
+Hello Luxuria Estate Group!
+
+I'm interested in the following property:
+
+📍 *PROPERTY DETAILS*
+• Property: ${property.title}
+• Location: ${property.location}
+• Price: ${property.price}
+• Type: ${property.type.charAt(0).toUpperCase() + property.type.slice(1)}
+• Bedrooms: ${property.beds}
+• Bathrooms: ${property.baths}
+• Size: ${property.sqft} sq.ft.
+
+📅 *VIEWING REQUEST*
+• Preferred Viewing Date: [Please specify]
+• Preferred Time: [Morning/Afternoon/Evening]
+• Number of People: [Number]
+
+💰 *FINANCING*
+• Cash Purchase
+• Mortgage Required
+• Considering Both
+
+📞 *CONTACT INFORMATION*
+• My Name: [Your Name]
+• Phone Number: [Your Phone]
+• Email: [Your Email]
+
+Please provide:
+1. Additional photos/videos
+2. Floor plans
+3. Availability for viewing
+4. Payment terms
+5. Any ongoing offers
+
+Looking forward to your response.
+
+Best regards,
+[Your Name]`
+            );
+            
+            propertyCard.innerHTML = `
+                <div class="property-image">
+                    <img src="${property.image}" alt="${property.title}" loading="lazy">
+                    <div class="property-badge">${property.type.charAt(0).toUpperCase() + property.type.slice(1)}</div>
+                    <div class="property-price">${property.price}</div>
+                </div>
+                <div class="property-content">
+                    <h3>${property.title}</h3>
+                    <div class="property-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${property.location}</span>
+                    </div>
+                    <p>${property.description}</p>
+                    <div class="property-features">
+                        <div class="feature">
+                            <i class="fas fa-bed"></i>
+                            <span>${property.beds} Beds</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-bath"></i>
+                            <span>${property.baths} Baths</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                            <span>${property.sqft} sq.ft</span>
+                        </div>
+                    </div>
+                    <a href="https://wa.me/254987654321?text=${whatsappMessage}" class="property-cta" target="_blank" rel="noopener">
+                        <i class="fab fa-whatsapp"></i> Schedule Viewing
+                    </a>
+                </div>
+            `;
+            
+            return propertyCard;
+        }
+
+        // EVENT LISTENERS
+        function setupEventListeners() {
+            // Filter buttons
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    currentFilter = filter;
+                    renderProperties();
+                });
+            });
+        }
+
+        // MOBILE MENU
+        function setupMobileMenu() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navMenu = document.getElementById('navMenu');
+            
+            if (mobileMenuBtn && navMenu) {
+                mobileMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    navMenu.classList.toggle('active');
+                    this.classList.toggle('active');
+                    
+                    if (navMenu.classList.contains('active')) {
+                        this.innerHTML = '<i class="fas fa-times"></i>';
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        this.innerHTML = '<i class="fas fa-bars"></i>';
+                        document.body.style.overflow = '';
+                    }
+                });
+                
+                // Close menu on link click
+                document.querySelectorAll('.nav-link, .nav-cta').forEach(link => {
+                    link.addEventListener('click', function() {
+                        navMenu.classList.remove('active');
+                        mobileMenuBtn.classList.remove('active');
+                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                        document.body.style.overflow = '';
+                    });
+                });
+            }
+        }
+
+        // SMOOTH SCROLLING
+        function setupSmoothScrolling() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    
+                    if (href === '#home') {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        return;
+                    }
+                    
+                    if (this.classList.contains('filter-btn') || 
+                        this.classList.contains('property-cta') ||
+                        href.includes('whatsapp')) {
+                        return;
+                    }
+                    
+                    e.preventDefault();
+                    
+                    const targetElement = document.querySelector(href);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                }, { passive: true });
+            });
+        }
+
+        // EMPTY STATE
+        function createEmptyState() {
+            return `
+                <div style="grid-column: 1/-1; text-align: center; padding: 60px; background: var(--pure-white); border-radius: var(--border-radius-lg); border: 1px solid rgba(212, 175, 55, 0.1);">
+                    <i class="fas fa-search" style="font-size: 3rem; color: var(--accent-gold); margin-bottom: 20px;"></i>
+                    <h3 style="color: var(--text-dark); margin-bottom: 15px;">Exclusive Properties Coming Soon</h3>
+                    <p style="color: var(--text-light); margin-bottom: 25px;">We're currently preparing new exclusive listings for this category. Contact us for premium off-market opportunities.</p>
+                    <a href="https://wa.me/254987654321" class="btn btn-primary" style="margin-top: 20px;">
+                        <i class="fab fa-whatsapp"></i> Enquire About Off-Market
+                    </a>
+                </div>
+            `;
+        }
+
+        // HEADER SCROLL EFFECT
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
+                header.style.background = 'rgba(0, 0, 0, 0.98)';
+            } else {
+                header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+                header.style.background = 'rgba(0, 0, 0, 0.95)';
+            }
+        });
+
+        // INITIALIZE
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
