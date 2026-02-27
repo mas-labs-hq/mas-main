@@ -1,4 +1,4 @@
-const CACHE_NAME = 'brizerm-markets-v7';
+const CACHE_NAME = 'brizerm-markets-v9';
 const urlsToCache = [
   './',
   './index.html',
