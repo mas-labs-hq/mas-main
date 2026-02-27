@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>Street Racer - MortApps Studios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #020617;
+            --surface: #0f172a;
+            --surface-light: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #ef4444;
+            --accent-light: #f87171;
+            --accent-glow: rgba(239, 68, 68, 0.4);
+            --border: rgba(51, 65, 85, 0.5);
+            --font-display: 'Sora', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        .bg-mesh {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(239, 68, 68, 0.12), transparent),
+                radial-gradient(ellipse 60% 40% at 80% 50%, rgba(248, 113, 113, 0.08), transparent),
+                var(--bg);
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            color: var(--text);
+            background: var(--surface-light);
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        
+        .brand-text {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .stat-value {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--accent-light);
+        }
+        
+        .game-wrapper {
+            padding-top: 60px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .game-container {
+            position: relative;
+            background: linear-gradient(145deg, var(--surface), rgba(15, 23, 42, 0.8));
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0.5rem;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            overflow: hidden;
+        }
+        
+        canvas {
+            display: block;
+            border-radius: 16px;
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .ctrl-btn {
+            width: 80px;
+            height: 70px;
+            background: linear-gradient(145deg, var(--surface-light), var(--surface));
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .ctrl-btn svg {
+            width: 36px;
+            height: 36px;
+            fill: var(--text);
+            transition: fill 0.15s;
+        }
+        
+        .ctrl-btn:active {
+            background: linear-gradient(145deg, var(--accent), #dc2626);
+            border-color: var(--accent-light);
+            transform: scale(0.95);
+        }
+        
+        .ctrl-btn:active svg {
+            fill: white;
+        }
+        
+        /* Overlays */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            z-index: 10;
+        }
+        
+        .overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .overlay-content {
+            text-align: center;
+            padding: 2rem;
+            max-width: 280px;
+        }
+        
+        .overlay-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .overlay-title {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff, var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .overlay-subtitle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+        
+        .score-large {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-light), #fca5a5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0.5rem 0;
+        }
+        
+        .high-score {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            padding: 0.5rem 1rem;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+        }
+        
+        .high-score-text {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: #f59e0b;
+        }
+        
+        .btn {
+            font-family: var(--font-body);
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            padding: 0.875rem 2rem;
+            background: linear-gradient(135deg, var(--accent), #dc2626);
+            color: white;
+            border-radius: 12px;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+        
+        .btn-row {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        .btn-secondary {
+            padding: 0.75rem 1.5rem;
+            background: var(--surface-light);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+        
+        .game-footer {
+            text-align: center;
+            padding: 0.75rem;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+        
+        .hint {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-align: center;
+        }
+        
+        @media (max-width: 400px) {
+            .header { padding: 0.6rem 0.8rem; }
+            .brand-text { display: none; }
+            .stats { gap: 0.5rem; }
+            .stat-value { font-size: 1rem; }
+            .ctrl-btn { width: 70px; height: 60px; }
+            .ctrl-btn svg { width: 30px; height: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+    
+    <header class="header">
+        <a href="../games.html" class="back-btn">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Back
+        </a>
+        <a href="../index.html" class="brand">
+            <div class="brand-icon">🏎️</div>
+            <span class="brand-text">MortApps</span>
+        </a>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Score</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Best</div>
+                <div class="stat-value" id="highScore">0</div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="game-wrapper">
+        <div class="game-container">
+            <canvas id="game"></canvas>
+            
+            <!-- Start Overlay -->
+            <div class="overlay" id="startOverlay">
+                <div class="overlay-content">
+                    <div class="overlay-icon">🏎️</div>
+                    <h1 class="overlay-title">Street Racer</h1>
+                    <p class="overlay-subtitle">Dodge traffic, collect coins, and race as far as you can!</p>
+                    <button class="btn btn-primary" id="startBtn">▶ Start Race</button>
+                </div>
+            </div>
+            
+            <!-- Game Over Overlay -->
+            <div class="overlay hidden" id="gameOverOverlay">
+                <div class="overlay-content">
+                    <div class="overlay-icon">💥</div>
+                    <h1 class="overlay-title">Crashed!</h1>
+                    <div class="score-large" id="finalScore">0</div>
+                    <div class="high-score">
+                        <span>🏆</span>
+                        <span class="high-score-text" id="bestScore">Best: 0</span>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" id="retryBtn">🔄 Retry</button>
+                        <a href="../games.html" class="btn btn-secondary">🏠 Menu</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="controls">
+            <button class="ctrl-btn" id="leftBtn" aria-label="Move Left">
+                <svg viewBox="0 0 24 24"><path d="M4 12l8-8v5h8v6h-8v5z"/></svg>
+            </button>
+            <button class="ctrl-btn" id="rightBtn" aria-label="Move Right">
+                <svg viewBox="0 0 24 24"><path d="M20 12l-8 8v-5h-8v-6h8v-5z"/></svg>
+            </button>
+        </div>
+        
+        <div class="hint">← → Arrow keys or buttons to change lanes</div>
+    </div>
+    
+    <footer class="game-footer">© 2026 MortApps Studios</footer>
+    
+    <script>
+        // Prevent right-click
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        
+        // Canvas setup
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        
+        // Game dimensions
+        const LANES = 4;
+        let canvasWidth = 280;
+        let canvasHeight = 480;
+        let laneWidth;
+        let carWidth;
+        let carHeight;
+        
+        // Game state
+        let player = { lane: 1, y: 0 };
+        let obstacles = [];
+        let coins = [];
+        let roadOffset = 0;
+        let score = 0;
+        let highScore = 0;
+        let playing = false;
+        let gameSpeed = 4;
+        let animFrame = null;
+        let lastObstacle = 0;
+        let lastCoin = 0;
+        
+        // Colors
+        const COLORS = {
+            road: '#1a1a2e',
+            lane: '#2d2d44',
+            stripe: '#4a4a6a',
+            player: '#ef4444',
+            playerAccent: '#fca5a5',
+            obstacle: ['#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6'],
+            coin: '#fbbf24',
+            coinGlow: 'rgba(251, 191, 36, 0.5)'
+        };
+        
+        // Load high score
+        highScore = parseInt(localStorage.getItem('streetRacer_high') || '0');
+        document.getElementById('highScore').textContent = highScore;
+        
+        // Resize canvas
+        function resizeCanvas() {
+            const maxWidth = Math.min(window.innerWidth - 48, 320);
+            const maxHeight = Math.min(window.innerHeight - 280, 520);
+            
+            const ratio = 280 / 480;
+            if (maxWidth / maxHeight > ratio) {
+                canvasHeight = maxHeight;
+                canvasWidth = maxHeight * ratio;
+            } else {
+                canvasWidth = maxWidth;
+                canvasHeight = maxWidth / ratio;
+            }
+            
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            
+            laneWidth = canvasWidth / LANES;
+            carWidth = laneWidth * 0.6;
+            carHeight = carWidth * 1.8;
+            player.y = canvasHeight - carHeight - 30;
+            
+            draw();
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Draw functions
+        function drawRoad() {
+            // Road background
+            ctx.fillStyle = COLORS.road;
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Lane dividers
+            ctx.strokeStyle = COLORS.stripe;
+            ctx.lineWidth = 3;
+            ctx.setLineDash([20, 20]);
+            
+            for (let i = 1; i < LANES; i++) {
+                const x = i * laneWidth;
+                ctx.beginPath();
+                ctx.moveTo(x, (-roadOffset % 40) - 20);
+                ctx.lineTo(x, canvasHeight);
+                ctx.stroke();
+            }
+            
+            ctx.setLineDash([]);
+            
+            // Road edges
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillRect(0, 0, 4, canvasHeight);
+            ctx.fillRect(canvasWidth - 4, 0, 4, canvasHeight);
+        }
+        
+        function drawCar(x, y, color, accent, isPlayer = false) {
+            // Car shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.roundRect(x + 3, y + 3, carWidth, carHeight, 8);
+            ctx.fill();
+            
+            // Car body
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.roundRect(x, y, carWidth, carHeight, 8);
+            ctx.fill();
+            
+            // Windshield
+            ctx.fillStyle = '#1a1a2e';
+            const wsY = isPlayer ? y + carHeight * 0.15 : y + carHeight * 0.55;
+            const wsH = carHeight * 0.25;
+            ctx.beginPath();
+            ctx.roundRect(x + carWidth * 0.15, wsY, carWidth * 0.7, wsH, 4);
+            ctx.fill();
+            
+            // Car accent stripe
+            ctx.fillStyle = accent || '#fff';
+            ctx.fillRect(x + carWidth * 0.1, y + carHeight * 0.4, carWidth * 0.8, 4);
+            
+            // Headlights/taillights
+            if (isPlayer) {
+                // Headlights
+                ctx.fillStyle = '#fef08a';
+                ctx.beginPath();
+                ctx.arc(x + carWidth * 0.25, y + 8, 4, 0, Math.PI * 2);
+                ctx.arc(x + carWidth * 0.75, y + 8, 4, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // Taillights
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(x + carWidth * 0.25, y + carHeight - 8, 4, 0, Math.PI * 2);
+                ctx.arc(x + carWidth * 0.75, y + carHeight - 8, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function drawCoin(coin) {
+            const size = laneWidth * 0.3;
+            
+            // Glow
+            ctx.shadowColor = COLORS.coinGlow;
+            ctx.shadowBlur = 10;
+            
+            // Coin
+            ctx.fillStyle = COLORS.coin;
+            ctx.beginPath();
+            ctx.arc(coin.x, coin.y, size, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Inner circle
+            ctx.fillStyle = '#fcd34d';
+            ctx.beginPath();
+            ctx.arc(coin.x, coin.y, size * 0.6, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // $ symbol
+            ctx.fillStyle = '#92400e';
+            ctx.font = `bold ${size}px var(--font-display)`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('$', coin.x, coin.y + 1);
+            
+            ctx.shadowBlur = 0;
+        }
+        
+        function draw() {
+            drawRoad();
+            
+            // Draw coins
+            coins.forEach(drawCoin);
+            
+            // Draw obstacles
+            obstacles.forEach(obs => {
+                const x = obs.lane * laneWidth + (laneWidth - carWidth) / 2;
+                drawCar(x, obs.y, COLORS.obstacle[obs.colorIndex], null, false);
+            });
+            
+            // Draw player
+            const playerX = player.lane * laneWidth + (laneWidth - carWidth) / 2;
+            drawCar(playerX, player.y, COLORS.player, COLORS.playerAccent, true);
+        }
+        
+        // Game logic
+        function spawnObstacle() {
+            const lane = Math.floor(Math.random() * LANES);
+            obstacles.push({
+                lane: lane,
+                y: -carHeight - 20,
+                colorIndex: Math.floor(Math.random() * COLORS.obstacle.length)
+            });
+        }
+        
+        function spawnCoin() {
+            const lane = Math.floor(Math.random() * LANES);
+            coins.push({
+                lane: lane,
+                x: lane * laneWidth + laneWidth / 2,
+                y: -20
+            });
+        }
+        
+        function checkCollision() {
+            const playerLeft = player.lane * laneWidth + (laneWidth - carWidth) / 2;
+            const playerRight = playerLeft + carWidth;
+            const playerTop = player.y;
+            const playerBottom = player.y + carHeight;
+            
+            // Check obstacle collision
+            for (const obs of obstacles) {
+                if (obs.lane !== player.lane) continue;
+                
+                const obsTop = obs.y;
+                const obsBottom = obs.y + carHeight;
+                
+                if (playerTop < obsBottom && playerBottom > obsTop) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        function checkCoinCollection() {
+            const playerCenterY = player.y + carHeight / 2;
+            
+            for (let i = coins.length - 1; i >= 0; i--) {
+                const coin = coins[i];
+                if (coin.lane === player.lane) {
+                    const coinY = coin.y;
+                    if (Math.abs(coinY - playerCenterY) < carHeight / 2) {
+                        coins.splice(i, 1);
+                        score += 50;
+                        updateScore();
+                    }
+                }
+            }
+        }
+        
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+        
+        function update() {
+            if (!playing) return;
+            
+            // Move road
+            roadOffset += gameSpeed;
+            
+            // Update score (distance)
+            score += 1;
+            updateScore();
+            
+            // Spawn obstacles
+            lastObstacle++;
+            if (lastObstacle > 60) {
+                spawnObstacle();
+                lastObstacle = 0;
+            }
+            
+            // Spawn coins
+            lastCoin++;
+            if (lastCoin > 40) {
+                if (Math.random() > 0.5) {
+                    spawnCoin();
+                }
+                lastCoin = 0;
+            }
+            
+            // Move obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].y += gameSpeed;
+                
+                if (obstacles[i].y > canvasHeight) {
+                    obstacles.splice(i, 1);
+                }
+            }
+            
+            // Move coins
+            for (let i = coins.length - 1; i >= 0; i--) {
+                coins[i].y += gameSpeed;
+                
+                if (coins[i].y > canvasHeight + 20) {
+                    coins.splice(i, 1);
+                }
+            }
+            
+            // Check collisions
+            if (checkCollision()) {
+                gameOver();
+                return;
+            }
+            
+            // Check coin collection
+            checkCoinCollection();
+            
+            // Increase difficulty
+            if (score % 500 === 0 && gameSpeed < 10) {
+                gameSpeed += 0.2;
+            }
+            
+            draw();
+        }
+        
+        function startGame() {
+            player = { lane: 1, y: canvasHeight - carHeight - 30 };
+            obstacles = [];
+            coins = [];
+            roadOffset = 0;
+            score = 0;
+            gameSpeed = 4;
+            lastObstacle = 0;
+            lastCoin = 0;
+            playing = true;
+            
+            updateScore();
+            document.getElementById('startOverlay').classList.add('hidden');
+            document.getElementById('gameOverOverlay').classList.add('hidden');
+            
+            function gameLoop() {
+                if (playing) {
+                    update();
+                    animFrame = requestAnimationFrame(gameLoop);
+                }
+            }
+            gameLoop();
+        }
+        
+        function gameOver() {
+            playing = false;
+            if (animFrame) {
+                cancelAnimationFrame(animFrame);
+                animFrame = null;
+            }
+            
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('streetRacer_high', highScore);
+                document.getElementById('highScore').textContent = highScore;
+            }
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('bestScore').textContent = 'Best: ' + highScore;
+            document.getElementById('gameOverOverlay').classList.remove('hidden');
+        }
+        
+        function moveLeft() {
+            if (!playing) return;
+            if (player.lane > 0) {
+                player.lane--;
+            }
+        }
+        
+        function moveRight() {
+            if (!playing) return;
+            if (player.lane < LANES - 1) {
+                player.lane++;
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('startBtn').onclick = startGame;
+        document.getElementById('retryBtn').onclick = startGame;
+        
+        document.getElementById('leftBtn').onclick = moveLeft;
+        document.getElementById('rightBtn').onclick = moveRight;
+        
+        document.getElementById('leftBtn').ontouchstart = (e) => {
+            e.preventDefault();
+            moveLeft();
+        };
+        
+        document.getElementById('rightBtn').ontouchstart = (e) => {
+            e.preventDefault();
+            moveRight();
+        };
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+                moveLeft();
+                e.preventDefault();
+            }
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+                moveRight();
+                e.preventDefault();
+            }
+            if (e.key === ' ' && !playing) {
+                startGame();
+                e.preventDefault();
+            }
+        });
+        
+        // Touch swipe on canvas
+        let touchStartX = 0;
+        
+        canvas.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+        
+        canvas.addEventListener('touchend', (e) => {
+            if (!playing) return;
+            const touchEndX = e.changedTouches[0].clientX;
+            const diff = touchEndX - touchStartX;
+            
+            if (Math.abs(diff) > 30) {
+                if (diff > 0) moveRight();
+                else moveLeft();
+            }
+        }, { passive: true });
+        
+        // Initial draw
+        draw();
+    </script>
+</body>
+</html>
