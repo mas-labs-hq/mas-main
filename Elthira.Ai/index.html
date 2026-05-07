@@ -2698,7 +2698,7 @@
                 'Screen Resolution': (screen.width || '?') + 'x' + (screen.height || '?'),
                 'Platform': (navigator.platform || (navigator.userAgentData && navigator.userAgentData.platform) || 'Unknown'),
                 'Language': navigator.language || 'Unknown',
-                'Connection Type': (navigator.connection && navigator.connection.effectiveType) ? navigator.connection.effectiveType.toUpperCase() : 'Unknown',
+                'Connection Type': (function() { var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection; if (!c || !c.type) return 'Unknown'; var t = c.type; if (t === 'cellular' && c.effectiveType) return 'Cellular (' + c.effectiveType.toUpperCase() + ')'; var m = {wifi:'WiFi',ethernet:'Ethernet',bluetooth:'Bluetooth',wimax:'WiMAX',none:'No Connection',other:'Other',unknown:'Unknown'}; return m[t] || t.charAt(0).toUpperCase() + t.slice(1); })(),
                 'Battery Level': batteryStr,
                 'Referrer': document.referrer || 'Direct visit'
             };
