@@ -744,11 +744,44 @@
     .mort-e-send:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(201,169,110,0.3); }
     .mort-e-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
     .mort-e-send svg { width: 20px; height: 20px; }
+    /* Quick-Reply Buttons */
+    .mort-e-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      max-width: calc(100% - 48px);
+    }
+    .mort-e-quick-btn {
+      background: rgba(201, 169, 110, 0.08);
+      border: 1px solid rgba(201, 169, 110, 0.25);
+      border-radius: 16px;
+      padding: 5px 14px;
+      font-size: 0.78rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      color: rgba(201, 169, 110, 0.85);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .mort-e-quick-btn:hover {
+      background: rgba(201, 169, 110, 0.18);
+      border-color: rgba(201, 169, 110, 0.5);
+      color: #c9a96e;
+      transform: translateY(-1px);
+    }
+    .mort-e-quick-btn:active {
+      transform: translateY(0);
+      background: rgba(201, 169, 110, 0.25);
+    }
     @media (max-width: 640px) {
       .mort-e-btn { bottom: 5.5rem; right: 1.25rem; width: 50px; height: 50px; }
       .mort-e-btn svg { width: 22px; height: 22px; }
       .mort-e-chat { padding: 16px; }
       .mort-e-input-area { padding: 12px 14px 16px; }
+      .mort-e-buttons { gap: 4px; }
+      .mort-e-quick-btn { padding: 4px 10px; font-size: 0.72rem; }
     }
   </style>
 
@@ -1693,6 +1726,7 @@
   <script>
     let mortEOpen = false;
     let mortEStreaming = false;
+    let mortEFirstOpen = true;
 
     function openMortE() {
       mortEOpen = true;
@@ -1701,6 +1735,21 @@
       requestAnimationFrame(() => { requestAnimationFrame(() => { imm.classList.add('active'); }); });
       document.getElementById('mortEInput').focus();
       document.body.style.overflow = 'hidden';
+
+      // Show returning user welcome on first open
+      if (mortEFirstOpen && typeof MortEBrains !== 'undefined') {
+        mortEFirstOpen = false;
+        try {
+          const welcome = MortEBrains.getWelcome();
+          if (welcome && welcome.text) {
+            const welcomeEl = document.getElementById('mortEWelcome');
+            if (welcomeEl) welcomeEl.remove();
+            setTimeout(() => {
+              streamMortEResponse(welcome.text, welcome.buttons || []);
+            }, 500);
+          }
+        } catch (e) { /* silent */ }
+      }
     }
 
     function closeMortE() {
@@ -1723,10 +1772,10 @@
         '</div>';
     }
 
-    async function sendMortEMessage() {
+    async function sendMortEMessage(overrideText) {
       if (mortEStreaming) return;
       const input = document.getElementById('mortEInput');
-      const text = input.value.trim();
+      const text = (overrideText || input.value).trim();
       if (!text) return;
       input.value = '';
 
@@ -1740,20 +1789,35 @@
       setStatusThinking(true);
       addThinkingIndicator();
 
-      const delay = 500 + Math.random() * 1000;
+      const delay = 400 + Math.random() * 800;
       await new Promise(r => setTimeout(r, delay));
 
-      let response;
+      let responseObj;
       try {
-        response = MortEBrains.query(text);
+        if (typeof MortEBrains === 'undefined') {
+          responseObj = { text: "My brain isn't loaded yet. Please refresh the page and try again.", buttons: [] };
+        } else {
+          const raw = MortEBrains.query(text);
+          // Handle both v4 (object) and legacy (string) responses
+          if (typeof raw === 'object' && raw !== null && typeof raw.text === 'string') {
+            responseObj = raw;
+          } else if (typeof raw === 'string') {
+            responseObj = { text: raw, buttons: [] };
+          } else {
+            responseObj = { text: "I couldn't come up with an answer for that. Could you try rephrasing?", buttons: [] };
+          }
+          if (!responseObj.text || responseObj.text.trim().length === 0) {
+            responseObj.text = "I couldn't come up with an answer for that. Could you try rephrasing?";
+          }
+        }
       } catch (e) {
-        response = "Something went wrong on my end. Could you try that again?";
+        responseObj = { text: "Something went wrong on my end. Could you try that again?", buttons: [] };
       }
 
       removeThinkingIndicator();
       setStatusThinking(false);
 
-      await streamMortEResponse(response);
+      await streamMortEResponse(responseObj.text, responseObj.buttons || []);
 
       mortEStreaming = false;
       document.getElementById('mortESend').disabled = false;
@@ -1797,7 +1861,32 @@
       else dot.classList.remove('thinking');
     }
 
-    async function streamMortEResponse(text) {
+    // Render quick-reply buttons below a bot message
+    function renderQuickButtons(buttons, bubbleEl) {
+      if (!buttons || buttons.length === 0) return;
+      const chat = document.getElementById('mortEChat');
+      const btnGroup = document.createElement('div');
+      btnGroup.className = 'mort-e-buttons';
+
+      buttons.forEach(btn => {
+        const btnEl = document.createElement('button');
+        btnEl.className = 'mort-e-quick-btn';
+        btnEl.textContent = btn.label;
+        btnEl.addEventListener('click', function() {
+          // Disable all buttons in this group after click
+          const siblings = btnGroup.querySelectorAll('.mort-e-quick-btn');
+          siblings.forEach(b => { b.disabled = true; b.style.opacity = '0.3'; b.style.pointerEvents = 'none'; });
+          // Send the button value as a user message
+          sendMortEMessage(btn.value);
+        });
+        btnGroup.appendChild(btnEl);
+      });
+
+      chat.appendChild(btnGroup);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function streamMortEResponse(text, buttons) {
       const chat = document.getElementById('mortEChat');
       const msg = document.createElement('div');
       msg.className = 'mort-e-message ai';
@@ -1821,6 +1910,9 @@
         else if (char === '\n') speed = 25;
         await new Promise(r => setTimeout(r, speed));
       }
+
+      // After streaming completes, render quick-reply buttons
+      renderQuickButtons(buttons, bubble);
     }
 
     // Handle Enter key for Mort-E
