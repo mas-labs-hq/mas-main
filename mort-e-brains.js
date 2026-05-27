@@ -58,7 +58,7 @@
         shortDescription: 'an AI-powered smart CV screening and candidate ranking tool',
         longDescription: 'Phein is MortApps Studios\' intelligent recruitment assistant. It uses AI to screen CVs, rank candidates, and dramatically reduce the time spent on initial recruitment filtering. Instead of manually reviewing hundreds of applications, Phein analyzes candidate qualifications, experience, and relevance to provide ranked recommendations. It\'s built for HR departments and recruitment teams who want to move faster without compromising on candidate quality. Cut your screening time in half — that\'s not a promise, that\'s what Phein does.',
         features: ['AI-powered CV analysis and scoring', 'Automatic candidate ranking based on job requirements', 'Dramatic reduction in manual screening time', 'Intelligent matching of qualifications to role requirements', 'Built for speed and accuracy in high-volume recruitment', 'Live demo available'],
-        demoUrl: 'http://mortappsstudios.com/client.phein_vr-6.0_demo',
+        demoUrl: '/client.phein_vr-6.0_demo',
       },
 
       elthira: {
