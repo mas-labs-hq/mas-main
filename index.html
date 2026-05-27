@@ -134,7 +134,7 @@
       --fg: #0f172a;
       --muted: #64748b;
       --accent: #2563eb;
-      --accent-dark: '#1d4ed8';
+      --accent-dark: #1d4ed8;
       --card: #ffffff;
       --border: #e2e8f0;
       --surface: #f8fafc;
@@ -629,6 +629,127 @@
     /* Spinner */
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .spinner { animation: spin 1s linear infinite; }
+
+    /* ═══ Mort-E GMA.2 AI Assistant ═══ */
+    .mort-e-btn {
+      position: fixed;
+      bottom: 7rem;
+      right: 2rem;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border: 1.5px solid rgba(201, 169, 110, 0.45);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 101;
+      box-shadow: 0 4px 20px rgba(201, 169, 110, 0.18), 0 0 40px rgba(201, 169, 110, 0.06);
+      transition: all 0.3s ease;
+      animation: mortEPulse 3s ease-in-out infinite;
+    }
+    .mort-e-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 28px rgba(201, 169, 110, 0.35), 0 0 50px rgba(201, 169, 110, 0.12);
+      border-color: rgba(201, 169, 110, 0.8);
+    }
+    @keyframes mortEPulse {
+      0%, 100% { box-shadow: 0 4px 20px rgba(201, 169, 110, 0.18), 0 0 40px rgba(201, 169, 110, 0.06); }
+      50% { box-shadow: 0 4px 28px rgba(201, 169, 110, 0.28), 0 0 50px rgba(201, 169, 110, 0.12); }
+    }
+    .mort-e-btn svg { width: 26px; height: 26px; stroke: #c9a96e; fill: none; stroke-width: 1.5; }
+
+    /* Immersion Layer */
+    .mort-e-immersion {
+      position: fixed; inset: 0; z-index: 10000;
+      background: #0a0a0f;
+      display: none; flex-direction: column;
+      opacity: 0; transition: opacity 0.35s ease;
+    }
+    .mort-e-immersion.active { display: flex; opacity: 1; }
+    .mort-e-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.07);
+      background: rgba(10,10,15,0.95); backdrop-filter: blur(20px);
+    }
+    .mort-e-model-info { display: flex; align-items: center; gap: 10px; }
+    .mort-e-model-name { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 0.95rem; color: #fff; letter-spacing: -0.02em; }
+    .mort-e-model-name span { color: #c9a96e; }
+    .mort-e-status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+    .mort-e-status-dot.thinking { background: #fbbf24; box-shadow: 0 0 6px #fbbf24; animation: mortEBlink 1s ease-in-out infinite; }
+    @keyframes mortEBlink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+    .mort-e-model-tag { font-size: 0.6rem; color: rgba(201,169,110,0.6); letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid rgba(201,169,110,0.2); padding: 2px 6px; border-radius: 3px; margin-left: 4px; }
+    .mort-e-actions { display: flex; align-items: center; gap: 6px; }
+    .mort-e-action-btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);
+      color: rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    .mort-e-action-btn:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.15); }
+    .mort-e-action-btn.danger:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #ef4444; }
+    .mort-e-chat {
+      flex: 1; overflow-y: auto; padding: 20px; scroll-behavior: smooth;
+    }
+    .mort-e-chat::-webkit-scrollbar { width: 4px; }
+    .mort-e-chat::-webkit-scrollbar-track { background: transparent; }
+    .mort-e-chat::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .mort-e-message { max-width: 720px; margin: 0 auto 16px; display: flex; gap: 12px; }
+    .mort-e-message.user { flex-direction: row-reverse; }
+    .mort-e-msg-avatar {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.02em;
+    }
+    .mort-e-message.ai .mort-e-msg-avatar { background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(201,169,110,0.05)); border: 1px solid rgba(201,169,110,0.2); color: #c9a96e; }
+    .mort-e-message.user .mort-e-msg-avatar { background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.2); color: #2563eb; }
+    .mort-e-msg-bubble { border-radius: 12px; padding: 12px 16px; font-size: 0.9rem; line-height: 1.65; max-width: calc(100% - 48px); }
+    .mort-e-message.ai .mort-e-msg-bubble { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+    .mort-e-message.user .mort-e-msg-bubble { background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.15); color: rgba(255,255,255,0.9); }
+    .mort-e-thinking { display: flex; align-items: center; gap: 8px; max-width: 720px; margin: 0 auto 16px; padding: 8px 0; color: rgba(255,255,255,0.35); font-size: 0.82rem; font-style: italic; }
+    .mort-e-thinking-dots span { display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: #c9a96e; margin: 0 2px; animation: mortEDotBounce 1.4s ease-in-out infinite; }
+    .mort-e-thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .mort-e-thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes mortEDotBounce { 0%,80%,100% { transform: translateY(0); opacity:0.3; } 40% { transform: translateY(-6px); opacity:1; } }
+    .mort-e-welcome { text-align: center; padding: 48px 20px 20px; max-width: 460px; margin: 0 auto; }
+    .mort-e-welcome-icon {
+      width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 16px;
+      background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(201,169,110,0.05));
+      border: 1px solid rgba(201,169,110,0.2); display: flex; align-items: center; justify-content: center;
+    }
+    .mort-e-welcome-icon svg { width: 28px; height: 28px; stroke: #c9a96e; fill: none; stroke-width: 1.5; }
+    .mort-e-welcome h3 { font-family: 'Sora', sans-serif; font-weight: 700; color: #fff; font-size: 1.2rem; margin-bottom: 6px; }
+    .mort-e-welcome h3 span { color: #c9a96e; }
+    .mort-e-welcome p { color: rgba(255,255,255,0.35); font-size: 0.85rem; line-height: 1.5; }
+    .mort-e-input-area {
+      padding: 14px 20px 20px; border-top: 1px solid rgba(255,255,255,0.07);
+      background: rgba(10,10,15,0.95); backdrop-filter: blur(20px);
+    }
+    .mort-e-input-wrap { max-width: 720px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
+    .mort-e-input {
+      flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; padding: 12px 16px; color: #fff;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none;
+      transition: border-color 0.2s ease;
+    }
+    .mort-e-input::placeholder { color: rgba(255,255,255,0.2); }
+    .mort-e-input:focus { border-color: rgba(201,169,110,0.4); }
+    .mort-e-send {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: linear-gradient(135deg, #c9a96e, #b8943f); border: none;
+      color: #0a0a0f; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s ease; flex-shrink: 0;
+    }
+    .mort-e-send:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(201,169,110,0.3); }
+    .mort-e-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .mort-e-send svg { width: 20px; height: 20px; }
+    @media (max-width: 640px) {
+      .mort-e-btn { bottom: 5.5rem; right: 1.25rem; width: 50px; height: 50px; }
+      .mort-e-btn svg { width: 22px; height: 22px; }
+      .mort-e-chat { padding: 16px; }
+      .mort-e-input-area { padding: 12px 14px 16px; }
+    }
   </style>
 
   <!-- Structured Data - ENHANCED -->
@@ -1301,6 +1422,47 @@
     </div>
   </footer>
 
+  <!-- Mort-E GMA.2 AI Assistant Button -->
+  <button class="mort-e-btn" onclick="openMortE()" aria-label="Open Mort-E AI Assistant">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="10" rx="3"/><path d="M9 9h.01M15 9h.01"/><path d="M9 13h6"/><path d="M8 14l-3 4"/><path d="M16 14l3 4"/><path d="M10 4V2M14 4V2"/></svg>
+  </button>
+
+  <!-- Mort-E Immersion Layer -->
+  <div class="mort-e-immersion" id="mortEImmersion">
+    <div class="mort-e-topbar">
+      <div class="mort-e-model-info">
+        <div class="mort-e-status-dot" id="mortEStatusDot"></div>
+        <div class="mort-e-model-name">Mort-E <span>GMA.2</span></div>
+
+      </div>
+      <div class="mort-e-actions">
+        <button class="mort-e-action-btn danger" onclick="deleteMortEConvo()" aria-label="Delete conversation" title="Delete conversation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6l-1 14H6L5 6M8 6V4h8v2"/></svg>
+        </button>
+        <button class="mort-e-action-btn" onclick="closeMortE()" aria-label="Close" title="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="mort-e-chat" id="mortEChat">
+      <div class="mort-e-welcome" id="mortEWelcome">
+        <div class="mort-e-welcome-icon">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="10" rx="3"/><path d="M9 9h.01M15 9h.01"/><path d="M9 13h6"/><path d="M8 14l-3 4"/><path d="M16 14l3 4"/><path d="M10 4V2M14 4V2"/></svg>
+        </div>
+        <h3>Mort-E <span>GMA.2</span></h3>
+        <p>Your AI guide to everything MortApps Studios. Ask about our products, services, team, or anything else.</p>
+      </div>
+    </div>
+    <div class="mort-e-input-area">
+      <div class="mort-e-input-wrap">
+        <input type="text" class="mort-e-input" id="mortEInput" placeholder="Ask Mort-E anything about MortApps Studios..." autocomplete="off">
+        <button class="mort-e-send" id="mortESend" onclick="sendMortEMessage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- WhatsApp Float -->
   <a href="https://wa.me/254113400063" target="_blank" class="whatsapp-float" aria-label="Chat on WhatsApp">
     <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -1522,6 +1684,162 @@
       e.preventDefault();
     });
 
+  </script>
+
+  <!-- Mort-E GMA.2 Brain -->
+  <script src="mort-e-brains.js"></script>
+
+  <!-- Mort-E GMA.2 UI Controller -->
+  <script>
+    let mortEOpen = false;
+    let mortEStreaming = false;
+
+    function openMortE() {
+      mortEOpen = true;
+      const imm = document.getElementById('mortEImmersion');
+      imm.style.display = 'flex';
+      requestAnimationFrame(() => { requestAnimationFrame(() => { imm.classList.add('active'); }); });
+      document.getElementById('mortEInput').focus();
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMortE() {
+      mortEOpen = false;
+      const imm = document.getElementById('mortEImmersion');
+      imm.classList.remove('active');
+      setTimeout(() => { imm.style.display = 'none'; }, 350);
+      document.body.style.overflow = '';
+    }
+
+    function deleteMortEConvo() {
+      if (typeof MortEBrains !== 'undefined') MortEBrains.reset();
+      const chat = document.getElementById('mortEChat');
+      chat.innerHTML = '<div class="mort-e-welcome" id="mortEWelcome">' +
+        '<div class="mort-e-welcome-icon">' +
+        '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="10" rx="3"/><path d="M9 9h.01M15 9h.01"/><path d="M9 13h6"/><path d="M8 14l-3 4"/><path d="M16 14l3 4"/><path d="M10 4V2M14 4V2"/></svg>' +
+        '</div>' +
+        '<h3>Mort-E <span>GMA.2</span></h3>' +
+        '<p>Your AI guide to everything MortApps Studios. Ask about our products, services, team, or anything else.</p>' +
+        '</div>';
+    }
+
+    async function sendMortEMessage() {
+      if (mortEStreaming) return;
+      const input = document.getElementById('mortEInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      const welcome = document.getElementById('mortEWelcome');
+      if (welcome) welcome.remove();
+
+      addMortEMessage(text, 'user');
+
+      mortEStreaming = true;
+      document.getElementById('mortESend').disabled = true;
+      setStatusThinking(true);
+      addThinkingIndicator();
+
+      const delay = 500 + Math.random() * 1000;
+      await new Promise(r => setTimeout(r, delay));
+
+      let response;
+      try {
+        response = MortEBrains.query(text);
+      } catch (e) {
+        response = "Something went wrong on my end. Could you try that again?";
+      }
+
+      removeThinkingIndicator();
+      setStatusThinking(false);
+
+      await streamMortEResponse(response);
+
+      mortEStreaming = false;
+      document.getElementById('mortESend').disabled = false;
+    }
+
+    function addMortEMessage(text, role) {
+      const chat = document.getElementById('mortEChat');
+      const msg = document.createElement('div');
+      msg.className = 'mort-e-message ' + role;
+      const avatarLabel = role === 'user' ? 'U' : 'M-E';
+      const bubble = document.createElement('div');
+      bubble.className = 'mort-e-msg-bubble';
+      bubble.textContent = text;
+      const avatar = document.createElement('div');
+      avatar.className = 'mort-e-msg-avatar';
+      avatar.textContent = avatarLabel;
+      msg.appendChild(avatar);
+      msg.appendChild(bubble);
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function addThinkingIndicator() {
+      const chat = document.getElementById('mortEChat');
+      const el = document.createElement('div');
+      el.className = 'mort-e-thinking';
+      el.id = 'mortEThinking';
+      el.innerHTML = 'Mort-E is thinking <div class="mort-e-thinking-dots"><span></span><span></span><span></span></div>';
+      chat.appendChild(el);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function removeThinkingIndicator() {
+      const el = document.getElementById('mortEThinking');
+      if (el) el.remove();
+    }
+
+    function setStatusThinking(isThinking) {
+      const dot = document.getElementById('mortEStatusDot');
+      if (isThinking) dot.classList.add('thinking');
+      else dot.classList.remove('thinking');
+    }
+
+    async function streamMortEResponse(text) {
+      const chat = document.getElementById('mortEChat');
+      const msg = document.createElement('div');
+      msg.className = 'mort-e-message ai';
+      const avatar = document.createElement('div');
+      avatar.className = 'mort-e-msg-avatar';
+      avatar.textContent = 'M-E';
+      const bubble = document.createElement('div');
+      bubble.className = 'mort-e-msg-bubble';
+      msg.appendChild(avatar);
+      msg.appendChild(bubble);
+      chat.appendChild(msg);
+
+      for (let i = 0; i < text.length; i++) {
+        bubble.textContent += text[i];
+        chat.scrollTop = chat.scrollHeight;
+        const char = text[i];
+        let speed = 12 + Math.random() * 12;
+        if (char === '.' || char === '!' || char === '?') speed = 70 + Math.random() * 40;
+        else if (char === ',') speed = 35 + Math.random() * 20;
+        else if (char === ' ') speed = 4 + Math.random() * 4;
+        else if (char === '\n') speed = 25;
+        await new Promise(r => setTimeout(r, speed));
+      }
+    }
+
+    // Handle Enter key for Mort-E
+    document.addEventListener('DOMContentLoaded', function() {
+      const mortEInput = document.getElementById('mortEInput');
+      if (mortEInput) {
+        mortEInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMortEMessage();
+          }
+        });
+      }
+    });
+
+    // Escape key closes Mort-E
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && mortEOpen) closeMortE();
+    });
   </script>
 </body>
 </html>
