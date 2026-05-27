@@ -206,12 +206,12 @@
         responses: {
           short: [
             '{entityName} is {shortDescription}. Want me to walk you through what it actually does?',
-            '{entityName} — {shortDescription}. There's a lot more to it if you want the full picture.',
+            "{entityName} \u2014 {shortDescription}. There's a lot more to it if you want the full picture.",
             'So {entityName} is {shortDescription}. Should I break it down further?',
           ],
           long: [
             'Alright, let me break down {entityName} properly. {longDescription} The key features include: {featureList}. Anything specific you want to dig into?',
-            'Here's the full picture on {entityName}. {longDescription} Key highlights: {featureList}. Want to know more about any particular aspect?',
+            "Here's the full picture on {entityName}. {longDescription} Key highlights: {featureList}. Want to know more about any particular aspect?",
           ],
           followUp: [
             'Good question — building on what I just said about {entityName}, {additionalDetail}. Does that help?',
