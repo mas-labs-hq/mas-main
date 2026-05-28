@@ -863,6 +863,43 @@
     let analytics;
     try { analytics = firebase.analytics(); } catch(e) { console.log('Analytics not available'); }
 
+    // GA event helper
+    function logGA(eventName, params) {
+      if (!analytics) return;
+      try { analytics.logEvent(eventName, params || {}); } catch(e) {}
+    }
+
+    // Device detection for analytics
+    function getDeviceType() {
+      var ua = navigator.userAgent;
+      if (/tablet|ipad|playbook|silk/i.test(ua)) return 'tablet';
+      if (/mobile|iphone|ipod|android.*mobile|blackberry|opera mini/i.test(ua)) return 'mobile';
+      return 'desktop';
+    }
+
+    // Log page view to GA
+    logGA('page_view', {
+      page_title: document.title,
+      page_path: window.location.pathname,
+      device_type: getDeviceType(),
+      language: navigator.language
+    });
+
+    // Scroll depth tracking
+    var scrollMilestones = {25:false, 50:false, 75:false, 100:false};
+    window.addEventListener('scroll', function() {
+      var scrollTop = window.scrollY || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight <= 0) return;
+      var pct = Math.round((scrollTop / docHeight) * 100);
+      [25,50,75,100].forEach(function(m) {
+        if (pct >= m && !scrollMilestones[m]) {
+          scrollMilestones[m] = true;
+          logGA('scroll_depth', {percent: m, page_path: window.location.pathname});
+        }
+      });
+    }, {passive: true});
+
     // ═══════════════════════════════════════════════════════════
     // SEED DATA — Original dummy counts from the blog
     // Views are set 123-134 above likes for realism.
@@ -1000,6 +1037,12 @@
       db.ref('blog/articles/' + id + '/likes').transaction(current => {
         return (current || 0) + delta;
       });
+
+      // GA analytics
+      logGA(wasLiked ? 'blog_unlike' : 'blog_like', {
+        article_id: id,
+        device_type: getDeviceType()
+      });
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -1032,6 +1075,13 @@
       // Increment shares in Firebase atomically
       db.ref('blog/articles/' + id + '/shares').transaction(current => {
         return (current || 0) + 1;
+      });
+
+      // GA analytics
+      logGA('blog_share', {
+        article_id: id,
+        platform: platform,
+        device_type: getDeviceType()
       });
 
       // Close popup
@@ -1068,6 +1118,7 @@
         if (!viewed) {
           db.ref('blog/articles/' + id + '/views').transaction(current => (current || 0) + 1);
           sessionStorage.setItem('article_' + id + '_viewed', 'true');
+          logGA('blog_view', { article_id: id, device_type: getDeviceType() });
         }
       });
     }
