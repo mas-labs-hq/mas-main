@@ -29,6 +29,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Analytics 4 (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-THGT2GHZ35"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-THGT2GHZ35', {
+      page_title: document.title,
+      page_path: window.location.pathname,
+      send_page_view: true
+    });
+  </script>
+
+  <!-- Firebase SDK (Compat — CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics-compat.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -376,7 +394,7 @@
               <strong class="text-secondary">Smart CV screening for Kenyan recruiters.</strong> Phein runs entirely on your HR team's workstations. No data ever leaves your office. No third-party servers. Just precise, AI-powered matching that turns hours of manual reading into seconds of calculated results. Built for agencies and companies that value privacy.
             </p>
             <div class="flex flex-wrap gap-3">
-              <a href="/client.phein_vr-6.0_demo" class="btn-primary">
+              <a href="/client.phein_vr-6.0_demo" class="btn-primary" onclick="if(typeof MortAppsFirebase!=='undefined')MortAppsFirebase.trackDemoClick('phein_screener')">
                 Try Demo
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </a>
@@ -453,7 +471,7 @@
               <strong class="text-secondary">Attendance that respects privacy.</strong> BioAttex turns any laptop or tablet into a secure check-in station. No fingerprint scanners. No cloud fees. Just precision facial recognition that runs entirely on your device. Perfect for SMEs, coworking spaces, and schools that want simplicity without compromise.
             </p>
             <div class="flex flex-wrap gap-3">
-              <a href="http://mortappsstudios.com/bioatx-demo" target="_blank" class="btn-primary">
+              <a href="http://mortappsstudios.com/bioatx-demo" target="_blank" class="btn-primary" onclick="if(typeof MortAppsFirebase!=='undefined')MortAppsFirebase.trackDemoClick('bioattex')">
                 Try Demo
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </a>
@@ -485,7 +503,7 @@
               <strong class="text-secondary">Try eyewear, no app store needed.</strong> Opticore Vipro runs on any laptop in your shop, letting customers see exactly how frames fit. No uploads, no lag. Pupillary distance, face width, alignment—all calculated locally. Give your optical business a high‑tech edge without sending customer photos anywhere.
             </p>
             <div class="flex flex-wrap gap-3">
-              <a href="/opticore-vipro.html" class="btn-primary">
+              <a href="/opticore-vipro.html" class="btn-primary" onclick="if(typeof MortAppsFirebase!=='undefined')MortAppsFirebase.trackDemoClick('opticore_vipro')">
                 Try Demo
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </a>
@@ -559,7 +577,7 @@
               <strong class="text-secondary">Plan like a pro, keep your data private.</strong> Brizerm Markets is the AI toolkit for the African entrepreneur who wants to build something real. No cloud, no subscriptions—just powerful planning tools that live on your own device. Validate ideas, track markets, and calculate returns, all without sending your business secrets anywhere.
             </p>
             <div class="flex flex-wrap gap-3">
-              <a href="briz/briz-demo.html" class="btn-primary">
+              <a href="briz/briz-demo.html" class="btn-primary" onclick="if(typeof MortAppsFirebase!=='undefined')MortAppsFirebase.trackDemoClick('brizerm_markets')">
                 Try Demo
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </a>
@@ -595,7 +613,7 @@
               <strong class="text-secondary">Smart farming for Kenyan smallholders.</strong> AgriXen gives you real‑time crop recommendations based on your county, a livestock health guide, a profit calculator, and a 24/7 AI assistant named Barn‑E. No account needed, no data leaves your device, and it’s completely free. Built for farmers who want practical advice without the noise.
             </p>
             <div class="flex flex-wrap gap-3">
-              <a href="https://www.mortappsstudios.com/AgriXen" class="btn-primary">
+              <a href="https://www.mortappsstudios.com/AgriXen" class="btn-primary" onclick="if(typeof MortAppsFirebase!=='undefined')MortAppsFirebase.trackDemoClick('agrixen')">
                 Get It
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </a>
@@ -685,7 +703,7 @@
               <strong class="text-secondary">Your tasks, your data, no cloud.</strong> TaskFlow Pro is a lightweight kanban board that keeps everything local. No accounts, no subscriptions, just a clean space to organise what matters. Drag tasks, set priorities, tag them, and export your work whenever you want. Works offline and installs like a real app on your phone or laptop.
             </p>
             <div class="flex flex-wrap gap-3">
-              <a href="/TaskFlowPro" class="btn-primary">
+              <a href="/TaskFlowPro" class="btn-primary" onclick="if(typeof MortAppsFirebase!=='undefined')MortAppsFirebase.trackDemoClick('taskflow_pro')">
                 Get It
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </a>
@@ -738,6 +756,25 @@
       </div>
     </section>
   </main>
+
+  <!-- Newsletter CTA -->
+  <section class="py-16 bg-surface-alt border-t border-b border-border">
+    <div class="max-w-3xl mx-auto px-6 text-center reveal">
+      <h2 class="heading-lg text-secondary mb-3">Stay Updated</h2>
+      <p class="text-muted mb-8 max-w-xl mx-auto">
+        Get notified about new releases, updates, and exclusive licensing offers. No spam, just product news.
+      </p>
+      <form id="swNewsletterForm" class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+        <input type="email" id="swNewsletterEmail" placeholder="you@company.com" required
+          class="flex-1 px-4 py-3 rounded-lg border border-border text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10">
+        <button type="submit" class="btn-primary whitespace-nowrap">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          Subscribe
+        </button>
+      </form>
+      <p id="swNewsletterStatus" class="mt-3 text-sm text-muted hidden"></p>
+    </div>
+  </section>
 
   <!-- Footer -->
   <footer class="bg-secondary py-12 border-t border-white/10">
@@ -792,6 +829,26 @@
           formStatus.textContent = "Thank you! Your inquiry has been received. We will contact you shortly.";
           formStatus.className = "mt-4 text-center text-sm text-green-400";
           purchaseForm.reset();
+          // Track purchase inquiry in Firebase
+          if (typeof MortAppsFirebase !== 'undefined') {
+            try {
+              var db = MortAppsFirebase.db;
+              db.ref('purchase_inquiries').push({
+                name: formData.get('name'),
+                email: formData.get('email'),
+                product: formData.get('product'),
+                message: formData.get('message'),
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                device: MortAppsFirebase.getDeviceType(),
+                browser: MortAppsFirebase.getBrowser(),
+                session_id: MortAppsFirebase.getSessionId()
+              });
+              MortAppsFirebase.logEvent('purchase_inquiry', {
+                product: formData.get('product'),
+                device_type: MortAppsFirebase.getDeviceType()
+              });
+            } catch(e) { console.warn('Firebase inquiry tracking error:', e); }
+          }
         } else {
           throw new Error('Form error');
         }
@@ -803,7 +860,49 @@
         btn.disabled = false;
       });
     });
+
+    // Newsletter Form Handler (Firebase)
+    const swNewsletterForm = document.getElementById('swNewsletterForm');
+    const swNewsletterStatus = document.getElementById('swNewsletterStatus');
+    
+    swNewsletterForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('swNewsletterEmail').value.trim();
+      if (!email) return;
+      
+      const btn = swNewsletterForm.querySelector('button[type="submit"]');
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+      btn.disabled = true;
+
+      if (typeof MortAppsFirebase !== 'undefined') {
+        MortAppsFirebase.subscribeNewsletter(email, 'software_page').then(function(result) {
+          swNewsletterStatus.textContent = result.duplicate 
+            ? "You're already subscribed!" 
+            : "You're in! We'll keep you posted on new releases.";
+          swNewsletterStatus.className = "mt-3 text-sm " + (result.duplicate ? "text-amber-600" : "text-green-600");
+          swNewsletterStatus.classList.remove('hidden');
+          swNewsletterForm.reset();
+        }).catch(function(err) {
+          swNewsletterStatus.textContent = "Something went wrong. Please try again.";
+          swNewsletterStatus.className = "mt-3 text-sm text-red-500";
+          swNewsletterStatus.classList.remove('hidden');
+        }).finally(function() {
+          btn.innerHTML = originalHTML;
+          btn.disabled = false;
+        });
+      } else {
+        swNewsletterStatus.textContent = "Subscription unavailable right now.";
+        swNewsletterStatus.className = "mt-3 text-sm text-muted";
+        swNewsletterStatus.classList.remove('hidden');
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+      }
+    });
   </script>
+
+  <!-- MortApps Firebase Analytics Module -->
+  <script src="firebase-init.js"></script>
 </body>
 
 </html>
