@@ -19,13 +19,18 @@
             --bg: #020617;
             --surface: #0f172a;
             --surface-light: #1e293b;
+            --surface-hover: #263046;
             --text: #f8fafc;
             --text-muted: #94a3b8;
             --accent: #2563eb;
             --accent-light: #3b82f6;
-            --border: #334155;
+            --accent-glow: rgba(37, 99, 235, 0.25);
+            --border: #1e293b;
+            --border-light: #334155;
             --font-display: 'Sora', sans-serif;
             --font-body: 'DM Sans', sans-serif;
+            --radius: 16px;
+            --radius-sm: 10px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -36,21 +41,26 @@
             color: var(--text);
             line-height: 1.5;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Header */
+        /* ===== Header ===== */
         header {
             position: sticky;
             top: 0;
-            z-index: 50;
-            background: rgba(2, 6, 23, 0.8);
-            backdrop-filter: blur(12px);
+            z-index: 100;
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
         }
         .nav-container {
             max-width: 1280px;
             margin: 0 auto;
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1.25rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -58,151 +68,352 @@
         .brand {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.625rem;
             text-decoration: none;
             color: var(--text);
         }
-        .brand img { height: 32px; width: 32px; border-radius: 6px; }
-        .brand-text { font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; }
-        .nav-links { display: flex; gap: 1.5rem; }
+        .brand img { height: 32px; width: 32px; border-radius: 8px; }
+        .brand-text { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; letter-spacing: -0.02em; }
+
+        .nav-links {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
         .nav-links a {
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.5rem 0.875rem;
+            border-radius: 8px;
+            transition: all 0.2s;
         }
-        .nav-links a:hover, .nav-links a.active { color: var(--text); }
+        .nav-links a:hover { color: var(--text); background: var(--surface-light); }
+        .nav-links a.active { color: var(--accent-light); background: rgba(37, 99, 235, 0.1); }
 
-        /* Hero */
+        /* Hamburger */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            color: var(--text);
+            transition: background 0.2s;
+        }
+        .hamburger:hover { background: var(--surface-light); }
+        .hamburger svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.5rem;
+            z-index: 99;
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+        .mobile-menu.open {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .mobile-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+        .mobile-menu a:hover { color: var(--text); background: var(--surface-light); }
+        .mobile-menu a.active { color: var(--accent-light); background: rgba(37, 99, 235, 0.1); }
+        .mobile-menu a svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.75; fill: none; flex-shrink: 0; }
+
+        @media (max-width: 640px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; align-items: center; justify-content: center; }
+            .mobile-menu { display: block; }
+        }
+
+        /* ===== Hero ===== */
         .hero {
             text-align: center;
-            padding: 4rem 1.5rem 3rem;
-            background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.15) 0%, transparent 60%);
+            padding: 3rem 1.25rem 2rem;
+            background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(37, 99, 235, 0.12) 0%, transparent 70%);
+            position: relative;
         }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.875rem;
+            border-radius: 9999px;
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-light);
+            margin-bottom: 1rem;
+        }
+        .hero-badge svg { width: 14px; height: 14px; fill: currentColor; stroke: none; }
         .hero h1 {
             font-family: var(--font-display);
-            font-size: clamp(2rem, 5vw, 3rem);
+            font-size: clamp(1.75rem, 5vw, 2.75rem);
             font-weight: 700;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.03em;
             background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .hero p {
             color: var(--text-muted);
-            font-size: 1.1rem;
-            max-width: 600px;
+            font-size: 1rem;
+            max-width: 520px;
             margin: 0 auto;
+            line-height: 1.6;
         }
 
-        /* Categories */
+        /* ===== Categories ===== */
         .categories {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
             gap: 0.5rem;
-            padding: 0 1.5rem 2rem;
+            padding: 0 1.25rem 2rem;
         }
         .cat-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
             padding: 0.5rem 1rem;
             border-radius: 9999px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-light);
             background: transparent;
             color: var(--text-muted);
             font-family: var(--font-body);
-            font-size: 0.85rem;
+            font-size: 0.825rem;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .cat-btn:hover { border-color: var(--accent); color: var(--text); }
+        .cat-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
+        .cat-btn:hover { border-color: var(--accent); color: var(--text); background: rgba(37, 99, 235, 0.05); }
         .cat-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .cat-btn.active svg { stroke: #fff; }
 
-        /* Games Grid */
+        /* ===== Games Grid ===== */
         .games-section {
             max-width: 1280px;
             margin: 0 auto;
-            padding: 0 1.5rem 4rem;
+            padding: 0 1.25rem 4rem;
+            flex: 1;
         }
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
         }
 
-        /* Card */
+        /* ===== Card ===== */
         .game-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: var(--radius);
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s;
             text-decoration: none;
             color: inherit;
-            display: block;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
         }
         .game-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(37, 99, 235, 0.2);
             border-color: var(--accent);
         }
+        .game-card:active {
+            transform: translateY(-2px);
+            transition-duration: 0.1s;
+        }
+
         .card-header {
-            height: 160px;
+            height: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             overflow: hidden;
         }
+        .card-header::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.15) 100%);
+        }
         .card-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 16px;
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             z-index: 1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        .card-icon svg { width: 32px; height: 32px; stroke-width: 1.5; }
+        .card-icon svg { width: 26px; height: 26px; stroke-width: 1.5; }
         
         /* Icon Background Variations */
-        .icon-neon { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
-        .icon-arcade { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
-        .icon-puzzle { background: rgba(14, 165, 233, 0.1); color: #0ea5e9; }
-        .icon-brain { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .icon-neon { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .icon-arcade { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+        .icon-puzzle { background: rgba(14, 165, 233, 0.15); color: #0ea5e9; }
+        .icon-brain { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .icon-racer { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
         
-        .card-body { padding: 1.25rem; }
-        .card-title { font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem; }
-        .card-desc { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-body { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
+        .card-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.375rem;
+            letter-spacing: -0.01em;
+        }
+        .card-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.5;
+            flex: 1;
+        }
         .card-footer { display: flex; justify-content: space-between; align-items: center; }
         .badge {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
             background: var(--surface-light);
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
+        .badge-arcade { background: rgba(139, 92, 246, 0.12); color: #a78bfa; }
+        .badge-puzzle { background: rgba(14, 165, 233, 0.12); color: #38bdf8; }
+        .badge-brain { background: rgba(245, 158, 11, 0.12); color: #fbbf24; }
+        
         .play-text {
             font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--accent);
+            font-size: 0.8rem;
+            color: var(--accent-light);
             display: flex;
             align-items: center;
             gap: 0.25rem;
         }
+        .play-text svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
 
-        /* Footer */
+        /* ===== Stats Bar ===== */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 0 1.25rem 2rem;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .stat-item svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.75; fill: none; opacity: 0.7; }
+        .stat-item strong { color: var(--text); font-weight: 600; }
+
+        /* ===== Footer ===== */
         footer {
             border-top: 1px solid var(--border);
-            padding: 2rem;
+            padding: 2rem 1.25rem;
             text-align: center;
             color: var(--text-muted);
-            font-size: 0.875rem;
+            font-size: 0.8rem;
+            margin-top: auto;
+        }
+        footer a { color: var(--accent-light); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* ===== Responsive ===== */
+        @media (min-width: 641px) {
+            .card-header { height: 140px; }
+            .card-icon { width: 60px; height: 60px; border-radius: 16px; }
+            .card-icon svg { width: 30px; height: 30px; }
+            .card-body { padding: 1.25rem; }
+            .card-title { font-size: 1.05rem; }
+            .card-desc { font-size: 0.875rem; }
         }
 
-        @media (max-width: 640px) {
-            .nav-links { display: none; }
+        @media (min-width: 1024px) {
+            .grid { gap: 1.25rem; }
+            .card-header { height: 160px; }
+            .card-icon { width: 64px; height: 64px; }
+            .card-icon svg { width: 32px; height: 32px; }
         }
+
+        @media (max-width: 400px) {
+            .card-header { height: 100px; }
+            .card-icon { width: 44px; height: 44px; border-radius: 12px; }
+            .card-icon svg { width: 22px; height: 22px; }
+            .card-body { padding: 0.75rem; }
+            .card-title { font-size: 0.875rem; }
+            .card-desc { font-size: 0.75rem; margin-bottom: 0.5rem; }
+            .badge { font-size: 0.65rem; padding: 0.15rem 0.4rem; }
+            .play-text { font-size: 0.75rem; }
+            .grid { gap: 0.625rem; }
+        }
+
+        /* ===== Animations ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .game-card {
+            animation: fadeInUp 0.5s ease both;
+        }
+        .game-card:nth-child(1) { animation-delay: 0.02s; }
+        .game-card:nth-child(2) { animation-delay: 0.04s; }
+        .game-card:nth-child(3) { animation-delay: 0.06s; }
+        .game-card:nth-child(4) { animation-delay: 0.08s; }
+        .game-card:nth-child(5) { animation-delay: 0.10s; }
+        .game-card:nth-child(6) { animation-delay: 0.12s; }
+        .game-card:nth-child(7) { animation-delay: 0.14s; }
+        .game-card:nth-child(8) { animation-delay: 0.16s; }
+        .game-card:nth-child(9) { animation-delay: 0.18s; }
+        .game-card:nth-child(10) { animation-delay: 0.20s; }
+        .game-card:nth-child(11) { animation-delay: 0.22s; }
+        .game-card:nth-child(12) { animation-delay: 0.24s; }
+        .game-card:nth-child(13) { animation-delay: 0.26s; }
+
+        /* Hidden utility */
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -211,7 +422,7 @@
     <header>
         <div class="nav-container">
             <a href="index.html" class="brand">
-                <img src="mas-icons/favicon-32x32.png" alt="Logo">
+                <img src="mas-icons/favicon-32x32.png" alt="MortApps Studios Logo">
                 <span class="brand-text">MortApps Studios</span>
             </a>
             <nav class="nav-links">
@@ -221,21 +432,82 @@
                 <a href="games.html" class="active">Games</a>
                 <a href="index.html#contact">Contact</a>
             </nav>
+            <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="index.html">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Home
+            </a>
+            <a href="index.html#portfolio">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                Portfolio
+            </a>
+            <a href="software.html">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                Software
+            </a>
+            <a href="games.html" class="active">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="16" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+                Games
+            </a>
+            <a href="index.html#contact">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Contact
+            </a>
         </div>
     </header>
 
     <!-- Hero -->
     <section class="hero">
+        <div class="hero-badge">
+            <svg viewBox="0 0 16 16"><path d="M8 0L10.5 5.5L16 6.5L12 10.5L13 16L8 13.5L3 16L4 10.5L0 6.5L5.5 5.5L8 0Z"/></svg>
+            12 Free Games
+        </div>
         <h1>Gaming Hub</h1>
         <p>No downloads, no installs. Just click and play. All games work on PC and mobile. Built for pure relaxation.</p>
     </section>
 
+    <!-- Stats -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="16" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+            <strong>12</strong> Games
+        </div>
+        <div class="stat-item">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            <strong>3</strong> Categories
+        </div>
+        <div class="stat-item">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <strong>100%</strong> Free
+        </div>
+    </div>
+
     <!-- Categories -->
     <div class="categories">
-        <button class="cat-btn active" data-filter="all">All Games</button>
-        <button class="cat-btn" data-filter="arcade">Arcade</button>
-        <button class="cat-btn" data-filter="puzzle">Puzzle</button>
-        <button class="cat-btn" data-filter="brain">Brain</button>
+        <button class="cat-btn active" data-filter="all">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            All Games
+        </button>
+        <button class="cat-btn" data-filter="arcade">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Arcade
+        </button>
+        <button class="cat-btn" data-filter="puzzle">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            Puzzle
+        </button>
+        <button class="cat-btn" data-filter="brain">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 0 0-8 8c0 3.4 2.1 6.3 5 7.5V20h6v-2.5c2.9-1.2 5-4.1 5-7.5a8 8 0 0 0-8-8z"/><line x1="10" y1="20" x2="14" y2="20"/><line x1="10" y1="22" x2="14" y2="22"/></svg>
+            Brain
+        </button>
     </div>
 
     <!-- Games Grid -->
@@ -245,7 +517,6 @@
             <a href="games/snake.html" class="game-card" data-category="arcade">
                 <div class="card-header" style="background: linear-gradient(135deg, #0f172a 0%, #064e3b 100%);">
                     <div class="card-icon icon-neon">
-                        <!-- Snake Icon -->
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605"/></svg>
                     </div>
                 </div>
@@ -253,8 +524,8 @@
                     <h3 class="card-title">Snake Classic</h3>
                     <p class="card-desc">Eat food, grow longer, avoid walls! The timeless arcade game with modern neon graphics.</p>
                     <div class="card-footer">
-                        <span class="badge">Arcade</span>
-                        <span class="play-text">Play Now &rarr;</span>
+                        <span class="badge badge-arcade">Arcade</span>
+                        <span class="play-text">Play Now <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                     </div>
                 </div>
             </a>
@@ -263,7 +534,6 @@
             <a href="games/breakout.html" class="game-card" data-category="arcade">
                 <div class="card-header" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);">
                     <div class="card-icon icon-arcade">
-                        <!-- Breakout Icon -->
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 012.25-2.25h7.5A2.25 2.25 0 0118 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 004.5 9v.878m13.5-3.036c.235.083.487.128.75.128A2.25 2.25 0 0121 9v.878m0 0a2.246 2.246 0 00-.75-.128H3.75c-.263 0-.515.045-.75.128m15 0v6.876a2.25 2.25 0 01-2.25 2.25h-1.5"/></svg>
                     </div>
                 </div>
@@ -271,8 +541,8 @@
                     <h3 class="card-title">Breakout</h3>
                     <p class="card-desc">Smash bricks with your paddle! Classic brick breaker action with power-ups.</p>
                     <div class="card-footer">
-                        <span class="badge">Arcade</span>
-                        <span class="play-text">Play Now &rarr;</span>
+                        <span class="badge badge-arcade">Arcade</span>
+                        <span class="play-text">Play Now <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                     </div>
                 </div>
             </a>
@@ -280,8 +550,7 @@
             <!-- 2048 -->
             <a href="games/2048.html" class="game-card" data-category="puzzle">
                 <div class="card-header" style="background: linear-gradient(135deg, #1a2e05 0%, #365314 100%);">
-                    <div class="card-icon icon-neon" style="background:rgba(163,230,53,0.1); color:#a3e635;">
-                        <!-- 2048 Icon -->
+                    <div class="card-icon icon-neon" style="background:rgba(163,230,53,0.15); color:#a3e635;">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
                     </div>
                 </div>
@@ -289,8 +558,8 @@
                     <h3 class="card-title">2048</h3>
                     <p class="card-desc">Slide and merge tiles to reach 2048! Addictive number puzzle that's easy to learn.</p>
                     <div class="card-footer">
-                        <span class="badge">Puzzle</span>
-                        <span class="play-text">Play Now &rarr;</span>
+                        <span class="badge badge-puzzle">Puzzle</span>
+                        <span class="play-text">Play Now <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                     </div>
                 </div>
             </a>
@@ -299,7 +568,6 @@
             <a href="games/tetris.html" class="game-card" data-category="puzzle">
                 <div class="card-header" style="background: linear-gradient(135deg, #0c0a09 0%, #1c1917 100%);">
                     <div class="card-icon icon-arcade">
-                        <!-- Tetris Icon -->
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 01-.657.643 48.39 48.39 0 01-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 01-.658.663v0c-.355 0-.676-.186-.959-.401a1.651 1.651 0 00-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 01-.42 3.89c-.06.39.14.78.5.94.39.17.84.04 1.08-.32.27-.39.5-.82.67-1.28.18-.46.31-.96.36-1.5.05-.53.05-1.08-.05-1.65-.1-.57-.27-1.11-.51-1.62-.24-.52-.55-.99-.91-1.42-.35-.43-.75-.8-1.17-1.09-.43-.29-.87-.5-1.29-.62-.21-.06-.42-.1-.61-.12"/></svg>
                     </div>
                 </div>
@@ -307,8 +575,8 @@
                     <h3 class="card-title">Tetris</h3>
                     <p class="card-desc">Stack falling blocks, clear lines, don't top out! The legendary puzzle game.</p>
                     <div class="card-footer">
-                        <span class="badge">Puzzle</span>
-                        <span class="play-text">Play Now &rarr;</span>
+                        <span class="badge badge-puzzle">Puzzle</span>
+                        <span class="play-text">Play Now <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                     </div>
                 </div>
             </a>
@@ -317,7 +585,6 @@
             <a href="games/memory.html" class="game-card" data-category="brain">
                 <div class="card-header" style="background: linear-gradient(135deg, #042f2e 0%, #083344 100%);">
                     <div class="card-icon icon-puzzle">
-                        <!-- Memory Icon -->
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     </div>
                 </div>
@@ -325,8 +592,8 @@
                     <h3 class="card-title">Memory Match</h3>
                     <p class="card-desc">Flip cards and find matching pairs! Test your memory with increasing difficulty.</p>
                     <div class="card-footer">
-                        <span class="badge">Brain</span>
-                        <span class="play-text">Play Now &rarr;</span>
+                        <span class="badge badge-brain">Brain</span>
+                        <span class="play-text">Play Now <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                     </div>
                 </div>
             </a>
@@ -334,8 +601,7 @@
             <!-- Wordle -->
             <a href="games/wordle.html" class="game-card" data-category="brain">
                 <div class="card-header" style="background: linear-gradient(135deg, #052e16 0%, #14532d 100%);">
-                    <div class="card-icon" style="background: rgba(74, 222, 128, 0.1); color: #4ade80;">
-                        <!-- Wordle Icon -->
+                    <div class="card-icon" style="background: rgba(74, 222, 128, 0.15); color: #4ade80;">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
                     </div>
                 </div>
@@ -343,8 +609,8 @@
                     <h3 class="card-title">Wordle Clone</h3>
                     <p class="card-desc">Guess the 5-letter word in 6 tries! Color hints guide you to the answer.</p>
                     <div class="card-footer">
-                        <span class="badge">Brain</span>
-                        <span class="play-text">Play Now &rarr;</span>
+                        <span class="badge badge-brain">Brain</span>
+                        <span class="play-text">Play Now <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                     </div>
                 </div>
             </a>
@@ -360,8 +626,8 @@
                     <h3 class="card-title">Flappy Ball</h3>
                     <p class="card-desc">Tap to fly through obstacles! Simple one-button gameplay that's addictive.</p>
                     <div class="card-footer">
-                        <span class="badge">Arcade</span>
-                        <span class="play-text">Play Now &rarr;</span>
+                        <span class="badge badge-arcade">Arcade</span>
+                        <span class="play-text">Play Now <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                     </div>
                 </div>
             </a>
@@ -377,8 +643,8 @@
                     <h3 class="card-title">Space Dodger</h3>
                     <p class="card-desc">Dodge asteroids in deep space! Survive as long as you can in endless mode.</p>
                     <div class="card-footer">
-                        <span class="badge">Arcade</span>
-                        <span class="play-text">Play Now &rarr;</span>
+                        <span class="badge badge-arcade">Arcade</span>
+                        <span class="play-text">Play Now <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                     </div>
                 </div>
             </a>
@@ -386,7 +652,7 @@
             <!-- Whack-a-Mole -->
             <a href="games/whackamole.html" class="game-card" data-category="arcade">
                 <div class="card-header" style="background: linear-gradient(135deg, #422006 0%, #713f12 100%);">
-                    <div class="card-icon" style="background: rgba(251, 191, 36, 0.1); color: #fbbf24;">
+                    <div class="card-icon" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24;">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z"/></svg>
                     </div>
                 </div>
@@ -394,8 +660,8 @@
                     <h3 class="card-title">Whack-a-Mole</h3>
                     <p class="card-desc">Tap moles before they hide! Test your reaction speed in this fast-paced game.</p>
                     <div class="card-footer">
-                        <span class="badge">Arcade</span>
-                        <span class="play-text">Play Now &rarr;</span>
+                        <span class="badge badge-arcade">Arcade</span>
+                        <span class="play-text">Play Now <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                     </div>
                 </div>
             </a>
@@ -411,8 +677,8 @@
                     <h3 class="card-title">Quick Math</h3>
                     <p class="card-desc">Solve equations against the clock! Train your brain with arithmetic.</p>
                     <div class="card-footer">
-                        <span class="badge">Brain</span>
-                        <span class="play-text">Play Now &rarr;</span>
+                        <span class="badge badge-brain">Brain</span>
+                        <span class="play-text">Play Now <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                     </div>
                 </div>
             </a>
@@ -420,7 +686,7 @@
             <!-- Color Match -->
             <a href="games/colormatch.html" class="game-card" data-category="brain">
                 <div class="card-header" style="background: linear-gradient(135deg, #581c87 0%, #701a75 100%);">
-                    <div class="card-icon" style="background: rgba(232, 121, 249, 0.1); color: #e879f9;">
+                    <div class="card-icon" style="background: rgba(232, 121, 249, 0.15); color: #e879f9;">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402M6.75 21A3.75 3.75 0 013 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 003.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008z"/></svg>
                     </div>
                 </div>
@@ -428,13 +694,13 @@
                     <h3 class="card-title">Color Match</h3>
                     <p class="card-desc">Match colors or words faster than your brain can process!</p>
                     <div class="card-footer">
-                        <span class="badge">Brain</span>
-                        <span class="play-text">Play Now &rarr;</span>
+                        <span class="badge badge-brain">Brain</span>
+                        <span class="play-text">Play Now <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                     </div>
                 </div>
             </a>
 
-            <!-- Clicker -->
+            <!-- Clicker Empire -->
             <a href="games/clicker.html" class="game-card" data-category="arcade">
                 <div class="card-header" style="background: linear-gradient(135deg, #431407 0%, #7c2d12 100%);">
                     <div class="card-icon icon-brain">
@@ -445,8 +711,25 @@
                     <h3 class="card-title">Clicker Empire</h3>
                     <p class="card-desc">Click to build points, unlock upgrades, and automate your empire!</p>
                     <div class="card-footer">
-                        <span class="badge">Arcade</span>
-                        <span class="play-text">Play Now &rarr;</span>
+                        <span class="badge badge-arcade">Arcade</span>
+                        <span class="play-text">Play Now <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Street Racer -->
+            <a href="games/street-racer.html" class="game-card" data-category="arcade">
+                <div class="card-header" style="background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);">
+                    <div class="card-icon icon-racer">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 01-2-2V9a2 2 0 012-2h1l2-3h8l2 3h1a2 2 0 012 2v6a2 2 0 01-2 2M5 17a2 2 0 00-2 2M19 17a2 2 0 002 2"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/><path d="M5 9h14"/><path d="M3 11h2m14 0h2"/></svg>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">Street Racer</h3>
+                    <p class="card-desc">Dodge traffic and race through the streets! Fast lane-changing action.</p>
+                    <div class="card-footer">
+                        <span class="badge badge-arcade">Arcade</span>
+                        <span class="play-text">Play Now <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                     </div>
                 </div>
             </a>
@@ -458,6 +741,7 @@
     </footer>
 
     <script>
+        // Category filter
         const btns = document.querySelectorAll('.cat-btn');
         const cards = document.querySelectorAll('.game-card');
 
@@ -468,17 +752,61 @@
                 
                 const filter = btn.dataset.filter;
                 cards.forEach(card => {
-                    card.style.display = (filter === 'all' || card.dataset.category === filter) ? 'block' : 'none';
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.style.display = '';
+                        card.style.animation = 'none';
+                        card.offsetHeight; // trigger reflow
+                        card.style.animation = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
                 });
             });
         });
 
-        // Right-click protection
-document.addEventListener('contextmenu', e => e.preventDefault());
+        // Hamburger menu
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        let menuOpen = false;
 
-        
+        hamburgerBtn.addEventListener('click', () => {
+            menuOpen = !menuOpen;
+            hamburgerBtn.setAttribute('aria-expanded', menuOpen);
+            
+            if (menuOpen) {
+                mobileMenu.classList.add('open');
+                // Switch to X icon
+                hamburgerBtn.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="6" y1="18" x2="18" y2="6"></line></svg>';
+            } else {
+                mobileMenu.classList.remove('open');
+                // Switch back to hamburger icon
+                hamburgerBtn.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+            }
+        });
+
+        // Close mobile menu when clicking a link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuOpen = false;
+                hamburgerBtn.setAttribute('aria-expanded', false);
+                mobileMenu.classList.remove('open');
+                hamburgerBtn.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (menuOpen && !hamburgerBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+                menuOpen = false;
+                hamburgerBtn.setAttribute('aria-expanded', false);
+                mobileMenu.classList.remove('open');
+                hamburgerBtn.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+            }
+        });
+
+        // Right-click protection
+        document.addEventListener('contextmenu', e => e.preventDefault());
     </script>
 </body>
 
 </html>
-
