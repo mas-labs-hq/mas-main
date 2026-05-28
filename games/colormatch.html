@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>Color Match - MortApps Studios</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #020617;
+            --surface: #0f172a;
+            --surface-light: #1e293b;
+            --surface-lighter: #334155;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #e879f9;
+            --accent-light: #f0abfc;
+            --accent-glow: rgba(232, 121, 249, 0.4);
+            --success: #22c55e;
+            --success-glow: rgba(34, 197, 94, 0.3);
+            --error: #ef4444;
+            --error-glow: rgba(239, 68, 68, 0.3);
+            --border: rgba(51, 65, 85, 0.5);
+            --font-display: 'Sora', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .bg-mesh {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(232, 121, 249, 0.12), transparent),
+                radial-gradient(ellipse 60% 40% at 80% 60%, rgba(192, 38, 211, 0.06), transparent),
+                var(--bg);
+        }
+        .bg-mesh::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+        }
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .back-btn:hover { color: var(--text); background: var(--surface-light); }
+        .brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; color: var(--text); }
+        .brand-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #e879f9, #c026d3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(232, 121, 249, 0.3);
+        }
+        .brand-icon svg { width: 18px; height: 18px; }
+        .brand-text { font-family: var(--font-display); font-weight: 700; font-size: 1rem; letter-spacing: -0.02em; }
+        .stats { display: flex; gap: 0.5rem; }
+        .stat {
+            text-align: center;
+            background: var(--surface);
+            padding: 0.35rem 0.7rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            min-width: 54px;
+        }
+        .stat-label { font-size: 0.55rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; }
+        .stat-value { font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--accent-light); }
+        .game-wrapper {
+            padding-top: 70px;
+            padding-bottom: 1rem;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .game-container {
+            background: linear-gradient(145deg, var(--surface), rgba(15, 23, 42, 0.8));
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 1.75rem;
+            box-shadow:
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            width: 100%;
+            max-width: 440px;
+            margin: 0 1rem;
+        }
+        .timer-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.75rem;
+        }
+        .timer-icon {
+            width: 20px; height: 20px;
+            color: var(--accent-light);
+            flex-shrink: 0;
+        }
+        .timer-track { flex: 1; height: 8px; background: var(--surface-light); border-radius: 4px; overflow: hidden; }
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            border-radius: 4px;
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+        .timer-fill.danger { background: linear-gradient(90deg, var(--error), #f97316); }
+        .color-word {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 8vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            text-align: center;
+            text-shadow: 0 0 30px currentColor;
+            transition: color 0.4s ease, transform 0.2s ease;
+            line-height: 1.2;
+        }
+        .color-word.pulse {
+            animation: wordPulse 0.3s ease;
+        }
+        @keyframes wordPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .instruction { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.75rem; text-align: center; }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        .color-btn {
+            padding: 1.1rem 0.75rem;
+            background: var(--surface-light);
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            color: var(--text);
+            font-family: var(--font-display);
+            font-size: clamp(0.95rem, 3vw, 1.1rem);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-transform: uppercase;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            min-height: 56px;
+        }
+        .color-btn:hover:not(:disabled) { border-color: var(--accent); transform: translateY(-2px); }
+        .color-btn:active:not(:disabled) { transform: scale(0.97); }
+        .color-btn:disabled { cursor: not-allowed; }
+        .color-btn.correct {
+            background: linear-gradient(145deg, var(--success), #16a34a) !important;
+            border-color: var(--success) !important;
+            color: white !important;
+            box-shadow: 0 4px 15px var(--success-glow);
+            animation: correctPop 0.4s ease;
+        }
+        .color-btn.wrong {
+            background: linear-gradient(145deg, var(--error), #dc2626) !important;
+            border-color: var(--error) !important;
+            color: white !important;
+            box-shadow: 0 4px 15px var(--error-glow);
+            animation: wrongShake 0.4s ease;
+        }
+        @keyframes correctPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+        /* Score popup */
+        .score-popup {
+            position: fixed;
+            pointer-events: none;
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 800;
+            z-index: 300;
+            animation: scoreFloat 0.8s ease-out forwards;
+        }
+        .score-popup.plus { color: var(--success); text-shadow: 0 0 15px var(--success-glow); }
+        .score-popup.minus { color: var(--error); text-shadow: 0 0 15px var(--error-glow); }
+        @keyframes scoreFloat {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
+        }
+        /* Overlays */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        .overlay.hidden { opacity: 0; pointer-events: none; }
+        .overlay-content { text-align: center; padding: 2rem; max-width: 340px; }
+        .overlay-icon {
+            width: 80px; height: 80px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .overlay-icon svg { width: 100%; height: 100%; }
+        .overlay-icon.bounce { animation: bounce 0.6s ease infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .overlay-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff, var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .overlay-subtitle { color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5; }
+        .stats-row { display: flex; justify-content: center; gap: 2rem; margin: 1rem 0 1.5rem; }
+        .final-stat { text-align: center; }
+        .final-stat-value {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-light), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .final-stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .btn {
+            font-family: var(--font-body);
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            min-height: 48px;
+        }
+        .btn-primary { background: linear-gradient(135deg, var(--accent), #c026d3); color: white; box-shadow: 0 4px 15px var(--accent-glow); }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn svg { width: 18px; height: 18px; }
+        .game-footer { text-align: center; padding: 1rem; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 0.02em; }
+
+        @media (max-width: 420px) {
+            .header { padding: 0.6rem 0.8rem; }
+            .brand-text { display: none; }
+            .game-container { padding: 1.25rem; border-radius: 20px; margin: 0 0.75rem; }
+            .stat { min-width: 48px; padding: 0.3rem 0.5rem; }
+            .stat-value { font-size: 0.9rem; }
+        }
+        @media (max-height: 640px) {
+            .game-wrapper { padding-top: 60px; justify-content: flex-start; }
+            .game-container { padding: 1rem; }
+            .timer-section { margin-bottom: 1rem; }
+            .color-word { margin-bottom: 0.25rem; }
+            .instruction { margin-bottom: 1rem; }
+            .color-btn { padding: 0.75rem; min-height: 48px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+    <header class="header">
+        <a href="../games.html" class="back-btn">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Back
+        </a>
+        <a href="../index.html" class="brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="13.5" cy="6.5" r="2.5"/>
+                    <circle cx="17.5" cy="10.5" r="2.5"/>
+                    <circle cx="8.5" cy="7.5" r="2.5"/>
+                    <circle cx="6.5" cy="12" r="2.5"/>
+                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.1-.7-.4-1-.3-.3-.4-.7-.4-1.1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-5.5-4.5-9-10-9z"/>
+                </svg>
+            </div>
+            <span class="brand-text">MortApps</span>
+        </a>
+        <div class="stats">
+            <div class="stat"><div class="stat-label">Score</div><div class="stat-value" id="score">0</div></div>
+            <div class="stat"><div class="stat-label">Best</div><div class="stat-value" id="best">0</div></div>
+        </div>
+    </header>
+
+    <div class="game-wrapper">
+        <div class="game-container">
+            <div class="timer-section">
+                <svg class="timer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <div class="timer-track"><div class="timer-fill" id="timer"></div></div>
+            </div>
+            <div class="color-word" id="word">READY</div>
+            <div class="instruction" id="instruction">Click Start to begin!</div>
+            <div class="buttons" id="buttons"></div>
+        </div>
+    </div>
+
+    <div class="overlay" id="startOverlay">
+        <div class="overlay-content">
+            <div class="overlay-icon bounce">
+                <svg viewBox="0 0 24 24" fill="none" stroke="url(#paletteGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <defs>
+                        <linearGradient id="paletteGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#e879f9"/>
+                            <stop offset="100%" style="stop-color:#f0abfc"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="13.5" cy="6.5" r="2.5"/>
+                    <circle cx="17.5" cy="10.5" r="2.5"/>
+                    <circle cx="8.5" cy="7.5" r="2.5"/>
+                    <circle cx="6.5" cy="12" r="2.5"/>
+                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.5-.7 1.5-1.5 0-.4-.1-.7-.4-1-.3-.3-.4-.7-.4-1.1 0-.8.7-1.5 1.5-1.5H16c3.3 0 6-2.7 6-6 0-5.5-4.5-9-10-9z"/>
+                </svg>
+            </div>
+            <h1 class="overlay-title">Color Match</h1>
+            <p class="overlay-subtitle">A Stroop test! Tap the COLOR the word is shown in, not the word itself!</p>
+            <button class="btn btn-primary" id="startBtn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Start Game
+            </button>
+        </div>
+    </div>
+
+    <div class="overlay hidden" id="gameOverOverlay">
+        <div class="overlay-content">
+            <div class="overlay-icon" id="gameOverIcon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="url(#timerGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <defs>
+                        <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ef4444"/>
+                            <stop offset="100%" style="stop-color:#f97316"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+            </div>
+            <h1 class="overlay-title">Time's Up!</h1>
+            <div class="stats-row">
+                <div class="final-stat"><div class="final-stat-value" id="fScore">0</div><div class="final-stat-label">Score</div></div>
+                <div class="final-stat"><div class="final-stat-value" id="fCorrect">0</div><div class="final-stat-label">Correct</div></div>
+            </div>
+            <button class="btn btn-primary" id="againBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"/>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+                Play Again
+            </button>
+        </div>
+    </div>
+
+    <footer class="game-footer">&copy; 2026 MortApps Studios</footer>
+
+    <script>
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        const COLORS = ['RED', 'BLUE', 'GREEN', 'YELLOW'];
+        const HEXES = {
+            'RED': '#ef4444',
+            'BLUE': '#3b82f6',
+            'GREEN': '#22c55e',
+            'YELLOW': '#eab308'
+        };
+
+        // Game state
+        let score = 0;
+        let best = parseInt(localStorage.getItem('color_best')) || 0;
+        let correct = 0;
+        let time = 100;
+        let playing = false;
+        let answer = '';
+        let timerRAF = null;
+        let lastTick = 0;
+
+        // DOM refs (cached)
+        const wordEl = document.getElementById('word');
+        const buttonsEl = document.getElementById('buttons');
+        const timerEl = document.getElementById('timer');
+        const scoreEl = document.getElementById('score');
+        const bestEl = document.getElementById('best');
+        const instructionEl = document.getElementById('instruction');
+        const startOverlay = document.getElementById('startOverlay');
+        const gameOverOverlay = document.getElementById('gameOverOverlay');
+
+        bestEl.textContent = best;
+
+        function showScorePopup(isCorrect) {
+            const popup = document.createElement('div');
+            popup.className = 'score-popup ' + (isCorrect ? 'plus' : 'minus');
+            popup.textContent = isCorrect ? '+10' : '-15';
+            popup.style.left = '50%';
+            popup.style.top = '40%';
+            popup.style.transform = 'translateX(-50%)';
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 800);
+        }
+
+        function generateQuestion() {
+            const word = COLORS[Math.floor(Math.random() * COLORS.length)];
+            let displayColor;
+            do {
+                displayColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+            } while (displayColor === word);
+
+            answer = displayColor;
+
+            wordEl.textContent = word;
+            wordEl.style.color = HEXES[displayColor];
+            wordEl.classList.remove('pulse');
+            void wordEl.offsetWidth; // force reflow
+            wordEl.classList.add('pulse');
+
+            instructionEl.textContent = 'Tap the COLOR of the word!';
+
+            const shuffled = [...COLORS].sort(() => Math.random() - 0.5);
+            buttonsEl.innerHTML = '';
+
+            shuffled.forEach(color => {
+                const btn = document.createElement('button');
+                btn.className = 'color-btn';
+                btn.textContent = color;
+                btn.style.color = HEXES[color];
+                btn.setAttribute('data-color', color);
+                // Touch-first: use touchstart for instant mobile response
+                btn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    checkAnswer(color, this);
+                }, { passive: false });
+                btn.addEventListener('click', function() {
+                    checkAnswer(color, this);
+                });
+                buttonsEl.appendChild(btn);
+            });
+        }
+
+        let answerLocked = false;
+
+        function checkAnswer(selected, button) {
+            if (!playing || answerLocked) return;
+            answerLocked = true;
+
+            // Disable all buttons
+            const allBtns = buttonsEl.querySelectorAll('.color-btn');
+            allBtns.forEach(btn => btn.disabled = true);
+
+            if (selected === answer) {
+                button.classList.add('correct');
+                score += 10;
+                correct++;
+                time = Math.min(100, time + 10);
+                showScorePopup(true);
+            } else {
+                button.classList.add('wrong');
+                time = Math.max(0, time - 15);
+                showScorePopup(false);
+                allBtns.forEach(btn => {
+                    if (btn.getAttribute('data-color') === answer) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+
+            scoreEl.textContent = score;
+
+            setTimeout(() => {
+                if (playing) {
+                    generateQuestion();
+                }
+                answerLocked = false;
+            }, 450);
+        }
+
+        function tickTimer(timestamp) {
+            if (!playing) return;
+            if (!lastTick) lastTick = timestamp;
+            const delta = timestamp - lastTick;
+            lastTick = timestamp;
+
+            // Decrease by 1.5 per 100ms
+            time -= (delta / 100) * 1.5;
+            const pct = Math.max(0, time);
+            timerEl.style.width = pct + '%';
+
+            if (pct < 25) {
+                timerEl.classList.add('danger');
+            } else {
+                timerEl.classList.remove('danger');
+            }
+
+            if (time <= 0) {
+                endGame();
+                return;
+            }
+
+            timerRAF = requestAnimationFrame(tickTimer);
+        }
+
+        function startGame() {
+            score = 0;
+            correct = 0;
+            time = 100;
+            playing = true;
+            answerLocked = false;
+            lastTick = 0;
+
+            scoreEl.textContent = '0';
+            timerEl.style.width = '100%';
+            timerEl.classList.remove('danger');
+
+            startOverlay.classList.add('hidden');
+            gameOverOverlay.classList.add('hidden');
+
+            if (timerRAF) cancelAnimationFrame(timerRAF);
+            timerRAF = requestAnimationFrame(tickTimer);
+
+            generateQuestion();
+        }
+
+        function endGame() {
+            playing = false;
+            if (timerRAF) {
+                cancelAnimationFrame(timerRAF);
+                timerRAF = null;
+            }
+
+            if (score > best) {
+                best = score;
+                localStorage.setItem('color_best', best);
+                bestEl.textContent = best;
+            }
+
+            document.getElementById('fScore').textContent = score;
+            document.getElementById('fCorrect').textContent = correct;
+            gameOverOverlay.classList.remove('hidden');
+        }
+
+        document.getElementById('startBtn').onclick = startGame;
+        document.getElementById('againBtn').onclick = startGame;
+    </script>
+</body>
+</html>

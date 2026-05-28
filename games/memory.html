@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>Memory Match - MortApps Studios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030712;
+            --surface: #0f172a;
+            --surface-light: #1e293b;
+            --surface-lighter: #334155;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #a855f7;
+            --accent-light: #c084fc;
+            --accent-glow: rgba(168, 85, 247, 0.35);
+            --accent-deep: #7c3aed;
+            --success: #22c55e;
+            --border: rgba(51, 65, 85, 0.5);
+            --font-display: 'Sora', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+            --card-size: min(72px, calc((100vw - 5rem) / 4));
+            --card-gap: min(10px, 2vw);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Premium Background */
+        .bg-mesh {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(168, 85, 247, 0.12), transparent),
+                radial-gradient(ellipse 60% 40% at 80% 60%, rgba(139, 92, 246, 0.06), transparent),
+                radial-gradient(ellipse 50% 30% at 20% 80%, rgba(236, 72, 153, 0.06), transparent),
+                var(--bg);
+        }
+
+        .bg-mesh::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            opacity: 0.025;
+            pointer-events: none;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(3, 7, 18, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .back-btn:hover { color: var(--text); background: var(--surface-light); }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .brand-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+        }
+        .brand-icon svg { width: 18px; height: 18px; }
+
+        .brand-text {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .stats-bar { display: flex; gap: 0.5rem; }
+
+        .stat {
+            text-align: center;
+            background: var(--surface);
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .stat-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+        .stat-value {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--accent-light);
+        }
+
+        /* Game Container */
+        .game-wrapper {
+            padding-top: 70px;
+            padding-bottom: 2rem;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-container {
+            background: linear-gradient(145deg, var(--surface), rgba(15, 23, 42, 0.8));
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: clamp(0.75rem, 3vw, 1.25rem);
+            box-shadow:
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+        }
+
+        /* Difficulty Buttons */
+        .diff-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: clamp(0.6rem, 2vw, 1rem);
+            justify-content: center;
+        }
+
+        .diff-btn {
+            padding: 0.5rem 1rem;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 40px;
+        }
+        .diff-btn:hover { background: var(--surface-lighter); color: var(--text); }
+        .diff-btn.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            perspective: 800px;
+        }
+
+        /* Card - 3D Flip */
+        .card {
+            cursor: pointer;
+            border-radius: 12px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            will-change: transform;
+        }
+
+        .card-face {
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        /* Front face (face-down) */
+        .card-front {
+            background: linear-gradient(145deg, var(--accent), var(--accent-deep));
+            box-shadow:
+                0 4px 15px rgba(168, 85, 247, 0.25),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            z-index: 2;
+        }
+
+        .card-front::before {
+            content: '';
+            width: 40%;
+            height: 40%;
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .card-front::after {
+            content: '?';
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: clamp(0.9rem, 3vw, 1.2rem);
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Subtle pattern on front */
+        .card-front-pattern {
+            position: absolute;
+            inset: 4px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            pointer-events: none;
+        }
+
+        /* Back face (face-up) */
+        .card-back {
+            background: linear-gradient(145deg, var(--surface-light), var(--surface-lighter));
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+            transform: rotateY(180deg);
+        }
+
+        .card-back svg {
+            width: 60%;
+            height: 60%;
+        }
+
+        /* Hover effect on unflipped cards */
+        .card:hover:not(.flipped):not(.matched) .card-front {
+            box-shadow:
+                0 8px 25px rgba(168, 85, 247, 0.35),
+                0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+        }
+
+        .card:hover:not(.flipped):not(.matched) {
+            transform: scale(1.04);
+        }
+
+        /* Flipped state */
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* Matched state */
+        .card.matched {
+            animation: matchPop 0.5s ease forwards;
+            pointer-events: none;
+        }
+        @keyframes matchPop {
+            0% { transform: rotateY(180deg) scale(1); opacity: 1; }
+            40% { transform: rotateY(180deg) scale(1.12); opacity: 1; }
+            100% { transform: rotateY(180deg) scale(0.85); opacity: 0; }
+        }
+
+        /* Mismatch shake */
+        .card.mismatch {
+            animation: mismatchShake 0.4s ease;
+        }
+        @keyframes mismatchShake {
+            0%, 100% { transform: rotateY(180deg) translateX(0); }
+            20% { transform: rotateY(180deg) translateX(-4px); }
+            40% { transform: rotateY(180deg) translateX(4px); }
+            60% { transform: rotateY(180deg) translateX(-3px); }
+            80% { transform: rotateY(180deg) translateX(3px); }
+        }
+
+        /* Footer */
+        .game-footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            letter-spacing: 0.02em;
+        }
+
+        /* Overlays */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 7, 18, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 1;
+            transition: opacity 0.35s ease;
+        }
+        .overlay.hidden { opacity: 0; pointer-events: none; }
+
+        .overlay-content {
+            text-align: center;
+            padding: 2rem;
+            max-width: 340px;
+            width: calc(100vw - 2rem);
+        }
+
+        .overlay-icon {
+            width: 80px; height: 80px;
+            margin: 0 auto 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: iconFloat 1.2s ease infinite;
+        }
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.05); }
+        }
+
+        .overlay-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 6vw, 2.25rem);
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #fff, var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .overlay-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.75rem;
+        }
+        .overlay-stat { text-align: center; }
+        .overlay-stat-value {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-light);
+        }
+        .overlay-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: var(--font-body);
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 48px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+            color: white;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--accent-glow); }
+        .btn-primary:active { transform: translateY(0) scale(0.97); }
+        .btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+        /* Match particles */
+        .particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 50;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFly 0.6s ease forwards;
+        }
+        @keyframes particleFly {
+            0% { opacity: 1; transform: translate(0, 0) scale(1); }
+            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+        }
+
+        /* Responsive - 4x4 grid */
+        .grid.grid-4 {
+            grid-template-columns: repeat(4, var(--card-size));
+            gap: var(--card-gap);
+        }
+        .grid.grid-4 .card {
+            width: var(--card-size);
+            height: var(--card-size);
+        }
+
+        /* Responsive - 6x6 grid */
+        .grid.grid-6 {
+            grid-template-columns: repeat(6, calc(var(--card-size) * 0.78));
+            gap: calc(var(--card-gap) * 0.7);
+        }
+        .grid.grid-6 .card {
+            width: calc(var(--card-size) * 0.78);
+            height: calc(var(--card-size) * 0.78);
+        }
+
+        @media (max-width: 500px) {
+            :root {
+                --card-size: min(68px, calc((100vw - 4rem) / 4));
+                --card-gap: min(8px, 1.5vw);
+            }
+            .header { padding: 0.6rem 0.75rem; }
+            .brand-text { display: none; }
+            .game-container { padding: clamp(0.6rem, 2.5vw, 0.8rem); border-radius: 20px; }
+            .diff-row { margin-bottom: 0.6rem; }
+            .diff-btn { padding: 0.4rem 0.8rem; font-size: 0.75rem; }
+            .overlay-content { padding: 1.5rem; }
+        }
+
+        /* Very small screens (320px) */
+        @media (max-width: 360px) {
+            :root {
+                --card-size: calc((100vw - 3.5rem) / 4);
+                --card-gap: 6px;
+            }
+            .grid.grid-6 {
+                grid-template-columns: repeat(6, calc(var(--card-size) * 0.68));
+                gap: 5px;
+            }
+            .grid.grid-6 .card {
+                width: calc(var(--card-size) * 0.68);
+                height: calc(var(--card-size) * 0.68);
+            }
+        }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            .game-wrapper { padding-top: 60px; padding-bottom: 0.5rem; }
+            .game-container { padding: 0.5rem; }
+            :root { --card-gap: 6px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+    <div class="particles" id="particles"></div>
+
+    <header class="header">
+        <a href="../games.html" class="back-btn">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Back
+        </a>
+        <a href="../index.html" class="brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="9" height="9" rx="1.5"/>
+                    <rect x="13" y="2" width="9" height="9" rx="1.5"/>
+                    <rect x="2" y="13" width="9" height="9" rx="1.5"/>
+                    <rect x="13" y="13" width="9" height="9" rx="1.5"/>
+                </svg>
+            </div>
+            <span class="brand-text">MortApps</span>
+        </a>
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-label">Moves</div>
+                <div class="stat-value" id="moves">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Time</div>
+                <div class="stat-value" id="time">0:00</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="game-wrapper">
+        <div class="game-container">
+            <div class="diff-row">
+                <button class="diff-btn active" data-size="4">Easy 4&times;4</button>
+                <button class="diff-btn" data-size="6">Medium 6&times;6</button>
+            </div>
+            <div class="grid grid-4" id="grid"></div>
+        </div>
+    </div>
+
+    <!-- Win Overlay -->
+    <div class="overlay hidden" id="winOverlay">
+        <div class="overlay-content">
+            <div class="overlay-icon">
+                <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+                    <circle cx="36" cy="36" r="30" stroke="#a855f7" stroke-width="2" opacity="0.3"/>
+                    <circle cx="36" cy="36" r="22" fill="rgba(168, 85, 247, 0.15)"/>
+                    <path d="M24 36l6 6 12-14" stroke="#c084fc" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M28 20l2-4 2 4" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+                    <path d="M42 18l1.5-3.5 1.5 3.5" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/>
+                    <path d="M34 16l1-3 1 3" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+                </svg>
+            </div>
+            <h1 class="overlay-title">Perfect Match!</h1>
+            <div class="overlay-stats">
+                <div class="overlay-stat">
+                    <div class="overlay-stat-value" id="finalMoves">0</div>
+                    <div class="overlay-stat-label">Moves</div>
+                </div>
+                <div class="overlay-stat">
+                    <div class="overlay-stat-value" id="finalTime">0:00</div>
+                    <div class="overlay-stat-label">Time</div>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="againBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"/>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+                Play Again
+            </button>
+        </div>
+    </div>
+
+    <footer class="game-footer">&copy; 2026 MortApps Studios</footer>
+
+    <script>
+        /* ─── Right-click protection ─── */
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        /* ─── 18 SVG shapes for card content ─── */
+        const SHAPES = [
+            { // 0 - Red Circle
+                svg: `<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="#ef4444"/><circle cx="20" cy="20" r="8" fill="rgba(255,255,255,0.15)"/></svg>`
+            },
+            { // 1 - Orange Square
+                svg: `<svg viewBox="0 0 40 40"><rect x="7" y="7" width="26" height="26" rx="4" fill="#f97316"/><rect x="12" y="12" width="16" height="16" rx="2" fill="rgba(255,255,255,0.15)"/></svg>`
+            },
+            { // 2 - Yellow Triangle
+                svg: `<svg viewBox="0 0 40 40"><polygon points="20,5 35,33 5,33" fill="#eab308"/><polygon points="20,13 28,29 12,29" fill="rgba(255,255,255,0.15)"/></svg>`
+            },
+            { // 3 - Purple Star
+                svg: `<svg viewBox="0 0 40 40"><polygon points="20,3 24.5,14.5 37,14.5 27,22.5 30.5,34 20,27 9.5,34 13,22.5 3,14.5 15.5,14.5" fill="#a855f7"/></svg>`
+            },
+            { // 4 - Pink Diamond
+                svg: `<svg viewBox="0 0 40 40"><polygon points="20,4 36,20 20,36 4,20" fill="#ec4899"/><polygon points="20,12 28,20 20,28 12,20" fill="rgba(255,255,255,0.15)"/></svg>`
+            },
+            { // 5 - Crimson Heart
+                svg: `<svg viewBox="0 0 40 40"><path d="M20 34 C10 26 3 19 3 13 A7 7 0 0 1 20 10 A7 7 0 0 1 37 13 C37 19 30 26 20 34Z" fill="#dc2626"/></svg>`
+            },
+            { // 6 - Teal Cross
+                svg: `<svg viewBox="0 0 40 40"><rect x="15" y="5" width="10" height="30" rx="2" fill="#14b8a6"/><rect x="5" y="15" width="30" height="10" rx="2" fill="#14b8a6"/><rect x="17" y="7" width="6" height="26" rx="1" fill="rgba(255,255,255,0.15)"/></svg>`
+            },
+            { // 7 - Blue Hexagon
+                svg: `<svg viewBox="0 0 40 40"><polygon points="20,3 35,11 35,27 20,35 5,27 5,11" fill="#3b82f6"/><polygon points="20,10 28,14.5 28,24.5 20,29 12,24.5 12,14.5" fill="rgba(255,255,255,0.12)"/></svg>`
+            },
+            { // 8 - Green Pentagon
+                svg: `<svg viewBox="0 0 40 40"><polygon points="20,4 36,16 30,34 10,34 4,16" fill="#22c55e"/><polygon points="20,11 29,18 26,30 14,30 11,18" fill="rgba(255,255,255,0.12)"/></svg>`
+            },
+            { // 9 - Amber Arrow
+                svg: `<svg viewBox="0 0 40 40"><polygon points="20,4 34,20 26,20 26,36 14,36 14,20 6,20" fill="#f59e0b"/><polygon points="20,10 28,19 24,19 24,32 16,32 16,19 12,19" fill="rgba(255,255,255,0.12)"/></svg>`
+            },
+            { // 10 - Indigo Moon
+                svg: `<svg viewBox="0 0 40 40"><path d="M24 5 A15 15 0 1 0 24 35 A11 11 0 1 1 24 5Z" fill="#6366f1"/></svg>`
+            },
+            { // 11 - Gold Sun
+                svg: `<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="#fbbf24"/><g stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"><line x1="20" y1="3" x2="20" y2="8"/><line x1="20" y1="32" x2="20" y2="37"/><line x1="3" y1="20" x2="8" y2="20"/><line x1="32" y1="20" x2="37" y2="20"/><line x1="8" y1="8" x2="11.5" y2="11.5"/><line x1="28.5" y1="28.5" x2="32" y2="32"/><line x1="32" y1="8" x2="28.5" y2="11.5"/><line x1="11.5" y1="28.5" x2="8" y2="32"/></g></svg>`
+            },
+            { // 12 - Cyan Ring
+                svg: `<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="none" stroke="#06b6d4" stroke-width="5"/><circle cx="20" cy="20" r="7" fill="#06b6d4" opacity="0.3"/></svg>`
+            },
+            { // 13 - Lime Lightning
+                svg: `<svg viewBox="0 0 40 40"><polygon points="24,3 12,21 19,21 16,37 28,19 21,19" fill="#84cc16"/></svg>`
+            },
+            { // 14 - Violet Wave
+                svg: `<svg viewBox="0 0 40 40"><path d="M3 20 Q10 8 17 20 Q24 32 31 20 Q35 14 37 20" fill="none" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round"/><path d="M3 24 Q10 12 17 24 Q24 36 31 24 Q35 18 37 24" fill="none" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round" opacity="0.4"/></svg>`
+            },
+            { // 15 - Slate Shield
+                svg: `<svg viewBox="0 0 40 40"><path d="M20 4 L34 12 L34 24 C34 30 28 35 20 37 C12 35 6 30 6 24 L6 12Z" fill="#64748b"/><path d="M20 10 L28 15 L28 23 C28 27 24 30 20 31 C16 30 12 27 12 23 L12 15Z" fill="rgba(255,255,255,0.15)"/></svg>`
+            },
+            { // 16 - Rose Rhombus
+                svg: `<svg viewBox="0 0 40 40"><polygon points="20,4 32,14 20,36 8,14" fill="#f43f5e"/><polygon points="20,12 26,17 20,28 14,17" fill="rgba(255,255,255,0.15)"/></svg>`
+            },
+            { // 17 - Emerald Spiral
+                svg: `<svg viewBox="0 0 40 40"><path d="M20 20 C20 16 24 12 28 14 C32 16 32 22 28 26 C24 30 16 30 12 26 C8 22 8 14 14 10 C18 7 26 7 30 12" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round"/></svg>`
+            }
+        ];
+
+        /* ─── State ─── */
+        const gridEl = document.getElementById('grid');
+        let cards = [];
+        let flipped = [];
+        let matched = 0;
+        let total = 0;
+        let moves = 0;
+        let timer = null;
+        let secs = 0;
+        let size = 4;
+        let started = false;
+        let canFlip = true;
+
+        /* ─── Particles ─── */
+        function spawnParticles(x, y, count = 6) {
+            const container = document.getElementById('particles');
+            const colors = ['#a855f7', '#c084fc', '#7c3aed', '#fbbf24', '#22c55e'];
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.6;
+                const dist = 25 + Math.random() * 35;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const sz = 4 + Math.random() * 5;
+                p.style.cssText = `
+                    left: ${x}px; top: ${y}px;
+                    background: ${color};
+                    --tx: ${Math.cos(angle) * dist}px;
+                    --ty: ${Math.sin(angle) * dist}px;
+                    width: ${sz}px; height: ${sz}px;
+                `;
+                container.appendChild(p);
+                p.addEventListener('animationend', () => p.remove());
+            }
+        }
+
+        /* ─── Init ─── */
+        function init() {
+            const pairs = (size * size) / 2;
+            total = pairs;
+            const chosen = SHAPES.slice(0, pairs);
+            cards = [...chosen, ...chosen].sort(() => Math.random() - 0.5);
+            flipped = [];
+            matched = 0;
+            moves = 0;
+            secs = 0;
+            started = false;
+            canFlip = true;
+            clearInterval(timer);
+            render();
+            document.getElementById('moves').textContent = '0';
+            document.getElementById('time').textContent = '0:00';
+            document.getElementById('winOverlay').classList.add('hidden');
+        }
+
+        /* ─── Render ─── */
+        function render() {
+            gridEl.className = `grid grid-${size}`;
+            gridEl.innerHTML = '';
+            cards.forEach((shape, i) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.i = i;
+
+                // Front face (face-down)
+                const front = document.createElement('div');
+                front.className = 'card-face card-front';
+                const pattern = document.createElement('div');
+                pattern.className = 'card-front-pattern';
+                front.appendChild(pattern);
+
+                // Back face (face-up with SVG)
+                const back = document.createElement('div');
+                back.className = 'card-face card-back';
+                back.innerHTML = shape.svg;
+
+                card.appendChild(front);
+                card.appendChild(back);
+
+                card.addEventListener('click', () => flipCard(card, i, shape), { passive: true });
+                gridEl.appendChild(card);
+            });
+        }
+
+        /* ─── Flip Card ─── */
+        function flipCard(cardEl, index, shape) {
+            if (!canFlip || flipped.length === 2 || cardEl.classList.contains('flipped') || cardEl.classList.contains('matched')) return;
+
+            if (!started) {
+                started = true;
+                timer = setInterval(() => {
+                    secs++;
+                    updateTime();
+                }, 1000);
+            }
+
+            cardEl.classList.add('flipped');
+            flipped.push({ card: cardEl, index, shape });
+
+            if (flipped.length === 2) {
+                moves++;
+                document.getElementById('moves').textContent = moves;
+
+                const [a, b] = flipped;
+                if (a.shape === b.shape) {
+                    // Match!
+                    canFlip = false;
+                    setTimeout(() => {
+                        const rectA = a.card.getBoundingClientRect();
+                        const rectB = b.card.getBoundingClientRect();
+                        spawnParticles(rectA.left + rectA.width / 2, rectA.top + rectA.height / 2, 6);
+                        spawnParticles(rectB.left + rectB.width / 2, rectB.top + rectB.height / 2, 6);
+                        a.card.classList.add('matched');
+                        b.card.classList.add('matched');
+                        matched++;
+                        flipped = [];
+                        canFlip = true;
+                        if (matched === total) win();
+                    }, 350);
+                } else {
+                    // Mismatch
+                    canFlip = false;
+                    setTimeout(() => {
+                        a.card.classList.add('mismatch');
+                        b.card.classList.add('mismatch');
+                    }, 300);
+                    setTimeout(() => {
+                        a.card.classList.remove('flipped', 'mismatch');
+                        b.card.classList.remove('flipped', 'mismatch');
+                        flipped = [];
+                        canFlip = true;
+                    }, 900);
+                }
+            }
+        }
+
+        /* ─── Timer ─── */
+        function updateTime() {
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            document.getElementById('time').textContent = `${m}:${s.toString().padStart(2, '0')}`;
+        }
+
+        /* ─── Win ─── */
+        function win() {
+            clearInterval(timer);
+            document.getElementById('finalMoves').textContent = moves;
+            document.getElementById('finalTime').textContent = document.getElementById('time').textContent;
+            setTimeout(() => {
+                document.getElementById('winOverlay').classList.remove('hidden');
+            }, 400);
+        }
+
+        /* ─── Difficulty buttons ─── */
+        document.querySelectorAll('.diff-btn').forEach(b => {
+            b.addEventListener('click', () => {
+                document.querySelectorAll('.diff-btn').forEach(x => x.classList.remove('active'));
+                b.classList.add('active');
+                size = parseInt(b.dataset.size);
+                init();
+            }, { passive: true });
+        });
+
+        document.getElementById('againBtn').addEventListener('click', init, { passive: true });
+
+        /* ─── Start ─── */
+        init();
+    </script>
+</body>
+</html>
