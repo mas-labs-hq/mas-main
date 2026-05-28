@@ -331,6 +331,8 @@
             background: rgba(5, 5, 5, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            transform: translateZ(0);
+            will-change: transform;
         }
 
         .nav-brand {
@@ -414,6 +416,110 @@
             width: 100%;
         }
 
+        /* FIX 1: MOBILE HAMBURGER MENU */
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: 1px solid rgba(42, 42, 60, 0.5);
+            color: var(--nebula);
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-menu-btn:hover {
+            color: var(--starlight);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        .mobile-menu-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 5, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 9998;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .mobile-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-overlay-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: transparent;
+            border: 1px solid rgba(42, 42, 60, 0.5);
+            color: var(--nebula);
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-overlay-close:hover {
+            color: var(--starlight);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        .mobile-overlay-close svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .mobile-overlay a {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: var(--nebula);
+            text-decoration: none;
+            padding: 1rem 2rem;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .mobile-overlay a:hover {
+            color: var(--quantum-blue);
+        }
+
         /* PORTFOLIO HERO */
         .portfolio-hero {
             min-height: 100vh;
@@ -435,6 +541,9 @@
                 radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.05) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(157, 78, 221, 0.05) 0%, transparent 50%),
                 radial-gradient(circle at 40% 80%, rgba(255, 0, 128, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            transform: translateZ(0);
+            will-change: transform;
         }
 
         .hero-content {
@@ -521,7 +630,7 @@
 
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 3rem;
             margin-top: 4rem;
         }
@@ -531,7 +640,7 @@
             border: 1px solid rgba(42, 42, 60, 0.3);
             border-radius: 12px;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
             position: relative;
         }
 
@@ -586,6 +695,7 @@
             height: 100%;
             object-fit: cover;
             transition: transform 0.6s ease;
+            will-change: transform;
         }
 
         .project-card:hover .project-preview img {
@@ -680,6 +790,9 @@
             background: 
                 radial-gradient(circle at 70% 30%, rgba(157, 78, 221, 0.1) 0%, transparent 50%),
                 linear-gradient(135deg, rgba(5, 5, 5, 0.9) 0%, rgba(10, 10, 15, 0.8) 100%);
+            pointer-events: none;
+            transform: translateZ(0);
+            will-change: transform;
         }
 
         .focus-content {
@@ -723,7 +836,7 @@
 
         .real-estate-projects {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 3rem;
             margin-top: 4rem;
         }
@@ -733,7 +846,7 @@
             border: 1px solid rgba(42, 42, 60, 0.3);
             border-radius: 12px;
             overflow: hidden;
-            transition: all 0.4s ease;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .real-estate-card:hover {
@@ -754,6 +867,7 @@
             height: 100%;
             object-fit: cover;
             transition: transform 0.6s ease;
+            will-change: transform;
         }
 
         .real-estate-card:hover .real-estate-preview img {
@@ -824,6 +938,10 @@
             .nav-links {
                 display: none;
             }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
             
             .hero-title {
                 font-size: 3rem;
@@ -838,11 +956,33 @@
             .grid-container {
                 grid-template-columns: 1fr;
             }
+
+            .real-estate-projects {
+                grid-template-columns: 1fr;
+            }
+
+            .real-estate-preview {
+                height: 220px;
+            }
             
             .footer-content {
                 flex-direction: column;
                 gap: 2rem;
                 text-align: center;
+            }
+
+            .portfolio-title {
+                font-size: 2.8rem;
+                letter-spacing: 6px;
+                margin-top: 20px;
+            }
+
+            .data-stream {
+                top: 45%;
+            }
+
+            .stream-line {
+                font-size: 1rem;
             }
         }
 
@@ -856,8 +996,29 @@
             }
             
             .portfolio-title {
-                font-size: 2.5rem;
-                letter-spacing: 5px;
+                font-size: 2.2rem;
+                letter-spacing: 4px;
+                margin-top: 15px;
+            }
+
+            .data-stream {
+                top: 40%;
+            }
+
+            .stream-line {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* FIX 3: REDUCED MOTION FOR ACCESSIBILITY */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
             }
         }
     </style>
@@ -889,6 +1050,16 @@
         </div>
     </div>
 
+    <!-- FIX 1: Mobile Overlay Menu -->
+    <div class="mobile-overlay" id="mobileOverlay">
+        <button class="mobile-overlay-close" id="mobileOverlayClose" aria-label="Close menu">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <a href="#projects" class="mobile-overlay-link">Projects</a>
+        <a href="#real-estate" class="mobile-overlay-link">Real Estate</a>
+        <a class="mobile-overlay-link" id="mobileMainSiteLink">Main Site</a>
+    </div>
+
     <!-- Main Content -->
     <div class="main-container">
         <!-- Architectural Navigation -->
@@ -905,6 +1076,10 @@
                 <li><a href="#real-estate" class="nav-link">Real Estate</a></li>
                 <li><a class="nav-link" id="mainSiteLinkNav">Main Site</a></li>
             </ul>
+            <!-- FIX 1: Hamburger button for mobile -->
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu">
+                <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
         </nav>
 
         <!-- Portfolio Hero -->
@@ -941,7 +1116,7 @@
                 <!-- Project 1: College Intake System -->
                 <article class="project-card">
                     <div class="project-preview">
-                        <img src="https://images.pexels.com/photos/9576020/pexels-photo-9576020.jpeg" alt="Education System">
+                        <img src="https://images.pexels.com/photos/9576020/pexels-photo-9576020.jpeg" alt="Education System" loading="lazy" decoding="async" fetchpriority="low">
                     </div>
                     <div class="project-content">
                         <div class="project-category">Education Technology</div>
@@ -967,7 +1142,7 @@
                 <!-- Project 2: Fashion Store (formerly I-Clad Nairobi) -->
                 <article class="project-card">
                     <div class="project-preview">
-                        <img src="https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Fashion Store">
+                        <img src="https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Fashion Store" loading="lazy" decoding="async" fetchpriority="low">
                     </div>
                     <div class="project-content">
                         <div class="project-category">Luxury E-commerce</div>
@@ -993,7 +1168,7 @@
                 <!-- Project 3: Baba Bima Insurance -->
                 <article class="project-card">
                     <div class="project-preview">
-                        <img src="https://www.betlinkinsurance.co.ke/images/productimages//1980.png" alt="Insurance Platform">
+                        <img src="https://www.betlinkinsurance.co.ke/images/productimages/1980.png" alt="Insurance Platform" loading="lazy" decoding="async" fetchpriority="low">
                     </div>
                     <div class="project-content">
                         <div class="project-category">Insurance Services</div>
@@ -1019,7 +1194,7 @@
                 <!-- Project 4: Wellness Center -->
                 <article class="project-card">
                     <div class="project-preview">
-                        <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Spa & Wellness">
+                        <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Spa & Wellness" loading="lazy" decoding="async" fetchpriority="low">
                     </div>
                     <div class="project-content">
                         <div class="project-category">Wellness Services</div>
@@ -1045,7 +1220,7 @@
                 <!-- Project 5: Pest Control (formerly IPME Pest Control) -->
                 <article class="project-card">
                     <div class="project-preview">
-                        <img src="https://images.pexels.com/photos/19789837/pexels-photo-19789837.jpeg" alt="Pest Control">
+                        <img src="https://images.pexels.com/photos/19789837/pexels-photo-19789837.jpeg" alt="Pest Control" loading="lazy" decoding="async" fetchpriority="low">
                     </div>
                     <div class="project-content">
                         <div class="project-category">Commercial Services</div>
@@ -1071,7 +1246,7 @@
                 <!-- Project 6: Premium Bakery (formerly Vintage Cakes) -->
                 <article class="project-card">
                     <div class="project-preview">
-                        <img src="https://babycakesmadebysarah.com/cdn/shop/files/IMG-0841.jpg?v=1742337807" alt="Bakery">
+                        <img src="https://babycakesmadebysarah.com/cdn/shop/files/IMG-0841.jpg?v=1742337807" alt="Bakery" loading="lazy" decoding="async" fetchpriority="low">
                     </div>
                     <div class="project-content">
                         <div class="project-category">Food & Beverage</div>
@@ -1111,7 +1286,7 @@
                     <!-- Brax Real Estate -->
                     <article class="real-estate-card">
                         <div class="real-estate-preview">
-                            <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=2073&q=80" alt="Brax Real Estate">
+                            <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=2073&q=80" alt="Brax Real Estate" loading="lazy" decoding="async" fetchpriority="low">
                         </div>
                         <div class="project-content">
                             <div class="project-category">Luxury Properties</div>
@@ -1137,7 +1312,7 @@
                     <!-- Lux Properties -->
                     <article class="real-estate-card">
                         <div class="real-estate-preview">
-                            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2053&q=80" alt="Lux Properties">
+                            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2053&q=80" alt="Lux Properties" loading="lazy" decoding="async" fetchpriority="low">
                         </div>
                         <div class="project-content">
                             <div class="project-category">Premium Developments</div>
@@ -1163,7 +1338,7 @@
                     <!-- Elite Properties -->
                     <article class="real-estate-card">
                         <div class="real-estate-preview">
-                            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80" alt="Elite Properties">
+                            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80" alt="Elite Properties" loading="lazy" decoding="async" fetchpriority="low">
                         </div>
                         <div class="project-content">
                             <div class="project-category">Ultra-Luxury</div>
@@ -1189,7 +1364,7 @@
                     <!-- Kenya Stays (NEW) -->
                     <article class="real-estate-card">
                         <div class="real-estate-preview">
-                            <img src="https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Kenya Stays">
+                            <img src="https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="Kenya Stays" loading="lazy" decoding="async" fetchpriority="low">
                         </div>
                         <div class="project-content">
                             <div class="project-category">Temporary Leasing</div>
@@ -1230,8 +1405,8 @@
                 </div>
             </div>
             <div style="text-align: center; margin-top: 2rem; color: var(--nebula); font-size: 0.8rem;">
-                © 2026 MortApps Studios, Nairobi, Kenya. All rights reserved.<br>
-                <span style="opacity: 0.6;">Architectural Web Solutions • AI Engineering • Enterprise Technology</span>
+                &copy; 2026 MortApps Studios, Nairobi, Kenya. All rights reserved.<br>
+                <span style="opacity: 0.6;">Architectural Web Solutions &bull; AI Engineering &bull; Enterprise Technology</span>
             </div>
         </footer>
     </div>
@@ -1441,80 +1616,75 @@
             });
         }
 
-        // Mobile menu setup
-        function setupMobileMenu() {
-            const navLinks = document.querySelector('.nav-links');
-            const navBrand = document.querySelector('.nav-brand');
-            
-            if (window.innerWidth <= 768) {
-                // Create mobile menu button
-                const mobileMenuBtn = document.createElement('button');
-                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                mobileMenuBtn.style.cssText = `
-                    background: transparent;
-                    border: 1px solid rgba(42, 42, 60, 0.5);
-                    color: var(--nebula);
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 8px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    font-size: 1.2rem;
-                `;
-                
-                navBrand.appendChild(mobileMenuBtn);
-                
-                // Toggle menu
+        // FIX 1: Mobile Hamburger Menu
+        (function() {
+            var mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            var mobileOverlay = document.getElementById('mobileOverlay');
+            var mobileOverlayClose = document.getElementById('mobileOverlayClose');
+            var mobileOverlayLinks = mobileOverlay.querySelectorAll('.mobile-overlay-link');
+            var mobileMainSiteLink = document.getElementById('mobileMainSiteLink');
+
+            function openMobileMenu() {
+                mobileOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeMobileMenu() {
+                mobileOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            if (mobileMenuBtn) {
                 mobileMenuBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+                    openMobileMenu();
                 });
-                
-                // Close menu when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!navLinks.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                        navLinks.style.display = 'none';
+            }
+
+            if (mobileOverlayClose) {
+                mobileOverlayClose.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    closeMobileMenu();
+                });
+            }
+
+            // Close on overlay link click
+            mobileOverlayLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    closeMobileMenu();
+                    // Handle anchor links for smooth scrolling
+                    var href = this.getAttribute('href');
+                    if (href && href.startsWith('#')) {
+                        e.preventDefault();
+                        var targetElement = document.querySelector(href);
+                        if (targetElement) {
+                            setTimeout(function() {
+                                window.scrollTo({
+                                    top: targetElement.offsetTop - 80,
+                                    behavior: 'smooth'
+                                });
+                            }, 300);
+                        }
                     }
                 });
-                
-                // Style mobile menu
-                navLinks.style.cssText = `
-                    position: fixed;
-                    top: 80px;
-                    left: 0;
-                    width: 100%;
-                    background: rgba(5, 5, 5, 0.98);
-                    backdrop-filter: blur(20px);
-                    padding: 2rem;
-                    flex-direction: column;
-                    gap: 1.5rem;
-                    display: none;
-                    z-index: 1001;
-                    border-top: 1px solid rgba(42, 42, 60, 0.3);
-                    border-bottom: 1px solid rgba(42, 42, 60, 0.3);
-                `;
-            }
-        }
+            });
 
-        // Initialize mobile menu
-        setupMobileMenu();
-        window.addEventListener('resize', setupMobileMenu);
-    </script>
-    
-    <!-- MortApps Studios Performance Analytics (Hidden) -->
-    <div style="display: none;">
-        <script>
-        (function() {
-            var msTracker = document.createElement('script');
-            msTracker.src = 'https://tracking.mortappsstudios.com/v1/portfolio.js';
-            msTracker.async = true;
-            msTracker.setAttribute('data-site-id', 'MAS_PORTFOLIO_2026');
-            msTracker.setAttribute('data-version', '1.0');
-            document.head.appendChild(msTracker);
+            // Handle "Main Site" link in mobile overlay
+            if (mobileMainSiteLink) {
+                mobileMainSiteLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    closeMobileMenu();
+                    window.open('https://mortappsstudios.com', '_blank');
+                });
+            }
+
+            // Close on Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && mobileOverlay.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            });
         })();
-        </script>
-    </div>
+    </script>
 </body>
 </html>
