@@ -30,6 +30,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Firebase SDK (Compat — CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics-compat.js"></script>
+
   <script>
     tailwind.config = {
       theme: {
@@ -222,6 +228,13 @@
       transition: background 0.2s;
     }
     .share-popup button:hover { background: #e2e8f0; }
+
+    /* View Count */
+    .view-count {
+      display: flex; align-items: center; gap: 0.3rem;
+      font-size: 0.8rem; color: var(--muted); font-weight: 400;
+    }
+    .view-count svg { width: 15px; height: 15px; }
 
     /* Header/Nav Styles */
     .nav-link {
@@ -831,16 +844,65 @@
   </footer>
 
   <script>
-    // Mobile Nav Toggle
+    // ═══════════════════════════════════════════════════════════
+    // FIREBASE CONFIGURATION & INITIALIZATION
+    // ═══════════════════════════════════════════════════════════
+    const firebaseConfig = {
+      apiKey: "AIzaSyBFNpwG8F104JMcwhhXkrk2HbyM80jjbZM",
+      authDomain: "mortapps-studios.firebaseapp.com",
+      databaseURL: "https://mortapps-studios-default-rtdb.firebaseio.com",
+      projectId: "mortapps-studios",
+      storageBucket: "mortapps-studios.firebasestorage.app",
+      messagingSenderId: "978442778256",
+      appId: "1:978442778256:web:f66b4f1f0f770ce08e4a15",
+      measurementId: "G-THGT2GHZ35"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    let analytics;
+    try { analytics = firebase.analytics(); } catch(e) { console.log('Analytics not available'); }
+
+    // ═══════════════════════════════════════════════════════════
+    // SEED DATA — Original dummy counts from the blog
+    // These are used to initialise Firebase on first run.
+    // Once Firebase has data, these values are never overwritten.
+    // ═══════════════════════════════════════════════════════════
+    const SEED_DATA = {
+      1: { likes: 423, shares: 13, views: 0 },
+      2: { likes: 278, shares: 8,  views: 0 },
+      3: { likes: 372, shares: 16, views: 0 },
+      4: { likes: 278, shares: 13, views: 0 },
+      5: { likes: 312, shares: 27, views: 0 },
+      6: { likes: 137, shares: 6,  views: 0 }
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // DEVICE ID — Tracks per-device like state in localStorage
+    // ═══════════════════════════════════════════════════════════
+    function getDeviceId() {
+      let id = localStorage.getItem('mas_device_id');
+      if (!id) {
+        id = 'dev_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('mas_device_id', id);
+      }
+      return id;
+    }
+    const deviceId = getDeviceId();
+
+    // ═══════════════════════════════════════════════════════════
+    // MOBILE NAV TOGGLE
+    // ═══════════════════════════════════════════════════════════
     function toggleMobileNav() {
       document.getElementById('mobileNav').classList.toggle('open');
     }
 
-    // Article Accordion Toggle
+    // ═══════════════════════════════════════════════════════════
+    // ARTICLE ACCORDION TOGGLE
+    // ═══════════════════════════════════════════════════════════
     function toggleArticle(btn) {
       const content = btn.nextElementSibling;
       const isOpen = content.classList.contains('open');
-      
       if (!isOpen) {
         content.classList.add('open');
         btn.textContent = "Close Article";
@@ -850,64 +912,101 @@
       }
     }
 
-    // --- LocalStorage Persistence Logic ---
+    // ═══════════════════════════════════════════════════════════
+    // FIREBASE: ENSURE SEED DATA EXISTS
+    // Only writes to Firebase if no data exists for that article.
+    // Never overwrites existing counters.
+    // ═══════════════════════════════════════════════════════════
+    async function ensureArticleData() {
+      for (const [id, seed] of Object.entries(SEED_DATA)) {
+        const snap = await db.ref('blog/articles/' + id).once('value');
+        if (!snap.exists()) {
+          await db.ref('blog/articles/' + id).set(seed);
+        }
+      }
+    }
 
-    // Helper: Load state on page load
+    // ═══════════════════════════════════════════════════════════
+    // FIREBASE: INJECT VIEW COUNT DISPLAY INTO EACH ARTICLE
+    // Adds a small eye icon + count between likes and shares
+    // without modifying the original HTML structure.
+    // ═══════════════════════════════════════════════════════════
+    function injectViewCountElements() {
+      document.querySelectorAll('.article-card').forEach(card => {
+        const actionBar = card.querySelector('.mt-auto');
+        if (!actionBar || actionBar.querySelector('.view-count')) return;
+
+        const likeBtn = actionBar.querySelector('.action-btn');
+        if (!likeBtn) return;
+
+        const viewSpan = document.createElement('span');
+        viewSpan.className = 'view-count';
+        viewSpan.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg><span class="view-count-num">0</span>';
+
+        // Insert after the like button
+        likeBtn.after(viewSpan);
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // FIREBASE: LOAD STATE & LISTEN FOR REAL-TIME UPDATES
+    // ═══════════════════════════════════════════════════════════
     function loadState() {
       document.querySelectorAll('.article-card').forEach(card => {
         const id = card.dataset.id;
-        
-        // Restore Like Count
-        const savedLikes = localStorage.getItem(`article_${id}_likes`);
-        if (savedLikes) {
-          card.querySelector('.like-count').textContent = savedLikes;
-        }
-        
-        // Restore Share Count
-        const savedShares = localStorage.getItem(`article_${id}_shares`);
-        if (savedShares) {
-          card.querySelector('.share-count').textContent = savedShares;
-        }
-        
-        // Restore Liked State (Red Heart)
-        const isLiked = localStorage.getItem(`article_${id}_liked`);
+        const articleRef = db.ref('blog/articles/' + id);
+
+        // Listen for real-time updates — all devices stay in sync
+        articleRef.on('value', (snap) => {
+          const data = snap.val();
+          if (!data) return;
+
+          // Update like count
+          const likeEl = card.querySelector('.like-count');
+          if (likeEl) likeEl.textContent = data.likes;
+
+          // Update share count
+          const shareEl = card.querySelector('.share-count');
+          if (shareEl) shareEl.textContent = data.shares;
+
+          // Update view count
+          const viewEl = card.querySelector('.view-count-num');
+          if (viewEl) viewEl.textContent = data.views || 0;
+        });
+
+        // Restore this device's liked state from localStorage
+        const isLiked = localStorage.getItem('article_' + id + '_liked');
         if (isLiked === 'true') {
-           const btn = card.querySelector('.action-btn'); // The like button
-           btn.classList.add('liked');
+          const btn = card.querySelector('.action-btn');
+          if (btn) btn.classList.add('liked');
         }
       });
     }
 
-    // Run on load
-    loadState();
-
-    // Like Button Logic
+    // ═══════════════════════════════════════════════════════════
+    // FIREBASE: LIKE BUTTON — Atomic transaction for accuracy
+    // ═══════════════════════════════════════════════════════════
     function toggleLike(btn) {
       const card = btn.closest('article');
       const id = card.dataset.id;
-      const countEl = btn.querySelector('.like-count');
-      let count = parseInt(countEl.textContent);
-      
-      if (btn.classList.contains('liked')) {
-        // Unlike
-        count--;
-        btn.classList.remove('liked');
-        localStorage.setItem(`article_${id}_liked`, 'false');
-      } else {
-        // Like
-        count++;
-        btn.classList.add('liked');
-        localStorage.setItem(`article_${id}_liked`, 'true');
-      }
-      
-      countEl.textContent = count;
-      localStorage.setItem(`article_${id}_likes`, count);
+      const wasLiked = btn.classList.contains('liked');
+      const delta = wasLiked ? -1 : 1;
+
+      // Optimistic UI update for instant feedback
+      btn.classList.toggle('liked');
+      localStorage.setItem('article_' + id + '_liked', wasLiked ? 'false' : 'true');
+
+      // Atomic Firebase transaction — safe across devices
+      db.ref('blog/articles/' + id + '/likes').transaction(current => {
+        return (current || 0) + delta;
+      });
     }
 
-    // Share Popup Logic
+    // ═══════════════════════════════════════════════════════════
+    // SHARE POPUP LOGIC
+    // ═══════════════════════════════════════════════════════════
     function toggleSharePopup(btn) {
       const popup = btn.nextElementSibling;
-      // Close others
       document.querySelectorAll('.share-popup.active').forEach(p => {
         if (p !== popup) p.classList.remove('active');
       });
@@ -921,43 +1020,70 @@
       }
     });
 
-    // Share Logic
+    // ═══════════════════════════════════════════════════════════
+    // FIREBASE: SHARE ARTICLE — Increment counter + open share URL
+    // ═══════════════════════════════════════════════════════════
     const pageUrl = "https://www.mortappsstudios.com/blog";
-    
+
     function shareArticle(platform, title) {
-      // Increment share count & Save
       const articleCard = event.target.closest('article');
       const id = articleCard.dataset.id;
-      const shareCountSpan = articleCard.querySelector('.share-count');
-      let count = parseInt(shareCountSpan.textContent);
-      
-      count++;
-      shareCountSpan.textContent = count;
-      localStorage.setItem(`article_${id}_shares`, count);
+
+      // Increment shares in Firebase atomically
+      db.ref('blog/articles/' + id + '/shares').transaction(current => {
+        return (current || 0) + 1;
+      });
 
       // Close popup
       const popup = event.target.closest('.share-popup');
-      if(popup) popup.classList.remove('active');
+      if (popup) popup.classList.remove('active');
 
-      const text = `Check out this article: ${title}`;
+      const text = 'Check out this article: ' + title;
       let url = '';
 
       switch(platform) {
         case 'whatsapp':
-          url = `https://wa.me/?text=${encodeURIComponent(text + ' ' + pageUrl)}`;
+          url = 'https://wa.me/?text=' + encodeURIComponent(text + ' ' + pageUrl);
           break;
         case 'twitter':
-          url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(pageUrl)}`;
+          url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(pageUrl);
           break;
         case 'linkedin':
-          url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(pageUrl)}`;
+          url = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(pageUrl);
           break;
         case 'email':
-          url = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(text + '\n' + pageUrl)}`;
+          url = 'mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(text + '\n' + pageUrl);
           break;
       }
       window.open(url, '_blank');
     }
+
+    // ═══════════════════════════════════════════════════════════
+    // FIREBASE: TRACK PAGE VIEWS — Once per session per article
+    // ═══════════════════════════════════════════════════════════
+    function trackViews() {
+      document.querySelectorAll('.article-card').forEach(card => {
+        const id = card.dataset.id;
+        const viewed = sessionStorage.getItem('article_' + id + '_viewed');
+        if (!viewed) {
+          db.ref('blog/articles/' + id + '/views').transaction(current => (current || 0) + 1);
+          sessionStorage.setItem('article_' + id + '_viewed', 'true');
+        }
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // INITIALIZATION — Runs after Firebase seed data is ensured
+    // ═══════════════════════════════════════════════════════════
+    ensureArticleData().then(() => {
+      injectViewCountElements();
+      loadState();
+      trackViews();
+    }).catch(err => {
+      console.error('Firebase init error:', err);
+      // Graceful fallback: still inject view elements
+      injectViewCountElements();
+    });
 
     // Right click protection
     document.addEventListener('contextmenu', event => event.preventDefault());
