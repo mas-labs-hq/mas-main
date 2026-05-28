@@ -1,9 +1,9 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════
- * Mort-E GMA.2 — Advanced Inference Engine v4.0.0
+ * Mort-E GMA.2 — Advanced Inference Engine v5.0.0
  * Part of the MortApps Studios AI Division
  *
- * Architecture (v4 — Structured Response + Quick-Reply Buttons):
+ * Architecture (v5 — Structured Response + Quick-Reply Buttons + Link Buttons + Compliment Handler):
  *   ┌─────────────┐  ┌──────────────┐  ┌────────────────┐
  *   │ Input       │→ │ NLP Pipeline │→ │ Intent         │
  *   │ Normalizer  │  │(stem/syn/   │  │ Classifier     │
@@ -16,14 +16,18 @@
  *   │  │ Context    │ │ Confirmation│ │ Depth        │ │
  *   │  │ Stack      │ │ Detector    │ │ Tracker      │ │
  *   │  └────────────┘ └─────────────┘ └──────────────┘ │
+ *   │  ┌────────────┐ ┌─────────────┐ ┌──────────────┐ │
+ *   │  │ Name       │ │ Compliment  │ │ Name         │ │
+ *   │  │ Correction │ │ Detector    │ │ Guard        │ │
+ *   │  └────────────┘ └─────────────┘ └──────────────┘ │
  *   └──────────────────────────┬───────────────────────┘
  *                              │
  *   ┌──────────────────────────▼───────────────────────┐
- *   │        Response Generator (v4)                    │
+ *   │        Response Generator (v5)                    │
  *   │  Returns: { text: string, buttons: [...] }        │
  *   │  ┌────────────┐ ┌─────────────┐ ┌──────────────┐│
  *   │  │ Anti-      │ │ Personalize │ │ Quick-Reply  ││
- *   │  │ Repetition │ │ (name/mem)  │ │ Buttons      ││
+ *   │  │ Repetition │ │ (name/mem)  │ │ + Link Btns  ││
  *   │  └────────────┘ └─────────────┘ └──────────────┘│
  *   └──────────────────────────────────────────────────┘
  *
@@ -47,7 +51,7 @@
   /* ═══════════════════════════════════════════════════════════════
      SECTION 1: NLP UTILITIES
      Stemming, Levenshtein distance, synonym expansion,
-     input normalization, stop words
+     input normalization, stop words, compliment detection
      ═══════════════════════════════════════════════════════════════ */
 
   // ── Porter Stemmer (compact inline) ──────────────────────────
@@ -159,7 +163,7 @@
           dp[i][j] = Math.min(
             dp[i - 1][j] + 1,
             dp[i][j - 1] + 1,
-            dp[i - 1][j - 1] + (a[i - 1] !== b[j - 1] ? 1 : 0)
+            dp[i - 1][j - 1] + (a[i - 1] !== b[i - 1] ? 1 : 0)
           );
         }
       }
@@ -185,7 +189,41 @@
     return best ? { match: best, score: bestScore } : null;
   }
 
-  // ── Synonym Map (expanded) ──────────────────────────────────
+  // ── Compliment Words (v5: prevent false name extraction) ─────
+  var COMPLIMENT_WORDS = new Set([
+    'sweet', 'awesome', 'brilliant', 'excellent', 'fantastic', 'amazing',
+    'wonderful', 'perfect', 'beautiful', 'lovely', 'damn', 'wow', 'sick',
+    'dope', 'fire', 'lit', 'epic', 'badass', 'legend', 'wicked',
+    'nice one', 'good one', 'well done', 'great job', 'nice work',
+    'nice', 'cool', 'great', 'impressive', 'love it', 'love this',
+  ]);
+
+  // ── Compliment Detection (v5: check before name extraction) ──
+  function isComplimentInput(input) {
+    var text = input.toLowerCase().trim().replace(/[!.?,;:'"]/g, '').replace(/\s+/g, ' ');
+    // Check if the entire trimmed input is a known compliment word/phrase
+    if (COMPLIMENT_WORDS.has(text)) return true;
+    // Check single-word compliment at start that constitutes the whole message
+    var singleWord = text.match(/^(\w+)$/);
+    if (singleWord) {
+      var word = singleWord[1];
+      if (COMPLIMENT_WORDS.has(word)) return true;
+    }
+    // Check patterns that look like compliments but not names
+    var complimentPatterns = [
+      /^(sweet|awesome|brilliant|cool|nice|amazing|fantastic|great|impressive|perfect|beautiful|lovely)\b/i,
+      /^love (it|this|that)\b/i,
+      /^you (rock|are great|are awesome|are cool|are smart|are helpful|are good|are amazing)\b/i,
+      /^(nice one|good one|well done|great job|nice work|good job)\b/i,
+      /^(wow|damn|sick|dope|fire|lit|epic|badass|legend|wicked)\b/i,
+    ];
+    for (var i = 0; i < complimentPatterns.length; i++) {
+      if (complimentPatterns[i].test(text)) return true;
+    }
+    return false;
+  }
+
+  // ── Synonym Map (expanded v5) ──────────────────────────────
   const SYNONYM_MAP = {
     hello: ['hi', 'hey', 'howdy', 'greetings', 'sup', 'yo', 'hola', 'morning', 'afternoon', 'evening'],
     bye: ['goodbye', 'farewell', 'later', 'cheers', 'night', 'see ya', 'gotta go', 'take care'],
@@ -208,6 +246,10 @@
     ai: ['artificial intelligence', 'machine learning', 'ml', 'neural', 'deep learning', 'nlp', 'computer vision'],
     privacy: ['data protection', 'gdpr', 'security', 'secure', 'encrypted', 'safe', 'local processing'],
     website: ['site', 'web', 'webpage', 'landing page', 'online presence', 'web app'],
+    // v5: New synonym entries
+    whatsapp: ['wa', 'whats app', 'whatsup', 'whatsapp us', 'chat on whatsapp', 'message on whatsapp'],
+    compliment: ['sweet', 'awesome', 'brilliant', 'cool', 'nice', 'amazing', 'fantastic', 'great', 'impressive', 'love it'],
+    herbal: ['herb', 'herbs', 'natural remedy', 'natural remedies', 'holistic', 'wellness', 'traditional medicine', 'herbal medicine', 'plant-based'],
   };
 
   function expandWithSynonyms(word) {
@@ -308,7 +350,8 @@
 
   /* ═══════════════════════════════════════════════════════════════
      SECTION 2: USER MEMORY (localStorage-backed)
-     Name remembering, preferences, visit tracking, personalization
+     Name remembering, preferences, visit tracking, personalization,
+     name correction (v5), compliment-aware name guard (v5)
      ═══════════════════════════════════════════════════════════════ */
 
   var UserMemory = (function () {
@@ -355,8 +398,48 @@
       return this.persistent.visitCount || 0;
     };
 
+    // v5: Detect name correction patterns like "No my name is mort" or "My name is not Sweet, it's mort"
+    UserMemory.prototype.detectNameCorrection = function (input) {
+      var text = input.trim();
+
+      // Pattern: "No my name is X" / "No I'm X" / "No call me X"
+      var noCorrectionPatterns = [
+        /no\s+(my name is|my name's|i am|i'm|it's|call me)\s+([A-Za-z]{1,20})/i,
+      ];
+      for (var i = 0; i < noCorrectionPatterns.length; i++) {
+        var m = text.match(noCorrectionPatterns[i]);
+        if (m) {
+          var correctedName = m[2].charAt(0).toUpperCase() + m[2].slice(1).toLowerCase();
+          return { corrected: true, name: correctedName };
+        }
+      }
+
+      // Pattern: "Not X, my name is Y" / "My name is not X, it's Y"
+      var notCorrectionPatterns = [
+        /not\s+([A-Za-z]{1,20})\s*[,.]?\s*(my name is|my name's|i am|i'm|it's|call me)\s+([A-Za-z]{1,20})/i,
+        /my name (is not|isn't)\s+([A-Za-z]{1,20})\s*[,.]?\s*(it's|i'm|i am|it is|my name is|call me)\s+([A-Za-z]{1,20})/i,
+      ];
+      for (var j = 0; j < notCorrectionPatterns.length; j++) {
+        var m2 = text.match(notCorrectionPatterns[j]);
+        if (m2) {
+          // The corrected name is the last capture group
+          var namePart = m2[m2.length - 1];
+          var correctedName2 = namePart.charAt(0).toUpperCase() + namePart.slice(1).toLowerCase();
+          return { corrected: true, name: correctedName2 };
+        }
+      }
+
+      return null;
+    };
+
     UserMemory.prototype.extractName = function (input) {
       var text = input.trim();
+
+      // v5: Check for compliment input BEFORE extracting name
+      if (isComplimentInput(text)) {
+        return null;
+      }
+
       var patterns = [
         /(?:my name is|my name's|i am|i'm|call me|name's|they call me)\s+([A-Z][a-zA-Z]{1,20})/i,
         /^(?:the name is|it's|i go by)\s+([A-Z][a-zA-Z]{1,20})/i,
@@ -368,6 +451,7 @@
       var singleWord = text.match(/^([A-Z][a-zA-Z]{1,20})$/);
       if (singleWord) {
         var candidate = singleWord[1];
+        // v5: Expanded notNames list with compliment words
         var notNames = ['Yes', 'No', 'Hello', 'Hey', 'Hi', 'Thanks', 'Okay', 'Sure', 'Maybe',
           'Please', 'Good', 'Great', 'Nice', 'Cool', 'Fine', 'Right', 'What', 'How',
           'Why', 'When', 'Where', 'Tell', 'Show', 'About', 'BioAttex', 'Phein',
@@ -376,7 +460,12 @@
           'Well', 'OK', 'Alright', 'Hello', 'There', 'Here', 'Now', 'Then',
           'More', 'Less', 'Much', 'Very', 'Just', 'Like', 'Want', 'Need',
           'Can', 'Will', 'Does', 'Did', 'Has', 'Have', 'Been', 'Going',
-          'Products', 'Services', 'Company', 'Studio', 'Briz', 'Mort'];
+          'Products', 'Services', 'Company', 'Studio', 'Briz', 'Mort',
+          // v5: Added compliment words to prevent false name extraction
+          'Sweet', 'Awesome', 'Brilliant', 'Excellent', 'Fantastic', 'Amazing',
+          'Wonderful', 'Perfect', 'Beautiful', 'Lovely', 'Damn', 'Wow', 'Sick',
+          'Dope', 'Fire', 'Lit', 'Epic', 'Badass', 'Legend', 'Wicked',
+          'WhatsApp', 'Herbal', 'Wellness'];
         if (notNames.indexOf(candidate) === -1) {
           return candidate;
         }
@@ -604,6 +693,8 @@
   /* ═══════════════════════════════════════════════════════════════
      SECTION 5: KNOWLEDGE BASE
      Entities, intents, fenced topics, tech FAQ
+     v5: Updated Elthira, WhatsApp intent, compliment intent,
+         self_identity intent, improved thanks intent
      ═══════════════════════════════════════════════════════════════ */
 
   var KB = {
@@ -668,20 +759,24 @@
         ],
       },
 
+      // v5: CORRECTED Elthira.Ai entity — Your Herbal Wellness Consultant
       elthira: {
         id: 'elthira',
         type: 'product',
-        domain: 'ai',
-        aliases: ['elthira ai', 'elthira.ai', 'elthra', 'elthra ai', 'elthira'],
-        shortDescription: 'an AI platform from the MortApps Studios ecosystem pushing the boundaries of intelligent systems',
-        longDescription: 'Elthira.Ai is part of MortApps Studios\' expanding AI product lineup. It represents the studio\'s continued investment in intelligent systems that solve real-world problems. While specific capabilities are being unveiled as development progresses, Elthira.Ai is positioned to be a significant addition to our AI ecosystem. Stay tuned \u2014 this one\'s going to turn heads.',
-        features: ['AI-powered capabilities in development', 'Part of the growing MortApps AI ecosystem', 'Next-generation intelligent systems'],
+        domain: 'herbal-wellness',
+        aliases: ['elthira ai', 'elthira.ai', 'elthra', 'elthra ai', 'elthira', 'herbal', 'wellness', 'herbal consultant', 'herbal wellness', 'natural remedies', 'herbs', 'herbal ai'],
+        shortDescription: 'your AI-powered herbal wellness consultant \u2014 discover natural remedies rooted in Kenyan herbal wisdom',
+        longDescription: 'Elthira.Ai is MortApps Studios\' AI-powered herbal wellness consultant. It helps users discover natural remedies and holistic wellness guidance powered by centuries of Kenyan herbal wisdom. Users describe their symptoms and receive personalized herbal recommendations drawn from traditional knowledge and modern science. The platform features a beautiful, step-by-step consultation flow with symptom selection, herbal remedy matching, and best practice guidance \u2014 all with a focus on natural, plant-based solutions rooted in East African herbal traditions.',
+        features: ['AI-powered herbal wellness consultation', 'Personalized natural remedy recommendations', 'Kenyan herbal wisdom and traditional knowledge', 'Symptom-based herbal matching', 'Holistic wellness guidance', 'Live platform at mortappsstudios.com/Elthira.Ai'],
+        demoUrl: 'https://mortappsstudios.com/Elthira.Ai',
         buttons: [
+          { label: 'Try Elthira.Ai', value: 'Elthira demo' },
           { label: 'Other Products', value: 'What products does MortApps Studios have' },
         ],
         additionalDetails: [
-          'Elthira.Ai is MortApps Studios\' ambitious play in the broader AI platform space. While we\'re keeping the specific feature set under wraps for now, the vision is clear: build an AI platform that\'s accessible, powerful, and genuinely useful \u2014 not just a tech demo.',
-          'What we can share is that Elthira.Ai draws on the same AI expertise that powers BioAttex\'s facial recognition and Phein\'s CV analysis. It\'s not starting from scratch \u2014 it\'s building on proven technology.',
+          'Herbal wellness consulting is an ancient practice that has guided communities toward natural healing for thousands of years. In Kenya and across East Africa, traditional herbalists have long served as the first point of contact for health concerns \u2014 using knowledge passed down through generations to identify which plants, roots, and leaves address specific ailments. Elthira.Ai bridges this rich heritage with modern AI technology, making herbal wisdom accessible to anyone with a smartphone or computer. Whether you\'re dealing with a persistent headache, digestive discomfort, or just looking to boost your immunity naturally, Elthira provides a structured consultation that mirrors the thoughtfulness of sitting with a traditional herbalist.',
+          'Kenyan herbal traditions are among the most diverse and well-documented in Africa. From the highlands of Mount Kenya to the coastal forests of Mombasa, each region boasts its own pharmacopeia of healing plants. Moringa, known as the "miracle tree," is used for everything from inflammation to malnutrition. Aloe vera finds its way into remedies for skin conditions and digestive issues. Roselle (hibiscus) is prized for blood pressure management, while neem serves as a powerful antimicrobial. Elthira.Ai draws on this deep well of knowledge, combining it with AI-driven matching to connect users with the right remedies for their specific symptoms. The result is a platform that respects tradition while making it scalable and personal.',
+          'Here\'s how Elthira works in practice: you start by describing your symptoms \u2014 whether it\'s a headache, fatigue, skin irritation, or something else. The AI analyzes your input against a curated database of Kenyan herbal remedies, considering symptom profiles, severity, and any contraindications. You then receive personalized herbal recommendations, complete with preparation methods (tea, poultice, infusion, etc.), suggested dosages, and important cautions \u2014 because natural doesn\'t mean risk-free, and Elthira takes that seriously. The platform also provides guidance on when to seek professional medical attention, ensuring that herbal wellness complements rather than replaces conventional healthcare where needed.',
         ],
       },
 
@@ -773,7 +868,7 @@
         domain: 'org',
         aliases: ['mortapps', 'mort apps', 'mortapps studios', 'the studio', 'you guys', 'your company', 'your studio', 'the company', 'the team', 'this place', 'this studio'],
         shortDescription: 'a premier software and web development studio based in Nairobi, Kenya',
-        longDescription: 'MortApps Studios is a premier software and web development studio based in Nairobi, Kenya. Founded in 2024 by Mort Ian K., the studio specializes in custom web applications, AI-integrated systems, biometric solutions, and digital experiences that solve real business problems. From biometric attendance (BioAttex) to intelligent recruitment (Phein) to precision eyewear tech (Opticore Vipro), every product is built with a philosophy that technology should feel human. The studio also builds custom web applications tailored to each client\'s specific requirements \u2014 no two projects are the same. With a growing portfolio of proprietary products and client solutions, MortApps Studios is proof that world-class software can come from anywhere.',
+        longDescription: 'MortApps Studios is a premier software and web development studio based in Nairobi, Kenya. Founded in 2024 by Mort Ian K., the studio specializes in custom web applications, AI-integrated systems, biometric solutions, and digital experiences that solve real business problems. From biometric attendance (BioAttex) to intelligent recruitment (Phein) to herbal wellness consulting (Elthira.Ai) to precision eyewear tech (Opticore Vipro), every product is built with a philosophy that technology should feel human. The studio also builds custom web applications tailored to each client\'s specific requirements \u2014 no two projects are the same. With a growing portfolio of proprietary products and client solutions, MortApps Studios is proof that world-class software can come from anywhere.',
         features: ['Custom web applications', 'AI-integrated systems', 'Biometric solutions', 'Website development', 'Digital experiences', 'Custom software for any industry'],
         buttons: [
           { label: 'Products', value: 'What products does MortApps Studios have' },
@@ -814,11 +909,11 @@
           patterns: [/^h+i+\b/i, /^he+y+\b/i, /^yo\b/i, /^sup\b/i, /^hola/i, /^(morning|afternoon|evening)\b/i],
         },
         responses: [
-          "Hey there{userNameComma}! I'm Mort-E GMA.2 \u2014 your guide to everything MortApps Studios. Whether it's our products, our story, or what we're building next \u2014 I've got you. What's on your mind?",
-          "Hello{userNameComma}! Mort-E GMA.2, at your service. I know this studio inside and out \u2014 from our biometric systems to our AI tools. What can I help you with?",
-          "Hey{userNameComma}! Welcome to Mort-E. Think of me as your personal guide to the MortApps universe. Products, services, founder stories \u2014 just ask.",
-          "Hi{userNameComma}! I'm Mort-E GMA.2, the AI that knows MortApps Studios better than anyone. What would you like to know?",
-          "Hello there{userNameComma}! Mort-E here, ready to walk you through everything MortApps Studios. What catches your interest?",
+          "Hey there{userNameComma}! I'm Mort-E GMA.2, powered by MortApps Studios \u2014 your guide to everything we build. Whether it's our products, our story, or what we're building next \u2014 I've got you. What's on your mind?",
+          "Hello{userNameComma}! Mort-E GMA.2, powered by MortApps Studios, at your service. I know this studio inside and out \u2014 from our biometric systems to our AI tools to our herbal wellness platform. What can I help you with?",
+          "Hey{userNameComma}! Welcome to Mort-E GMA.2, powered by MortApps Studios. Think of me as your personal guide to the MortApps universe. Products, services, founder stories \u2014 just ask.",
+          "Hi{userNameComma}! I'm Mort-E GMA.2, powered by MortApps Studios \u2014 the AI that knows MortApps better than anyone. What would you like to know?",
+          "Hello there{userNameComma}! Mort-E GMA.2 here, powered by MortApps Studios, ready to walk you through everything we build. What catches your interest?",
         ],
         buttons: [
           { label: 'Products', value: 'What products do you have' },
@@ -833,10 +928,10 @@
           patterns: [/how (are|do|is|have|go)/i, /what'?s up/i],
         },
         responses: [
-          "I'm running at full capacity{userNameComma} \u2014 always the case when you're built to know everything about a studio this ambitious. But enough about me. What about MortApps Studios can I help you with?",
-          "Doing great{userNameComma}! Always sharp, always ready. I spend my time knowing this studio inside and out so I can give you the best answers. What are you curious about?",
-          "Can't complain{userNameComma} \u2014 I'm an AI, that's kind of my thing. But I'm definitely at my best when someone's asking about MortApps Studios. What's on your mind?",
-          "All systems go{userNameComma}! I'm here, I'm ready, and I know this studio backwards and forwards. What would you like to explore?",
+          "I'm running at full capacity{userNameComma} \u2014 always the case when you're Mort-E GMA.2, powered by MortApps Studios, built to know everything about a studio this ambitious. But enough about me. What about MortApps Studios can I help you with?",
+          "Doing great{userNameComma}! Mort-E GMA.2 is always sharp, always ready. Powered by MortApps Studios, I spend my time knowing this studio inside and out so I can give you the best answers. What are you curious about?",
+          "Can't complain{userNameComma} \u2014 I'm an AI powered by MortApps Studios, that's kind of my thing. But I'm definitely at my best when someone's asking about what we build. What's on your mind?",
+          "All systems go{userNameComma}! Mort-E GMA.2, powered by MortApps Studios, is here and ready. I know this studio backwards and forwards. What would you like to explore?",
         ],
         buttons: [
           { label: 'Products', value: 'What products do you have' },
@@ -850,24 +945,25 @@
           patterns: [/see ya/i, /take care/i, /good ?bye/i, /^bye\b/i, /good ?night/i],
         },
         responses: [
-          "Take care{userNameComma}. If you ever need to know anything about MortApps Studios, you know where to find me.",
-          "Goodbye{userNameComma}! Remember \u2014 if you need to reach the team, labs@mortappsstudios.com is always open. Come back anytime.",
-          "Later{userNameComma}! And hey \u2014 if something crosses your mind about our products or services, I'll be right here.",
-          "See you around{userNameComma}. MortApps Studios is always building something new \u2014 worth checking back.",
+          "Take care{userNameComma}. If you ever need to know anything about MortApps Studios, you know where to find me \u2014 Mort-E GMA.2, always here.",
+          "Goodbye{userNameComma}! Remember \u2014 if you need to reach the team, labs@mortappsstudios.com is always open. Or WhatsApp us at +254 113 400 063. Come back anytime.",
+          "Later{userNameComma}! And hey \u2014 if something crosses your mind about our products or services, I'll be right here. Mort-E GMA.2, powered by MortApps Studios, never clocks out.",
+          "See you around{userNameComma}. MortApps Studios is always building something new \u2014 worth checking back. Mort-E GMA.2 out.",
         ],
         buttons: [],
       },
       {
+        // v5: Updated thanks intent — removed sweet/nice/cool (handled by compliment intent)
         id: 'thanks',
         triggers: {
-          keywords: ['thanks', 'thank you', 'appreciate', 'helpful', 'great answer', 'awesome', 'nice', 'cool', 'sweet'],
-          patterns: [/thank/i, /appreciate/i, /^(nice|cool|sweet|great|awesome)\b/i],
+          keywords: ['thanks', 'thank you', 'appreciate', 'helpful', 'great answer'],
+          patterns: [/^thanks/i, /thank you/i, /appreciate/i, /^helpful\b/i],
         },
         responses: [
-          "Glad I could help{userNameComma}. Anything else you want to know about MortApps Studios?",
-          "You're welcome{userNameComma}! That's what I'm here for. Got more questions?",
-          "Appreciate that{userNameComma}! If there's anything else on your mind about what we do, don't hesitate.",
-          "Happy to help{userNameComma}. I've got plenty more where that came from \u2014 just ask.",
+          "Glad I could help{userNameComma}. That's what Mort-E GMA.2, powered by MortApps Studios, is here for. Anything else you want to know?",
+          "You're welcome{userNameComma}! That's what I'm built for. Got more questions about MortApps Studios?",
+          "Appreciate that{userNameComma}! If there's anything else on your mind about what we do, don't hesitate. I'm Mort-E GMA.2 \u2014 always ready.",
+          "Happy to help{userNameComma}. I've got plenty more where that came from \u2014 just ask. Mort-E GMA.2, powered by MortApps Studios, at your service.",
         ],
         buttons: [
           { label: 'Products', value: 'What products do you have' },
@@ -875,15 +971,64 @@
         ],
       },
       {
+        // v5: NEW compliment intent
+        id: 'compliment',
+        triggers: {
+          keywords: ['sweet', 'awesome', 'brilliant', 'cool', 'nice', 'amazing', 'fantastic', 'great', 'love it', 'love this', 'impressive', 'well done', 'nice one', 'good job', 'you rock', 'you are great', 'you are awesome', 'you are cool', 'you are smart', 'you are helpful', 'you are good'],
+          patterns: [/^(sweet|awesome|brilliant|cool|nice|amazing|fantastic|great)\b/i, /love (it|this|that)/i, /you (rock|are great|are awesome|are cool|are smart|are helpful|are good|are amazing)/i],
+        },
+        responses: [
+          "Appreciate that{userNameComma}! I'm Mort-E GMA.2, powered by MortApps Studios, built to be as sharp and helpful as possible when it comes to everything we create. Compliments like that tell me the knowledge base is doing its job. Anything else you'd like to explore?",
+          "Thanks{userNameComma}! I take pride in knowing this studio inside and out. Whether it's BioAttex, Phein, Elthira.Ai, or anything else under the MortApps umbrella \u2014 I'm here to give you the best answers. What's next?",
+          "That means a lot{userNameComma}! Being Mort-E GMA.2, powered by MortApps Studios, means I've got to represent at the highest level. I'm always learning and always ready. Got more questions?",
+        ],
+        buttons: [
+          { label: 'Products', value: 'What products do you have' },
+          { label: 'Services', value: 'What services do you offer' },
+        ],
+      },
+      {
+        // v5: NEW self_identity intent
+        id: 'self_identity',
+        triggers: {
+          keywords: ['what are you', 'who are you', 'what is your name', 'your name', 'tell me about yourself', 'what should i call you', 'are you a bot', 'are you ai', 'are you a chatbot', 'are you human'],
+          patterns: [/^what are you/i, /^who are you/i, /your name/i, /^are you (a |an )?(bot|ai|chatbot|human)/i, /tell me about yourself/i, /what should i call you/i],
+        },
+        responses: [
+          "I'm Mort-E GMA.2 \u2014 the AI assistant built by and for MortApps Studios. I'm powered entirely by MortApps Studios' technology, running locally in your browser with no external APIs or cloud services. Think of me as the studio's digital ambassador: I know every product, every service, every detail about what we build and why we build it. I can help you explore BioAttex, Phein, Elthira.Ai, and the rest of our lineup, or connect you with the team for anything I can't handle. What would you like to know?",
+        ],
+        buttons: [
+          { label: 'Products', value: 'What products do you have' },
+          { label: 'Services', value: 'What services do you offer' },
+          { label: 'About Studio', value: 'Tell me about MortApps Studios' },
+        ],
+      },
+      {
+        // v5: NEW whatsapp intent with link button
+        id: 'whatsapp',
+        triggers: {
+          keywords: ['whatsapp', 'open whatsapp', 'whatsapp you', 'chat on whatsapp', 'whatsapp chat', 'wa me', 'message on whatsapp'],
+          patterns: [/whatsapp/i, /^wa\b/i, /chat on whatsapp/i],
+        },
+        responses: [
+          "You can reach MortApps Studios directly on WhatsApp. It's one of the fastest ways to get in touch with the team \u2014 whether you have a question about a product, want to discuss a custom project, or just need some information. Tap the button below to start a conversation!",
+          "WhatsApp is a great way to connect with us{userNameComma}. MortApps Studios is active on WhatsApp and the team typically responds quickly. You can ask about products, services, pricing, or anything else. Tap the button to start chatting!",
+        ],
+        buttons: [
+          { label: 'WhatsApp Us', value: 'whatsapp_link', type: 'link', url: 'https://wa.me/254113400063' },
+        ],
+      },
+      {
+        // v5: Updated product_overview — Elthira described as herbal wellness
         id: 'product_overview',
         triggers: {
           keywords: ['products', 'what do you make', 'what do you offer', 'what do you build', 'your software', 'what have you built', 'portfolio', 'your work', 'what products', 'your products', 'product lineup', 'what do you sell', 'what do you create'],
           patterns: [/what.*(products?|software|apps?|tools?|build|make|offer|create)/i, /show me.*(products?|what you)/i, /your (product|software|app|tool)/i, /product lineup/i],
         },
         responses: [
-          "{userNameLead}we've built a diverse lineup at MortApps Studios. Here's the roster: BioAttex (biometric attendance with facial recognition), Phein (AI-powered CV screening), Elthira.Ai (our expanding AI platform), AgriXen (agriculture technology), Briz (productivity tools), and Opticore Vipro (precision eyewear technology). We also build custom web applications tailored to each client's requirements \u2014 and we've got more in the pipeline. Which one catches your eye?",
-          "{userNameLead}MortApps Studios has six products and counting: BioAttex, Phein, Elthira.Ai, AgriXen, Briz, and Opticore Vipro \u2014 spanning biometrics, recruitment, AI, agriculture, productivity, and optics. Plus, we build custom web apps depending on what the client needs. No two projects are the same. Want me to dive into any of them?",
-          "{userNameLead}our product suite covers serious ground \u2014 BioAttex for biometric attendance, Phein for smart CV screening, Elthira.Ai for AI solutions, AgriXen for agriculture tech, Briz for workflow efficiency, and Opticore Vipro for eyewear technology. And that's just what's public \u2014 there's more in development. Want details on any of these?",
+          "{userNameLead}we've built a diverse lineup at MortApps Studios. Here's the roster: BioAttex (biometric attendance with facial recognition), Phein (AI-powered CV screening), Elthira.Ai (AI-powered herbal wellness consultant), AgriXen (agriculture technology), Briz (productivity tools), and Opticore Vipro (precision eyewear technology). We also build custom web applications tailored to each client's requirements \u2014 and we've got more in the pipeline. Which one catches your eye?",
+          "{userNameLead}MortApps Studios has six products and counting: BioAttex, Phein, Elthira.Ai, AgriXen, Briz, and Opticore Vipro \u2014 spanning biometrics, recruitment, herbal wellness, agriculture, productivity, and optics. Plus, we build custom web apps depending on what the client needs. No two projects are the same. Want me to dive into any of them?",
+          "{userNameLead}our product suite covers serious ground \u2014 BioAttex for biometric attendance, Phein for smart CV screening, Elthira.Ai for AI-powered herbal wellness consulting, AgriXen for agriculture tech, Briz for workflow efficiency, and Opticore Vipro for eyewear technology. And that's just what's public \u2014 there's more in development. Want details on any of these?",
         ],
         buttons: [
           { label: 'BioAttex', value: 'Tell me about BioAttex' },
@@ -899,9 +1044,9 @@
           patterns: [/what is mortapps/i, /who is mortapps/i, /about (mortapps|the (company|studio))/i, /tell me about (mortapps|the (company|studio))/i],
         },
         responses: [
-          "{userNameLead}MortApps Studios is a premier software and web development studio based in Nairobi, Kenya. Founded in 2024, we specialize in custom web applications, AI-integrated systems, biometric solutions, and digital experiences that solve real business problems. Our philosophy? Technology should feel human. From BioAttex to Phein to Opticore Vipro \u2014 every product reflects that belief. And we build custom web applications tailored to each client's needs. No cookie-cutter solutions here. Want to know more about what we do?",
-          "{userNameLead}MortApps Studios is where serious software gets built. We're based in Nairobi, and we build custom web applications, AI-integrated systems, biometric solutions, and digital experiences that actually matter. We've got six products in our lineup and we build custom solutions for clients across industries. Our founder, Mort Ian K., started this with one belief: technology should feel human. That drives everything we build. What aspect interests you most?",
-          "{userNameLead}think of MortApps Studios as a software studio that refuses to build boring things. Based in Nairobi, Kenya \u2014 we create custom web applications, AI tools, biometric systems, and digital platforms that solve real problems. We've got proprietary products like BioAttex, Phein, and several more in development, plus we build custom solutions for clients. The mission is simple: software that matters. Want the full breakdown?",
+          "{userNameLead}MortApps Studios is a premier software and web development studio based in Nairobi, Kenya. Founded in 2024, we specialize in custom web applications, AI-integrated systems, biometric solutions, and digital experiences that solve real business problems. Our philosophy? Technology should feel human. From BioAttex to Phein to Elthira.Ai to Opticore Vipro \u2014 every product reflects that belief. And we build custom web applications tailored to each client's needs. No cookie-cutter solutions here. Want to know more about what we do?",
+          "{userNameLead}MortApps Studios is where serious software gets built. We're based in Nairobi, and we build custom web applications, AI-integrated systems, biometric solutions, and digital experiences that actually matter. We've got six products in our lineup \u2014 from biometric attendance to herbal wellness consulting \u2014 and we build custom solutions for clients across industries. Our founder, Mort Ian K., started this with one belief: technology should feel human. That drives everything we build. What aspect interests you most?",
+          "{userNameLead}think of MortApps Studios as a software studio that refuses to build boring things. Based in Nairobi, Kenya \u2014 we create custom web applications, AI tools, biometric systems, and digital platforms that solve real problems. We've got proprietary products like BioAttex, Phein, Elthira.Ai, and several more, plus we build custom solutions for clients. The mission is simple: software that matters. Want the full breakdown?",
         ],
         buttons: [
           { label: 'Products', value: 'What products do you have' },
@@ -932,9 +1077,9 @@
           patterns: [/what (services|solutions|can you)/i, /how can you help/i, /your services/i],
         },
         responses: [
-          "{userNameLead}MortApps Studios offers a focused range of services: custom web application development, website design and development, AI integration services, biometric system implementation, and custom software solutions tailored to your specific requirements. We don't do cookie-cutter \u2014 every project is built around what you actually need. Beyond that, our sister brand Linkage Media Hub handles digital marketing and influencer coordination. Want to discuss a specific project? Hit up labs@mortappsstudios.com or use the contact form on our site.",
-          "{userNameLead}here's what we bring to the table: custom web applications built from scratch, AI integration that makes your existing systems smarter, biometric solutions with our BioAttex platform, website development that actually looks and works right, and custom software for any industry. Every solution is tailored \u2014 we don't recycle. If you want to talk specifics, reach out at labs@mortappsstudios.com or drop us a message through the contact form.",
-          "{userNameLead}our services span custom web applications, AI integration, biometric systems, website development, and bespoke software solutions. The common thread? Everything is built to match your needs, not the other way around. We also have Linkage Media Hub as a sister brand for digital marketing. Ready to start a conversation? labs@mortappsstudios.com or the contact form is the way in.",
+          "{userNameLead}MortApps Studios offers a focused range of services: custom web application development, website design and development, AI integration services, biometric system implementation, and custom software solutions tailored to your specific requirements. We don't do cookie-cutter \u2014 every project is built around what you actually need. Beyond that, our sister brand Linkage Media Hub handles digital marketing and influencer coordination. Want to discuss a specific project? Hit up labs@mortappsstudios.com or WhatsApp us at +254 113 400 063.",
+          "{userNameLead}here's what we bring to the table: custom web applications built from scratch, AI integration that makes your existing systems smarter, biometric solutions with our BioAttex platform, website development that actually looks and works right, and custom software for any industry. Every solution is tailored \u2014 we don't recycle. If you want to talk specifics, reach out at labs@mortappsstudios.com or WhatsApp us directly.",
+          "{userNameLead}our services span custom web applications, AI integration, biometric systems, website development, and bespoke software solutions. The common thread? Everything is built to match your needs, not the other way around. We also have Linkage Media Hub as a sister brand for digital marketing. Ready to start a conversation? labs@mortappsstudios.com, WhatsApp, or the contact form is the way in.",
         ],
         buttons: [
           { label: 'Custom Project', value: 'I need a custom web application' },
@@ -954,7 +1099,7 @@
           "{userNameLead}you've got options: labs@mortappsstudios.com (email), +254 113 400 063 (call or WhatsApp), or the contact form on mortappsstudios.com. For the founder directly, klraineian@gmail.com works. Pick whatever's most comfortable for you.",
         ],
         buttons: [
-          { label: 'WhatsApp', value: 'Open WhatsApp' },
+          { label: 'WhatsApp', value: 'whatsapp_link', type: 'link', url: 'https://wa.me/254113400063' },
           { label: 'Schedule Meeting', value: 'I want to schedule a meeting' },
         ],
       },
@@ -965,12 +1110,12 @@
           patterns: [/schedule (a )?(meeting|call|consultation)/i, /book (a )?(call|meeting)/i, /discuss (a )?project/i],
         },
         responses: [
-          "For scheduling a meeting, the best move is to use the contact form on our website at mortappsstudios.com#contact. Include what you'd like to discuss and your preferred times \u2014 the team will get back to you quickly. You can also email labs@mortappsstudios.com directly. We don't do automated booking \u2014 real humans coordinate real meetings here.",
-          "Want to meet? Head to mortappsstudios.com#contact and use the contact form \u2014 tell us what you need and when works for you. Alternatively, email labs@mortappsstudios.com. We keep it personal, not automated. Someone from the team will coordinate directly with you.",
-          "The fastest way to set up a meeting is through the contact form on our site at mortappsstudios.com#contact. Drop your details, what you'd like to discuss, and your availability. You can also email labs@mortappsstudios.com. We respond promptly \u2014 you won't be left hanging.",
+          "For scheduling a meeting, the best move is to use the contact form on our website at mortappsstudios.com#contact. Include what you'd like to discuss and your preferred times \u2014 the team will get back to you quickly. You can also email labs@mortappsstudios.com directly or WhatsApp us at +254 113 400 063. We don't do automated booking \u2014 real humans coordinate real meetings here.",
+          "Want to meet? Head to mortappsstudios.com#contact and use the contact form \u2014 tell us what you need and when works for you. Alternatively, email labs@mortappsstudios.com or WhatsApp us at +254 113 400 063. We keep it personal, not automated. Someone from the team will coordinate directly with you.",
+          "The fastest way to set up a meeting is through the contact form on our site at mortappsstudios.com#contact. Drop your details, what you'd like to discuss, and your availability. You can also email labs@mortappsstudios.com or reach out on WhatsApp. We respond promptly \u2014 you won't be left hanging.",
         ],
         buttons: [
-          { label: 'Contact Form', value: 'How to use the contact form' },
+          { label: 'WhatsApp Us', value: 'whatsapp_link', type: 'link', url: 'https://wa.me/254113400063' },
           { label: 'Email Us', value: 'What is the email for MortApps Studios' },
         ],
       },
@@ -981,32 +1126,34 @@
           patterns: [/can i (try|test|see|demo)/i, /show me a demo/i, /live demo/i, /try (it|out|bioattex|phein)/i],
         },
         responses: [
-          "{userNameLead}we've got live demos available for some of our products. BioAttex has a demo at mortappsstudios.com/bioatx-demo where you can see the biometric attendance system in action. Phein's CV screener demo is at mortappsstudios.com/client.phein_vr-6.0_demo. For the others, reach out at labs@mortappsstudios.com and we can arrange something. Which product are you interested in?",
-          "{userNameLead}yes \u2014 you can try BioAttex and Phein right now. BioAttex demo: mortappsstudios.com/bioatx-demo. Phein demo: mortappsstudios.com/client.phein_vr-6.0_demo. For other products, contact us at labs@mortappsstudios.com and we'll set something up. Nothing beats seeing it in action.",
-          "{userNameLead}demos are available! BioAttex (biometric attendance) \u2014 mortappsstudios.com/bioatx-demo. Phein (CV screening) \u2014 mortappsstudios.com/client.phein_vr-6.0_demo. For other products or a personalized walkthrough, reach out to labs@mortappsstudios.com. We're happy to show you what we've built.",
+          "{userNameLead}we've got live demos and platforms available for some of our products. BioAttex has a demo at mortappsstudios.com/bioatx-demo where you can see the biometric attendance system in action. Phein's CV screener demo is at mortappsstudios.com/client.phein_vr-6.0_demo. Elthira.Ai's herbal wellness platform is live at mortappsstudios.com/Elthira.Ai. For the others, reach out at labs@mortappsstudios.com and we can arrange something. Which product are you interested in?",
+          "{userNameLead}yes \u2014 you can try BioAttex, Phein, and Elthira.Ai right now. BioAttex demo: mortappsstudios.com/bioatx-demo. Phein demo: mortappsstudios.com/client.phein_vr-6.0_demo. Elthira.Ai (herbal wellness): mortappsstudios.com/Elthira.Ai. For other products, contact us at labs@mortappsstudios.com and we'll set something up. Nothing beats seeing it in action.",
+          "{userNameLead}demos are available! BioAttex (biometric attendance) \u2014 mortappsstudios.com/bioatx-demo. Phein (CV screening) \u2014 mortappsstudios.com/client.phein_vr-6.0_demo. Elthira.Ai (herbal wellness) \u2014 mortappsstudios.com/Elthira.Ai. For other products or a personalized walkthrough, reach out to labs@mortappsstudios.com. We're happy to show you what we've built.",
         ],
         buttons: [
           { label: 'BioAttex Demo', value: 'BioAttex demo' },
           { label: 'Phein Demo', value: 'Phein demo' },
+          { label: 'Try Elthira.Ai', value: 'Elthira demo' },
           { label: 'All Products', value: 'What products do you have' },
         ],
       },
       {
+        // v5: Updated capabilities — prominent self-identity
         id: 'capabilities',
         triggers: {
           keywords: ['what can you do', 'what do you know', 'what are you', 'who are you', 'your capabilities', 'help me', 'how can you help me', 'what should i ask'],
           patterns: [/what can you/i, /what are you\b/i, /your capabilities/i, /how can you help/i],
         },
         responses: [
-          "{userNameLead}I'm Mort-E GMA.2 \u2014 built to know everything about MortApps Studios. I can tell you about our products (BioAttex, Phein, Elthira.Ai, AgriXen, Briz, Opticore Vipro), our services, our founder Mort Ian K., our sister brand Linkage Media Hub, how to contact us, schedule meetings, or try demos. I also know about basic tech concepts related to our work. Basically, if it's about MortApps Studios, I'm your AI. What are you curious about?",
-          "Think of me as the MortApps Studios encyclopedia with personality. I cover: all six products, services and custom development, the founder and company story, contact information and meeting scheduling, demo links, and our sister brand Linkage Media Hub. I also handle tech questions about our approach. What would you like to explore?",
-          "I know MortApps Studios inside and out. Products, services, founder story, contact details, demos, tech stack \u2014 ask away. I'm not a general-purpose AI, but when it comes to this studio, I'm the best source you'll find. What's on your mind?",
+          "{userNameLead}I'm Mort-E GMA.2, powered by MortApps Studios \u2014 built to know everything about this studio. I can tell you about our products (BioAttex, Phein, Elthira.Ai, AgriXen, Briz, Opticore Vipro), our services, our founder Mort Ian K., our sister brand Linkage Media Hub, how to contact us, schedule meetings, try demos, or even WhatsApp us directly. I also know about basic tech concepts related to our work. Basically, if it's about MortApps Studios, I'm your AI. What are you curious about?",
+          "I'm Mort-E GMA.2, powered by MortApps Studios \u2014 think of me as the MortApps encyclopedia with personality. I cover: all six products (including Elthira.Ai for herbal wellness), services and custom development, the founder and company story, contact information and meeting scheduling, demo links, WhatsApp connectivity, and our sister brand Linkage Media Hub. I also handle tech questions about our approach. What would you like to explore?",
+          "I'm Mort-E GMA.2, powered by MortApps Studios. I know this studio inside and out \u2014 products, services, founder story, contact details, demos, tech stack, WhatsApp, you name it. Ask away. I'm not a general-purpose AI, but when it comes to MortApps Studios, I'm the best source you'll find. What's on your mind?",
         ],
         buttons: [
           { label: 'Products', value: 'What products do you have' },
           { label: 'Services', value: 'What services do you offer' },
           { label: 'Demos', value: 'Can I try any demos' },
-          { label: 'Contact', value: 'How can I contact MortApps Studios' },
+          { label: 'WhatsApp', value: 'whatsapp_link', type: 'link', url: 'https://wa.me/254113400063' },
         ],
       },
       {
@@ -1016,13 +1163,13 @@
           patterns: [/where (are you|is mortapps|is the studio)/i, /your location/i, /where (are you )?based/i],
         },
         responses: [
-          "{userNameLead}MortApps Studios is based in Nairobi, Kenya. We build world-class software from right here in East Africa \u2014 and we serve clients globally. Location doesn't limit quality. Need to reach us? labs@mortappsstudios.com or +254 113 400 063.",
-          "Nairobi, Kenya \u2014 that's where we operate from. MortApps Studios proves you don't need to be in Silicon Valley to build exceptional software. We work with clients everywhere. Want to connect? labs@mortappsstudios.com.",
-          "We're headquartered in Nairobi, Kenya. Global reach, local roots. The best software doesn't have a zip code \u2014 it has standards. And ours are high. Reach us at labs@mortappsstudios.com or +254 113 400 063.",
+          "{userNameLead}MortApps Studios is based in Nairobi, Kenya. We build world-class software from right here in East Africa \u2014 and we serve clients globally. Location doesn't limit quality. Need to reach us? labs@mortappsstudios.com or WhatsApp at +254 113 400 063.",
+          "Nairobi, Kenya \u2014 that's where we operate from. MortApps Studios proves you don't need to be in Silicon Valley to build exceptional software. We work with clients everywhere. Want to connect? labs@mortappsstudios.com or WhatsApp us.",
+          "We're headquartered in Nairobi, Kenya. Global reach, local roots. The best software doesn't have a zip code \u2014 it has standards. And ours are high. Reach us at labs@mortappsstudios.com, WhatsApp at +254 113 400 063, or the contact form on our site.",
         ],
         buttons: [
           { label: 'About Studio', value: 'Tell me about MortApps Studios' },
-          { label: 'Contact', value: 'How can I contact MortApps Studios' },
+          { label: 'WhatsApp', value: 'whatsapp_link', type: 'link', url: 'https://wa.me/254113400063' },
         ],
       },
       {
@@ -1032,9 +1179,9 @@
           patterns: [/what (tech|technology|languages|frameworks|stack)/i, /tech stack/i, /build with/i, /programming languages/i],
         },
         responses: [
-          "MortApps Studios builds with a versatile tech stack. For web applications, we work with HTML, CSS, JavaScript, and modern frameworks. For AI-powered products like BioAttex and Phein, we leverage machine learning and facial recognition tech. We also utilize GitHub Pages for reliable hosting and build custom backend solutions depending on the project. The stack adapts to the challenge \u2014 we're not married to one tool. Curious about a specific product's tech?",
-          "Our tech stack is project-driven, not dogmatic. We use HTML, CSS, JavaScript, and modern frameworks for web development. For AI products, we work with machine learning and computer vision technologies. Hosting includes platforms like GitHub Pages, and we build custom solutions as needed. The right tool for the right job \u2014 that's the philosophy. Want to know more about how a specific product is built?",
-          "We're pragmatic about tech. Web development with HTML, CSS, JavaScript, and frameworks. AI and ML for products like BioAttex and Phein. GitHub Pages for hosting. Custom backends when the project demands it. We choose tools based on what the project needs, not what's trendy. Want specifics on any product's architecture?",
+          "MortApps Studios builds with a versatile tech stack. For web applications, we work with HTML, CSS, JavaScript, and modern frameworks. For AI-powered products like BioAttex and Phein, we leverage machine learning and facial recognition tech. For Elthira.Ai, we apply AI to herbal wellness and natural language understanding. We also utilize GitHub Pages for reliable hosting and build custom backend solutions depending on the project. The stack adapts to the challenge \u2014 we're not married to one tool. Curious about a specific product's tech?",
+          "Our tech stack is project-driven, not dogmatic. We use HTML, CSS, JavaScript, and modern frameworks for web development. For AI products, we work with machine learning, computer vision, and NLP technologies. Hosting includes platforms like GitHub Pages, and we build custom solutions as needed. The right tool for the right job \u2014 that's the philosophy. Want to know more about how a specific product is built?",
+          "We're pragmatic about tech. Web development with HTML, CSS, JavaScript, and frameworks. AI and ML for products like BioAttex, Phein, and Elthira.Ai. GitHub Pages for hosting. Custom backends when the project demands it. We choose tools based on what the project needs, not what's trendy. Want specifics on any product's architecture?",
         ],
         buttons: [
           { label: 'BioAttex', value: 'How is BioAttex built' },
@@ -1049,7 +1196,7 @@
           patterns: [/why (did you|mortapps)/i, /your (mission|vision|philosophy)/i, /what drives/i, /why (this|the) company/i],
         },
         responses: [
-          "The philosophy at MortApps Studios is simple: technology should feel human. Too much software is built for machines, not people. Mort Ian K. started this studio because he believed that world-class software doesn't have to come from Silicon Valley \u2014 it can come from Nairobi, and it can solve real problems for real businesses. We're not here to chase trends. We're here to build things that matter. That's the mission.",
+          "The philosophy at MortApps Studios is simple: technology should feel human. Too much software is built for machines, not people. Mort Ian K. started this studio because he believed that world-class software doesn't have to come from Silicon Valley \u2014 it can come from Nairobi, and it can solve real problems for real businesses. Whether it's biometric attendance, CV screening, or herbal wellness consulting, every product exists because someone needed it. We're not here to chase trends. We're here to build things that matter. That's the mission.",
           "MortApps Studios exists because Mort Ian K. saw a gap: businesses needed software that actually worked for them, not the other way around. The mission is clear \u2014 build technology that feels human, solves real problems, and doesn't compromise on quality. We value long-term relationships over quick transactions, and we'd rather build six excellent products than sixty mediocre ones. That's what drives us.",
           "Our driving philosophy: technology should feel human. We started this studio to prove that exceptional software can come from anywhere \u2014 Nairobi included. We build for impact, not for vanity metrics. Long-term relationships, genuine problem-solving, and products that people actually want to use. That's the MortApps way.",
         ],
@@ -1065,12 +1212,12 @@
           patterns: [/are you hiring/i, /work at mortapps/i, /join (the )?team/i, /job (openings|positions)/i, /career/i],
         },
         responses: [
-          "MortApps Studios is always interested in talented people who share our philosophy. We don't post traditional job listings \u2014 but if you're a developer, designer, or problem solver who believes technology should feel human, reach out. Email labs@mortappsstudios.com with who you are and what you bring to the table. We read every message.",
+          "MortApps Studios is always interested in talented people who share our philosophy. We don't post traditional job listings \u2014 but if you're a developer, designer, or problem solver who believes technology should feel human, reach out. Email labs@mortappsstudios.com or WhatsApp us at +254 113 400 063 with who you are and what you bring to the table. We read every message.",
           "We don't do typical hiring \u2014 but we're always open to meeting exceptional people. If you think you'd fit the MortApps culture \u2014 building things that matter, quality over quantity, technology that feels human \u2014 introduce yourself at labs@mortappsstudios.com. No form letters, please. Just be real.",
-          "Hiring at MortApps Studios isn't a formal process \u2014 it's a conversation. If you're skilled, passionate, and aligned with our mission, we want to hear from you. Drop us a line at labs@mortappsstudios.com. Tell us what you can do and why MortApps matters to you.",
+          "Hiring at MortApps Studios isn't a formal process \u2014 it's a conversation. If you're skilled, passionate, and aligned with our mission, we want to hear from you. Drop us a line at labs@mortappsstudios.com or WhatsApp us. Tell us what you can do and why MortApps matters to you.",
         ],
         buttons: [
-          { label: 'Contact', value: 'How can I contact MortApps Studios' },
+          { label: 'WhatsApp Us', value: 'whatsapp_link', type: 'link', url: 'https://wa.me/254113400063' },
           { label: 'About Studio', value: 'Tell me about MortApps Studios' },
         ],
       },
@@ -1081,12 +1228,12 @@
           patterns: [/partner(ship)?/i, /work together/i, /collaborat/i, /business opportunit/i],
         },
         responses: [
-          "We're open to the right partnerships. If you've got a project, an idea, or a business case that aligns with what MortApps Studios does, we'd love to hear about it. The best starting point is labs@mortappsstudios.com \u2014 tell us what you're thinking, and we'll take it from there. We don't do generic partnerships \u2014 we do meaningful ones.",
+          "We're open to the right partnerships. If you've got a project, an idea, or a business case that aligns with what MortApps Studios does, we'd love to hear about it. The best starting point is labs@mortappsstudios.com or WhatsApp us at +254 113 400 063 \u2014 tell us what you're thinking, and we'll take it from there. We don't do generic partnerships \u2014 we do meaningful ones.",
           "Partnership inquiries are welcome. Whether it's a collaboration, a client project, or a business opportunity \u2014 if it makes sense for both sides, we're interested. Reach out at labs@mortappsstudios.com with the details. We prefer substance over pitches.",
-          "Interested in working with MortApps Studios? Good \u2014 we're interested in serious collaborations. Email labs@mortappsstudios.com with your proposal or idea. We respond to genuine opportunities, not mass outreach. Let's build something worth building.",
+          "Interested in working with MortApps Studios? Good \u2014 we're interested in serious collaborations. Email labs@mortappsstudios.com or WhatsApp us with your proposal or idea. We respond to genuine opportunities, not mass outreach. Let's build something worth building.",
         ],
         buttons: [
-          { label: 'Contact Us', value: 'How can I contact MortApps Studios' },
+          { label: 'WhatsApp Us', value: 'whatsapp_link', type: 'link', url: 'https://wa.me/254113400063' },
           { label: 'Services', value: 'What services do you offer' },
         ],
       },
@@ -1097,12 +1244,12 @@
           patterns: [/can you build/i, /build (me|a|an)/i, /i need (a |an )?(app|website|software|application)/i, /custom (app|software|website|web)/i],
         },
         responses: [
-          "{userNameLead}absolutely \u2014 custom web application development is core to what MortApps Studios does. Every project is built from scratch around your specific requirements, not recycled from a template. Whether it's a web app, a website, a platform, or something unique \u2014 we handle it. The best next step is to reach out at labs@mortappsstudios.com or use the contact form on our site with your project details. We'll take it from there.",
+          "{userNameLead}absolutely \u2014 custom web application development is core to what MortApps Studios does. Every project is built from scratch around your specific requirements, not recycled from a template. Whether it's a web app, a website, a platform, or something unique \u2014 we handle it. The best next step is to reach out at labs@mortappsstudios.com, WhatsApp us at +254 113 400 063, or use the contact form on our site with your project details. We'll take it from there.",
           "{userNameLead}that's exactly what we do. MortApps Studios builds custom web applications and websites tailored to each client's requirements. No two projects are the same \u2014 we don't do cookie-cutter. Tell us what you need at labs@mortappsstudios.com or through the contact form on mortappsstudios.com, and we'll scope it out.",
-          "{userNameLead}custom development is our bread and butter. From web applications to websites to full platforms \u2014 we build what you need, the way you need it. Head to mortappsstudios.com#contact and use the form, or email labs@mortappsstudios.com directly. Include what you're looking to build and we'll start the conversation.",
+          "{userNameLead}custom development is our bread and butter. From web applications to websites to full platforms \u2014 we build what you need, the way you need it. Head to mortappsstudios.com#contact and use the form, email labs@mortappsstudios.com directly, or WhatsApp us. Include what you're looking to build and we'll start the conversation.",
         ],
         buttons: [
-          { label: 'Contact Us', value: 'How can I contact MortApps Studios' },
+          { label: 'WhatsApp Us', value: 'whatsapp_link', type: 'link', url: 'https://wa.me/254113400063' },
           { label: 'Our Services', value: 'What services do you offer' },
           { label: 'Portfolio', value: 'What products do you have' },
         ],
@@ -1124,22 +1271,23 @@
         ],
       },
       {
+        // v5: Updated who_made_you — prominent Mort-E GMA.2 identity
         id: 'who_made_you',
         triggers: {
           keywords: ['who made you', 'who built you', 'who created you', 'who developed you', 'who programmed you', 'who designed you', 'your creator', 'your developer'],
           patterns: [/who (made|built|created|developed|programmed|designed) (you|mort-e|morte)/i, /your (creator|developer|maker)/i],
         },
         responses: [
-          "I was built by MortApps Studios \u2014 specifically as part of the MortApps AI Division. I'm Mort-E GMA.2, designed to know everything about this studio and share it with visitors like you. Think of me as the studio's digital ambassador.",
-          "The team at MortApps Studios created me. I'm their in-house AI, built to be the most knowledgeable guide to everything MortApps. Every response I give is powered by the studio's knowledge base, so you're getting information straight from the source.",
-          "MortApps Studios built me from the ground up. I'm not a third-party chatbot \u2014 I was designed in-house to understand this studio, its products, and its philosophy at a deep level. That's why I'm good at what I do.",
+          "I was built by MortApps Studios \u2014 specifically as part of the MortApps AI Division. I'm Mort-E GMA.2, powered by MortApps Studios, designed to know everything about this studio and share it with visitors like you. Think of me as the studio's digital ambassador.",
+          "The team at MortApps Studios created me. I'm Mort-E GMA.2, powered by MortApps Studios, their in-house AI built to be the most knowledgeable guide to everything MortApps. Every response I give is powered by the studio's knowledge base, so you're getting information straight from the source.",
+          "MortApps Studios built me from the ground up. I'm Mort-E GMA.2, powered by MortApps Studios \u2014 not a third-party chatbot, but an AI designed in-house to understand this studio, its products, and its philosophy at a deep level. That's why I'm good at what I do.",
         ],
         buttons: [
           { label: 'About Studio', value: 'Tell me about MortApps Studios' },
           { label: 'Products', value: 'What products do you have' },
         ],
       },
-      // ── v4: NEW INTENTS — Tech FAQ ───────────────────────────
+      // ── Tech FAQ Intents ────────────────────────────────────
       {
         id: 'ai_question',
         triggers: {
@@ -1147,8 +1295,8 @@
           patterns: [/what is (ai|artificial intelligence|machine learning|ml|deep learning|nlp)/i, /how does ai work/i, /explain (ai|machine learning)/i],
         },
         responses: [
-          "AI \u2014 Artificial Intelligence \u2014 is the broad field of creating systems that can perform tasks typically requiring human intelligence. That includes things like understanding language, recognizing images, making decisions, and learning from data. At MortApps Studios, we use AI practically: BioAttex uses it for facial recognition, Phein uses it for CV analysis. We don't build AI for the hype \u2014 we build it because it solves real problems. Want to know more about how we use AI?",
-          "Artificial Intelligence is about building systems that can perceive, reason, and act. Machine Learning (a subset of AI) is where systems learn patterns from data instead of being explicitly programmed for every scenario. Deep Learning uses neural networks \u2014 layered structures inspired by the brain \u2014 to tackle complex tasks like image and speech recognition. MortApps Studios applies these concepts in products like BioAttex and Phein. Curious about a specific product?",
+          "AI \u2014 Artificial Intelligence \u2014 is the broad field of creating systems that can perform tasks typically requiring human intelligence. That includes things like understanding language, recognizing images, making decisions, and learning from data. At MortApps Studios, we use AI practically: BioAttex uses it for facial recognition, Phein uses it for CV analysis, and Elthira.Ai uses it for herbal wellness consulting. We don't build AI for the hype \u2014 we build it because it solves real problems. Want to know more about how we use AI?",
+          "Artificial Intelligence is about building systems that can perceive, reason, and act. Machine Learning (a subset of AI) is where systems learn patterns from data instead of being explicitly programmed for every scenario. Deep Learning uses neural networks \u2014 layered structures inspired by the brain \u2014 to tackle complex tasks like image and speech recognition. MortApps Studios applies these concepts in products like BioAttex, Phein, and Elthira.Ai. Curious about a specific product?",
         ],
         buttons: [
           { label: 'BioAttex AI', value: 'How does BioAttex use AI' },
@@ -1245,7 +1393,7 @@
           "Good question, but pricing isn't something I can answer accurately here \u2014 it varies based on scope, complexity, and requirements. What I can tell you is that we're fair and transparent. Contact the team at labs@mortappsstudios.com or via the website form for a real discussion about your project and investment.",
         ],
         buttons: [
-          { label: 'Contact Us', value: 'How can I contact MortApps Studios' },
+          { label: 'WhatsApp Us', value: 'whatsapp_link', type: 'link', url: 'https://wa.me/254113400063' },
           { label: 'Services', value: 'What services do you offer' },
         ],
       },
@@ -1420,7 +1568,7 @@
 
 
   /* ═══════════════════════════════════════════════════════════════
-     SECTION 7: RESPONSE GENERATOR (v4 — Structured Responses)
+     SECTION 7: RESPONSE GENERATOR (v5 — Structured Responses + Link Buttons)
      Returns { text, buttons } objects for UI rendering
      Template engine, personalization, anti-repetition,
      depth tracking, offer management
@@ -1429,11 +1577,19 @@
   var memory = new UserMemory();
   var state = new ConversationState();
 
-  // v4: Create a response object with text and optional buttons
+  // v5: Create a response object with text, buttons (supports type: 'link')
   function makeResponse(text, buttons) {
     return {
       text: text || '',
-      buttons: buttons || [],
+      buttons: (buttons || []).map(function (btn) {
+        // Ensure every button has a type (default: 'message')
+        return {
+          label: btn.label,
+          value: btn.value,
+          type: btn.type || 'message',
+          url: btn.url || null,
+        };
+      }),
     };
   }
 
@@ -1487,7 +1643,7 @@
     return names[id] || id;
   }
 
-  // Generate entity response based on depth (v4: returns {text, buttons})
+  // Generate entity response based on depth (v5: returns {text, buttons})
   function generateEntityResponse(entity, userConfirmed) {
     var topicId = 'entity_' + entity.id;
     var depth = state.getDepth(topicId);
@@ -1553,7 +1709,7 @@
     ]);
   }
 
-  // Name asking logic (v4: ask earlier — after 1st turn)
+  // Name asking logic (v5: ask earlier — after 1st turn)
   function shouldAskName() {
     if (state.nameAsked) return false;
     if (memory.getName()) return false;
@@ -1574,16 +1730,16 @@
     return makeResponse(responses[Math.floor(Math.random() * responses.length)], []);
   }
 
-  // v4: Generate returning user welcome
+  // v5: Generate returning user welcome
   function getReturningUserWelcome() {
     var name = memory.getName();
     var visits = memory.getVisitCount();
     if (!name) return null;
 
     var welcomes = [
-      "Hey " + name + "! Great to see you again. Welcome back to Mort-E. What can I help you with this time?",
-      name + "! You're back. Mort-E GMA.2 at your service, just like before. What's on your mind?",
-      "Welcome back, " + name + "! I remember you. Still the same MortApps Studios expert. What are you curious about?",
+      "Hey " + name + "! Great to see you again. Welcome back to Mort-E GMA.2, powered by MortApps Studios. What can I help you with this time?",
+      name + "! You're back. Mort-E GMA.2, powered by MortApps Studios, at your service just like before. What's on your mind?",
+      "Welcome back, " + name + "! I remember you. Still the same MortApps Studios expert, powered by Mort-E GMA.2. What are you curious about?",
     ];
     return makeResponse(welcomes[Math.floor(Math.random() * welcomes.length)], [
       { label: "What's New", value: 'What products do you have' },
@@ -1593,7 +1749,7 @@
 
 
   /* ═══════════════════════════════════════════════════════════════
-     SECTION 8: MAIN QUERY FUNCTION (v4 — Structured Responses)
+     SECTION 8: MAIN QUERY FUNCTION (v5 — Structured Responses + Link Buttons + Compliment Handler)
      The core processing pipeline. Returns { text, buttons }
      ═══════════════════════════════════════════════════════════════ */
 
@@ -1618,6 +1774,26 @@
 
     // Normalize input through NLP pipeline
     var normalized = normalizeInput(input);
+
+    // ── STEP 0 (v5): Check for name correction ────────────────
+    var nameCorrection = memory.detectNameCorrection(input);
+    if (nameCorrection && nameCorrection.corrected) {
+      var oldName = memory.getName();
+      memory.setName(nameCorrection.name);
+      state.awaitingName = false;
+      state.clearOffer();
+      var correctionResponses = [
+        "Got it! I'll call you " + nameCorrection.name + " from now on. Sorry about that! Now, what can I help you with?",
+        "My apologies! Correcting that to " + nameCorrection.name + ". Won't happen again. What would you like to know about MortApps Studios?",
+        "Fixed! You're " + nameCorrection.name + " in my memory now. Thanks for the correction. What else can I help with?",
+      ];
+      var correctionResp = correctionResponses[Math.floor(Math.random() * correctionResponses.length)];
+      state.addTurn('bot', correctionResp);
+      return makeResponse(correctionResp, [
+        { label: 'Products', value: 'What products do you have' },
+        { label: 'Services', value: 'What services do you offer' },
+      ]);
+    }
 
     // ── STEP 1: Check for name response ────────────────────────
     if (state.awaitingName || (state.hasPendingOffer() && state.pendingOfferId === 'ask_name')) {
@@ -1713,20 +1889,27 @@
       state.clearOffer();
     }
 
+    // ── STEP 2.5 (v5): Check for compliment BEFORE name extraction ─
+    // This prevents "Sweet" from being treated as a name
+    var isCompliment = isComplimentInput(input);
+
     // ── STEP 3: Check for user providing their name unsolicited ─
-    var unsolicitedName = memory.extractName(input);
-    if (unsolicitedName && !memory.getName()) {
-      memory.setName(unsolicitedName);
-      var unsolicitedResponses = [
-        "Nice to meet you, " + unsolicitedName + "! I'll remember that. Now, what can I help you with regarding MortApps Studios?",
-        unsolicitedName + " \u2014 love it! I've got your name stored. What would you like to know?",
-      ];
-      var unsolResp = unsolicitedResponses[Math.floor(Math.random() * unsolicitedResponses.length)];
-      state.addTurn('bot', unsolResp);
-      return makeResponse(unsolResp, [
-        { label: 'Products', value: 'What products do you have' },
-        { label: 'Services', value: 'What services do you offer' },
-      ]);
+    // v5: Skip name extraction if input is a compliment
+    if (!isCompliment) {
+      var unsolicitedName = memory.extractName(input);
+      if (unsolicitedName && !memory.getName()) {
+        memory.setName(unsolicitedName);
+        var unsolicitedResponses = [
+          "Nice to meet you, " + unsolicitedName + "! I'll remember that. Now, what can I help you with regarding MortApps Studios?",
+          unsolicitedName + " \u2014 love it! I've got your name stored. What would you like to know?",
+        ];
+        var unsolResp = unsolicitedResponses[Math.floor(Math.random() * unsolicitedResponses.length)];
+        state.addTurn('bot', unsolResp);
+        return makeResponse(unsolResp, [
+          { label: 'Products', value: 'What products do you have' },
+          { label: 'Services', value: 'What services do you offer' },
+        ]);
+      }
     }
 
     // ── STEP 4: Check fenced topics (redirect) ─────────────────
@@ -1828,10 +2011,10 @@
 
     // ── STEP 10: General fallback with helpful buttons ──────────
     var generalFallbacks = [
-      "I'm not sure I caught that{userNameComma}. Try me on our products, services, or the company story \u2014 that's where I shine.",
-      "Hmm{userNameComma}, that's a bit outside my wheelhouse. I know MortApps Studios inside and out \u2014 products, services, founder story, contact info. What can I help with?",
-      "Not quite tracking that one{userNameComma}. I'm your go-to for everything MortApps Studios. Ask me about BioAttex, Phein, our services, or anything else about the studio.",
-      "I didn't quite get that{userNameComma}. I specialize in all things MortApps Studios \u2014 products, services, how to contact us, demos, you name it. What are you curious about?",
+      "I'm not sure I caught that{userNameComma}. Try me on our products, services, or the company story \u2014 that's where I shine. I'm Mort-E GMA.2, powered by MortApps Studios.",
+      "Hmm{userNameComma}, that's a bit outside my wheelhouse. I know MortApps Studios inside and out \u2014 products, services, founder story, contact info, WhatsApp. What can I help with?",
+      "Not quite tracking that one{userNameComma}. I'm your go-to for everything MortApps Studios. Ask me about BioAttex, Phein, Elthira.Ai, our services, or anything else about the studio.",
+      "I didn't quite get that{userNameComma}. I specialize in all things MortApps Studios \u2014 products, services, how to contact us, demos, WhatsApp, you name it. What are you curious about?",
       "That one's a bit outside my knowledge{userNameComma}. But if it's about MortApps Studios, I've got you covered. Our products, services, founder, or how to reach us \u2014 just ask.",
     ];
     var fallback = generalFallbacks[Math.floor(Math.random() * generalFallbacks.length)];
@@ -1840,7 +2023,7 @@
       { label: 'Products', value: 'What products do you have' },
       { label: 'Services', value: 'What services do you offer' },
       { label: 'About Studio', value: 'Tell me about MortApps Studios' },
-      { label: 'Contact', value: 'How can I contact MortApps Studios' },
+      { label: 'WhatsApp', value: 'whatsapp_link', type: 'link', url: 'https://wa.me/254113400063' },
     ]);
   }
 
@@ -1848,7 +2031,7 @@
     state.reset();
   }
 
-  // v4: Get returning user welcome (called by UI on open)
+  // v5: Get returning user welcome (called by UI on open)
   function getWelcome() {
     if (memory.isReturningUser()) {
       return getReturningUserWelcome();
@@ -1858,8 +2041,10 @@
 
 
   /* ═══════════════════════════════════════════════════════════════
-     SECTION 9: PUBLIC API (v4 — Structured Responses)
-     query() returns { text: string, buttons: [{label, value}] }
+     SECTION 9: PUBLIC API (v5 — Structured Responses + Link Buttons)
+     query() returns { text: string, buttons: [{label, value, type, url}] }
+     type: 'message' (default) sends value as chat message
+     type: 'link' opens url in new tab
      ═══════════════════════════════════════════════════════════════ */
 
   window.MortEBrains = {
