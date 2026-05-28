@@ -31,6 +31,19 @@
   
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Google Analytics 4 (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-THGT2GHZ35"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-THGT2GHZ35', {
+      page_title: document.title,
+      page_path: window.location.pathname,
+      send_page_view: true
+    });
+  </script>
+
   <!-- Firebase SDK (Compat — CDN) -->
   <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-database-compat.js"></script>
@@ -843,49 +856,15 @@
     </div>
   </footer>
 
+  <script src="firebase-init.js"></script>
   <script>
+    // (firebase-init.js handles init, sessions, scroll, time tracking)
     // ═══════════════════════════════════════════════════════════
-    // FIREBASE CONFIGURATION & INITIALIZATION
-    // ═══════════════════════════════════════════════════════════
-    const firebaseConfig = {
-      apiKey: "AIzaSyBFNpwG8F104JMcwhhXkrk2HbyM80jjbZM",
-      authDomain: "mortapps-studios.firebaseapp.com",
-      databaseURL: "https://mortapps-studios-default-rtdb.firebaseio.com",
-      projectId: "mortapps-studios",
-      storageBucket: "mortapps-studios.firebasestorage.app",
-      messagingSenderId: "978442778256",
-      appId: "1:978442778256:web:f66b4f1f0f770ce08e4a15",
-      measurementId: "G-THGT2GHZ35"
-    };
+    const db = MortAppsFirebase.db;
+    const logGA = MortAppsFirebase.logEvent;
+    const getDeviceType = MortAppsFirebase.getDeviceType;
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    let analytics;
-    try { analytics = firebase.analytics(); } catch(e) { console.log('Analytics not available'); }
-
-    // GA event helper
-    function logGA(eventName, params) {
-      if (!analytics) return;
-      try { analytics.logEvent(eventName, params || {}); } catch(e) {}
-    }
-
-    // Device detection for analytics
-    function getDeviceType() {
-      var ua = navigator.userAgent;
-      if (/tablet|ipad|playbook|silk/i.test(ua)) return 'tablet';
-      if (/mobile|iphone|ipod|android.*mobile|blackberry|opera mini/i.test(ua)) return 'mobile';
-      return 'desktop';
-    }
-
-    // Log page view to GA
-    logGA('page_view', {
-      page_title: document.title,
-      page_path: window.location.pathname,
-      device_type: getDeviceType(),
-      language: navigator.language
-    });
-
-    // Scroll depth tracking
+    // Scroll depth tracking (supplements firebase-init.js with blog-specific GA events)
     var scrollMilestones = {25:false, 50:false, 75:false, 100:false};
     window.addEventListener('scroll', function() {
       var scrollTop = window.scrollY || document.documentElement.scrollTop;
