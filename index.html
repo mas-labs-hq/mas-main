@@ -106,6 +106,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Firebase SDK (Compat — CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics-compat.js"></script>
+
   <script>
     tailwind.config = {
       theme: {
@@ -661,6 +667,71 @@
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .spinner { animation: spin 1s linear infinite; }
 
+    /* ═══ Newsletter Modal ═══ */
+    .newsletter-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .newsletter-modal-overlay.active { opacity: 1; visibility: visible; }
+    .newsletter-modal {
+      background: #fff; padding: 2.5rem; border-radius: 20px;
+      max-width: 420px; width: 90%; text-align: center;
+      transform: scale(0.9); transition: transform 0.3s ease;
+      position: relative;
+    }
+    .newsletter-modal-overlay.active .newsletter-modal { transform: scale(1); }
+    .newsletter-modal-close {
+      position: absolute; top: 12px; right: 16px;
+      background: none; border: none; font-size: 1.5rem;
+      color: #94a3b8; cursor: pointer; line-height: 1;
+      transition: color 0.2s;
+    }
+    .newsletter-modal-close:hover { color: #0f172a; }
+    .newsletter-modal h3 {
+      font-family: 'Sora', sans-serif; font-weight: 700;
+      font-size: 1.3rem; color: #0f172a; margin-bottom: 0.5rem;
+    }
+    .newsletter-modal p {
+      color: #64748b; font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.25rem;
+    }
+    .newsletter-modal input {
+      width: 100%; padding: 0.85rem 1rem; border: 1px solid #e2e8f0;
+      border-radius: 8px; font-size: 0.95rem; font-family: 'DM Sans', sans-serif;
+      outline: none; transition: border-color 0.2s;
+      margin-bottom: 0.75rem;
+    }
+    .newsletter-modal input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08); }
+    .newsletter-modal button[type="submit"] {
+      width: 100%; padding: 0.85rem; background: #2563eb; color: #fff;
+      border: none; border-radius: 8px; font-weight: 600; font-size: 0.95rem;
+      font-family: 'DM Sans', sans-serif; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .newsletter-modal button[type="submit"]:hover { background: #1d4ed8; }
+    .newsletter-modal button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
+    .newsletter-msg { font-size: 0.85rem; margin-top: 0.75rem; }
+    .newsletter-msg.success { color: #16a34a; }
+    .newsletter-msg.error { color: #dc2626; }
+    .newsletter-msg.duplicate { color: #ca8a04; }
+
+    /* ═══ Newsletter CTA Button ═══ */
+    .newsletter-cta {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.5rem 1rem; background: rgba(37, 99, 235, 0.08);
+      border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 8px;
+      color: #2563eb; font-weight: 600; font-size: 0.85rem;
+      font-family: 'DM Sans', sans-serif; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .newsletter-cta:hover {
+      background: rgba(37, 99, 235, 0.15); border-color: rgba(37, 99, 235, 0.4);
+    }
+
     /* ═══ Mort-E GMA.2 AI Assistant ═══ */
     .mort-e-btn {
       position: fixed;
@@ -1132,6 +1203,23 @@
     </div>
   </div>
 
+  <!-- Newsletter Modal -->
+  <div class="newsletter-modal-overlay" id="newsletterModal">
+    <div class="newsletter-modal">
+      <button class="newsletter-modal-close" onclick="closeNewsletterModal()" aria-label="Close">&times;</button>
+      <div style="width:48px;height:48px;margin:0 auto 16px;border-radius:12px;background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.15);display:flex;align-items:center;justify-content:center;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg>
+      </div>
+      <h3>Stay in the Loop</h3>
+      <p>Get the latest perspectives, product updates, and engineering insights delivered to your inbox. No spam, ever.</p>
+      <form id="newsletterForm" onsubmit="handleNewsletterSubmit(event)">
+        <input type="email" id="newsletterEmail" placeholder="you@example.com" required autocomplete="email">
+        <button type="submit" id="newsletterSubmitBtn">Subscribe</button>
+      </form>
+      <div id="newsletterMsg" class="newsletter-msg"></div>
+    </div>
+  </div>
+
   <!-- Header -->
   <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="header">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -1379,10 +1467,16 @@
             <h2 class="heading-lg text-secondary mb-3">Perspectives</h2>
             <p class="text-muted">Explorations in technology, design philosophy, and the digital craft. Fresh insights from our engineering desk.</p>
           </div>
-          <a href="blog.html" class="btn-secondary whitespace-nowrap">
-            Read Our Insights
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <button onclick="openNewsletterModal()" class="newsletter-cta">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg>
+              Subscribe
+            </button>
+            <a href="blog.html" class="btn-secondary whitespace-nowrap">
+              Read Our Insights
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -1824,7 +1918,103 @@
       e.preventDefault();
     });
 
+    // ═══ Newsletter Modal Logic ═══
+    function openNewsletterModal() {
+      var modal = document.getElementById('newsletterModal');
+      if (modal) { modal.classList.add('active'); }
+    }
+
+    function closeNewsletterModal() {
+      var modal = document.getElementById('newsletterModal');
+      if (modal) { modal.classList.remove('active'); }
+    }
+
+    // Close newsletter modal on overlay click
+    document.addEventListener('DOMContentLoaded', function() {
+      var nlModal = document.getElementById('newsletterModal');
+      if (nlModal) {
+        nlModal.addEventListener('click', function(e) {
+          if (e.target === nlModal) closeNewsletterModal();
+        });
+      }
+    });
+
+    function handleNewsletterSubmit(e) {
+      e.preventDefault();
+      var emailInput = document.getElementById('newsletterEmail');
+      var submitBtn = document.getElementById('newsletterSubmitBtn');
+      var msgEl = document.getElementById('newsletterMsg');
+      var email = emailInput.value.trim();
+
+      if (!email) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Subscribing...';
+      msgEl.className = 'newsletter-msg';
+      msgEl.textContent = '';
+
+      if (typeof MortAppsFirebase !== 'undefined') {
+        MortAppsFirebase.subscribeNewsletter(email, 'homepage').then(function(result) {
+          if (result && result.duplicate) {
+            msgEl.className = 'newsletter-msg duplicate';
+            msgEl.textContent = "You're already subscribed!";
+          } else {
+            msgEl.className = 'newsletter-msg success';
+            msgEl.textContent = "You're in! Welcome to the MortApps community.";
+            emailInput.value = '';
+          }
+        }).catch(function(err) {
+          msgEl.className = 'newsletter-msg error';
+          msgEl.textContent = err.message || 'Something went wrong. Please try again.';
+        }).finally(function() {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Subscribe';
+        });
+      } else {
+        msgEl.className = 'newsletter-msg error';
+        msgEl.textContent = 'Service unavailable. Please try again later.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Subscribe';
+      }
+    }
+
+    // ═══ Demo Click Tracking ═══
+    function trackDemoClick(slug) {
+      if (typeof MortAppsFirebase !== 'undefined') {
+        MortAppsFirebase.trackDemoClick(slug);
+      }
+    }
+
+    // Attach demo click tracking to portfolio cards
+    document.addEventListener('DOMContentLoaded', function() {
+      // BioAttex demo link
+      var bioLink = document.querySelector('a[href*="bioatx-demo"]');
+      if (bioLink) {
+        bioLink.addEventListener('click', function() { trackDemoClick('bioattex'); });
+      }
+      // Phein demo link
+      var pheinLink = document.querySelector('a[href*="phein"]');
+      if (pheinLink) {
+        pheinLink.addEventListener('click', function() { trackDemoClick('phein'); });
+      }
+      // Elthira link
+      var elthiraLink = document.querySelector('a[href*="Elthira"]');
+      if (elthiraLink) {
+        elthiraLink.addEventListener('click', function() { trackDemoClick('elthira'); });
+      }
+    });
+
+    // ═══ Escape key closes newsletter modal ═══
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeNewsletterModal();
+      }
+    });
+
   </script>
+
+  <!-- Firebase Init -->
+  <script src="firebase-init.js"></script>
 
   <!-- Mort-E GMA.2 Brain -->
   <script src="mort-e-brains.js"></script>
@@ -1842,6 +2032,11 @@
       requestAnimationFrame(() => { requestAnimationFrame(() => { imm.classList.add('active'); }); });
       document.getElementById('mortEInput').focus();
       document.body.style.overflow = 'hidden';
+
+      // Track Mort-E session (Firebase analytics)
+      if (typeof MortAppsFirebase !== 'undefined') {
+        MortAppsFirebase.trackMortESession();
+      }
 
       // Show returning user welcome on first open
       if (mortEFirstOpen && typeof MortEBrains !== 'undefined') {
@@ -1890,6 +2085,11 @@
       if (welcome) welcome.remove();
 
       addMortEMessage(text, 'user');
+
+      // Track Mort-E message (Firebase analytics)
+      if (typeof MortAppsFirebase !== 'undefined') {
+        MortAppsFirebase.trackMortEMessage();
+      }
 
       mortEStreaming = true;
       document.getElementById('mortESend').disabled = true;
