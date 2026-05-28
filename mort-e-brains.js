@@ -1939,6 +1939,10 @@
 
     if (bestIntent && bestScore >= 5) {
       state.lastIntentId = bestIntent.id;
+      // Firebase intent analytics
+      if (typeof MortAppsFirebase !== 'undefined') {
+        try { MortAppsFirebase.trackMortEIntent('intent_' + bestIntent.id); } catch (e) { /* silent */ }
+      }
       var intentResponse = pickResponse(bestIntent.responses, 'intent_' + bestIntent.id);
       var personalizedIntent = personalizeResponse(intentResponse);
       state.addTurn('bot', personalizedIntent);
@@ -1951,6 +1955,10 @@
       state.currentTopic = matchedEntity.id;
       state.lastEntityId = matchedEntity.id;
       state.lastIntentId = 'entity_' + matchedEntity.id;
+      // Firebase entity analytics
+      if (typeof MortAppsFirebase !== 'undefined') {
+        try { MortAppsFirebase.trackMortEIntent('entity_' + matchedEntity.id); } catch (e) { /* silent */ }
+      }
 
       var moreKeywords = ['more', 'detail', 'deeper', 'further', 'expand', 'elaborate', 'continue', 'explain', 'break down', 'full', 'tell me more'];
       var isAskingForMore = false;
