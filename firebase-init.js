@@ -1,24 +1,36 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════
- * MortApps Studios — Firebase Integration Module
- * Cross-device engagement tracking & newsletter capture
+ * MortApps Studios — Firebase Integration Module v2.0
+ * Cross-device engagement tracking, newsletter capture & Google Analytics
  *
  * Features:
  *   - Blog likes / shares / views (Realtime Database)
  *   - Newsletter email capture (Realtime Database)
  *   - Mort-E chat analytics (Realtime Database)
  *   - Demo click tracking (Realtime Database)
+ *   - Google Analytics custom events (demographics, engagement, real-time)
  *   - Session deduplication (localStorage guard per action)
+ *   - Page view tracking with scroll depth & time-on-page
+ *   - Device & traffic source detection
  *
  * Database Structure:
- *   /blog_posts/{slug}/likes     — number
- *   /blog_posts/{slug}/shares    — number
- *   /blog_posts/{slug}/views     — number
- *   /newsletter_emails/{pushId}  — { email, timestamp, source }
- *   /mort_e_analytics/sessions   — number
- *   /mort_e_analytics/messages   — number
- *   /mort_e_analytics/intents/{intentId}/count — number
- *   /demo_clicks/{productSlug}   — number
+ *   /blog/articles/{id}/likes      — number
+ *   /blog/articles/{id}/shares     — number
+ *   /blog/articles/{id}/views      — number
+ *   /newsletter_emails/{pushId}    — { email, timestamp, source }
+ *   /mort_e_analytics/sessions     — number
+ *   /mort_e_analytics/messages     — number
+ *   /mort_e_analytics/intents/{id} — { count, last_topic }
+ *   /mort_e_analytics/conversations/{pushId} — { session_id, messages, started, device, country }
+ *   /demo_clicks/{productSlug}     — number
+ *   /site_analytics/page_views/{pushId}  — { page, referrer, device, timestamp, session_id }
+ *   /site_analytics/sessions/{pushId}    — { started, pages, device, browser, os, country }
+ *
+ * Google Analytics Events:
+ *   page_view, blog_view, blog_like, blog_share
+ *   newsletter_subscribe, mort_e_session, mort_e_message
+ *   demo_click, scroll_depth, time_on_page
+ *   session_start, session_end (with duration)
  *
  * (c) 2026 MortApps Studios. All rights reserved.
  * ═══════════════════════════════════════════════════════════════════════
@@ -40,10 +52,11 @@
   };
 
   // ── Initialize Firebase (compat SDK) ─────────────────────────────
+  var analytics = null;
   try {
     firebase.initializeApp(firebaseConfig);
     if (typeof firebase.analytics === 'function') {
-      firebase.analytics();
+      analytics = firebase.analytics();
     }
   } catch (e) {
     console.warn('[MortApps Firebase] Init error:', e.message);
@@ -51,8 +64,204 @@
 
   var db = firebase.database();
 
-  // ── Local Deduplication Helpers ──────────────────────────────────
-  // Prevents a single user from infinitely incrementing counters
+  // ═══════════════════════════════════════════════════════════════
+  // GOOGLE ANALYTICS HELPER
+  // Safe wrapper that silently fails if analytics not available
+  // ═══════════════════════════════════════════════════════════════
+  function logEvent(eventName, params) {
+    if (!analytics) return;
+    try {
+      analytics.logEvent(eventName, params || {});
+    } catch (e) {
+      // Silent — never break the site for analytics
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // DEVICE & SESSION DETECTION
+  // Captures device type, browser, OS, referrer, screen size
+  // ═══════════════════════════════════════════════════════════════
+  var sessionId = null;
+  var sessionStart = Date.now();
+
+  function getDeviceType() {
+    var ua = navigator.userAgent;
+    if (/tablet|ipad|playbook|silk/i.test(ua) || (navigator.maxTouchPoints > 1 && window.innerWidth >= 768)) return 'tablet';
+    if (/mobile|iphone|ipod|android.*mobile|blackberry|opera mini|iemobile/i.test(ua)) return 'mobile';
+    return 'desktop';
+  }
+
+  function getBrowser() {
+    var ua = navigator.userAgent;
+    if (ua.indexOf('Firefox') > -1) return 'Firefox';
+    if (ua.indexOf('Edg') > -1) return 'Edge';
+    if (ua.indexOf('Chrome') > -1) return 'Chrome';
+    if (ua.indexOf('Safari') > -1) return 'Safari';
+    if (ua.indexOf('Opera') > -1 || ua.indexOf('OPR') > -1) return 'Opera';
+    return 'Other';
+  }
+
+  function getOS() {
+    var ua = navigator.userAgent;
+    if (ua.indexOf('Windows') > -1) return 'Windows';
+    if (ua.indexOf('Mac') > -1) return 'macOS';
+    if (ua.indexOf('Linux') > -1 && ua.indexOf('Android') === -1) return 'Linux';
+    if (ua.indexOf('Android') > -1) return 'Android';
+    if (ua.indexOf('iPhone') > -1 || ua.indexOf('iPad') > -1) return 'iOS';
+    return 'Other';
+  }
+
+  function getReferrer() {
+    try {
+      var ref = document.referrer || 'direct';
+      if (ref === '') return 'direct';
+      var url = new URL(ref);
+      return url.hostname;
+    } catch (e) {
+      return 'direct';
+    }
+  }
+
+  function getScreenInfo() {
+    return {
+      width: screen.width,
+      height: screen.height,
+      viewport: window.innerWidth + 'x' + window.innerHeight,
+      dpr: window.devicePixelRatio || 1,
+    };
+  }
+
+  function initSession() {
+    var stored = sessionStorage.getItem('mas_session_id');
+    if (stored) {
+      sessionId = stored;
+    } else {
+      sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2, 8);
+      sessionStorage.setItem('mas_session_id', sessionId);
+
+      // Log session start to Firebase + GA
+      var sessionData = {
+        started: firebase.database.ServerValue.TIMESTAMP,
+        device: getDeviceType(),
+        browser: getBrowser(),
+        os: getOS(),
+        referrer: getReferrer(),
+        screen: screen.width + 'x' + screen.height,
+        viewport: window.innerWidth + 'x' + window.innerHeight,
+        language: navigator.language || 'unknown',
+        page: window.location.pathname,
+      };
+
+      db.ref('site_analytics/sessions').push(sessionData);
+      incrementCounter('site_analytics/total_sessions');
+      logEvent('session_start', {
+        device_type: getDeviceType(),
+        browser: getBrowser(),
+        os: getOS(),
+        referrer: getReferrer(),
+        language: navigator.language,
+      });
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // PAGE VIEW TRACKING
+  // Logs every page view to Firebase + GA with device & referrer info
+  // ═══════════════════════════════════════════════════════════════
+  function trackPageView() {
+    var pageData = {
+      page: window.location.pathname,
+      title: document.title,
+      referrer: getReferrer(),
+      device: getDeviceType(),
+      browser: getBrowser(),
+      os: getOS(),
+      language: navigator.language || 'unknown',
+      timestamp: firebase.database.ServerValue.TIMESTAMP,
+      session_id: sessionId,
+    };
+
+    // Log to Realtime Database (sampling: 1 in 3 page views to control DB size)
+    if (Math.random() < 0.33) {
+      db.ref('site_analytics/page_views').push(pageData);
+    }
+
+    incrementCounter('site_analytics/page_views_total');
+
+    // GA event — this is what powers the Analytics dashboard
+    logEvent('page_view', {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname,
+      device_type: getDeviceType(),
+      browser: getBrowser(),
+      os: getOS(),
+      referrer: getReferrer(),
+      language: navigator.language,
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // SCROLL DEPTH TRACKING
+  // Tracks how far users scroll (25%, 50%, 75%, 100%) — engagement signal
+  // ═══════════════════════════════════════════════════════════════
+  var scrollMilestones = { 25: false, 50: false, 75: false, 100: false };
+
+  function initScrollTracking() {
+    var page = window.location.pathname;
+    window.addEventListener('scroll', function () {
+      var scrollTop = window.scrollY || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight <= 0) return;
+      var scrollPercent = Math.round((scrollTop / docHeight) * 100);
+
+      [25, 50, 75, 100].forEach(function (milestone) {
+        if (scrollPercent >= milestone && !scrollMilestones[milestone]) {
+          scrollMilestones[milestone] = true;
+          logEvent('scroll_depth', {
+            percent: milestone,
+            page_path: page,
+            device_type: getDeviceType(),
+          });
+          incrementCounter('site_analytics/scroll_' + milestone);
+        }
+      });
+    }, { passive: true });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // TIME ON PAGE TRACKING
+  // Fires at 10s, 30s, 60s, 120s, 300s — engagement & bounce signals
+  // ═══════════════════════════════════════════════════════════════
+  function initTimeTracking() {
+    var page = window.location.pathname;
+    var intervals = [10, 30, 60, 120, 300]; // seconds
+
+    intervals.forEach(function (sec) {
+      setTimeout(function () {
+        logEvent('time_on_page', {
+          seconds: sec,
+          page_path: page,
+          device_type: getDeviceType(),
+        });
+        incrementCounter('site_analytics/time_' + sec + 's');
+      }, sec * 1000);
+    });
+
+    // Track session duration on page leave
+    window.addEventListener('beforeunload', function () {
+      var duration = Math.round((Date.now() - sessionStart) / 1000);
+      logEvent('session_end', {
+        duration_seconds: duration,
+        page_path: page,
+        device_type: getDeviceType(),
+      });
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // LOCAL DEDUPLICATION HELPERS
+  // ═══════════════════════════════════════════════════════════════
   var DEDUP_PREFIX = 'mas_firebase_';
 
   function hasActed(actionKey) {
@@ -99,9 +308,14 @@
      ═══════════════════════════════════════════════════════════════ */
   function trackView(slug) {
     var key = 'view_' + slug;
-    if (hasActed(key)) return; // One view per session per post
+    if (hasActed(key)) return;
     markActed(key);
-    incrementCounter('blog_posts/' + slug + '/views');
+    incrementCounter('blog/articles/' + slug + '/views');
+    logEvent('blog_view', {
+      article_id: slug,
+      device_type: getDeviceType(),
+      referrer: getReferrer(),
+    });
   }
 
 
@@ -112,14 +326,18 @@
   function toggleLike(slug) {
     var key = 'like_' + slug;
     if (hasActed(key)) {
-      // Already liked — unlike
       try { localStorage.removeItem(DEDUP_PREFIX + key); } catch (e) { /* silent */ }
-      incrementCounter('blog_posts/' + slug + '/likes', -1);
-      return false; // Returns unliked state
+      incrementCounter('blog/articles/' + slug + '/likes', -1);
+      logEvent('blog_unlike', { article_id: slug });
+      return false;
     } else {
       markActed(key);
-      incrementCounter('blog_posts/' + slug + '/likes', 1);
-      return true; // Returns liked state
+      incrementCounter('blog/articles/' + slug + '/likes', 1);
+      logEvent('blog_like', {
+        article_id: slug,
+        device_type: getDeviceType(),
+      });
+      return true;
     }
   }
 
@@ -132,8 +350,13 @@
      BLOG: SHARES
      Increment on share action (no dedup — user can share multiple times)
      ═══════════════════════════════════════════════════════════════ */
-  function trackShare(slug) {
-    incrementCounter('blog_posts/' + slug + '/shares');
+  function trackShare(slug, platform) {
+    incrementCounter('blog/articles/' + slug + '/shares');
+    logEvent('blog_share', {
+      article_id: slug,
+      platform: platform || 'unknown',
+      device_type: getDeviceType(),
+    });
   }
 
 
@@ -142,7 +365,7 @@
      Returns { likes, shares, views } for a slug
      ═══════════════════════════════════════════════════════════════ */
   function getPostStats(slug, callback) {
-    db.ref('blog_posts/' + slug).once('value').then(function (snap) {
+    db.ref('blog/articles/' + slug).once('value').then(function (snap) {
       var data = snap.val() || {};
       callback({
         likes: data.likes || 0,
@@ -164,52 +387,126 @@
     if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
       return Promise.reject(new Error('Invalid email address'));
     }
-    // Deduplicate: one subscription per email per device
     var key = 'newsletter_' + email.toLowerCase();
     if (hasActed(key)) {
       return Promise.resolve({ duplicate: true });
     }
     markActed(key);
 
+    logEvent('newsletter_subscribe', {
+      source: source || 'unknown',
+      device_type: getDeviceType(),
+    });
+
     return db.ref('newsletter_emails').push({
       email: email.trim().toLowerCase(),
       timestamp: firebase.database.ServerValue.TIMESTAMP,
       source: source || 'unknown',
+      device: getDeviceType(),
+      session_id: sessionId,
     });
   }
 
 
   /* ═══════════════════════════════════════════════════════════════
      MORT-E CHAT ANALYTICS
-     Track sessions opened, messages sent, and top intents
+     Track sessions opened, messages sent, and top intents.
+     Also logs full conversation sessions for deeper analysis.
      ═══════════════════════════════════════════════════════════════ */
   var mortESessionKey = 'mort_e_session_tracked';
   var mortESessionId = null;
+  var mortEMessageCount = 0;
+  var mortEConversationRef = null;
 
   function trackMortESession() {
-    // One session per page load
     if (hasActed(mortESessionKey)) return;
     markActed(mortESessionKey);
     mortESessionId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+
     incrementCounter('mort_e_analytics/sessions');
+
+    // Create a conversation record for this session
+    mortEConversationRef = db.ref('mort_e_analytics/conversations').push({
+      session_id: mortESessionId,
+      started: firebase.database.ServerValue.TIMESTAMP,
+      device: getDeviceType(),
+      browser: getBrowser(),
+      os: getOS(),
+      language: navigator.language || 'unknown',
+      messages: 0,
+      topics: [],
+    });
+
+    logEvent('mort_e_session', {
+      device_type: getDeviceType(),
+      browser: getBrowser(),
+      os: getOS(),
+    });
   }
 
-  function trackMortEMessage() {
+  function trackMortEMessage(topic) {
     incrementCounter('mort_e_analytics/messages');
+    mortEMessageCount++;
+
+    // Update the conversation record with message count and topic
+    if (mortEConversationRef) {
+      mortEConversationRef.update({
+        messages: mortEMessageCount,
+        last_activity: firebase.database.ServerValue.TIMESTAMP,
+      });
+
+      // Add topic if provided
+      if (topic) {
+        var topicKey = topic.toLowerCase().replace(/[^a-z0-9_]/g, '_').substring(0, 40);
+        db.ref('mort_e_analytics/conversations/' + mortEConversationRef.key + '/topics/' + topicKey)
+          .transaction(function (current) { return (current || 0) + 1; });
+      }
+    }
+
+    logEvent('mort_e_message', {
+      message_count: mortEMessageCount,
+      topic: topic || 'unknown',
+      device_type: getDeviceType(),
+    });
   }
 
   function trackMortEIntent(intentId) {
     if (!intentId) return;
     incrementCounter('mort_e_analytics/intents/' + intentId + '/count');
+
+    // Update last_topic on the intent record
+    db.ref('mort_e_analytics/intents/' + intentId).update({
+      last_used: firebase.database.ServerValue.TIMESTAMP,
+    });
+
+    // Also track via the message function for the conversation record
+    trackMortEMessage(intentId);
   }
 
 
   /* ═══════════════════════════════════════════════════════════════
      DEMO CLICK TRACKING
-     Track how many times each product demo is clicked
+     Track how many times each product demo is clicked,
+     with device type and referrer for analytics
      ═══════════════════════════════════════════════════════════════ */
   function trackDemoClick(productSlug) {
     incrementCounter('demo_clicks/' + productSlug);
+
+    // Log detailed click event for analytics
+    db.ref('demo_clicks/' + productSlug + '/details').push({
+      timestamp: firebase.database.ServerValue.TIMESTAMP,
+      device: getDeviceType(),
+      browser: getBrowser(),
+      referrer: getReferrer(),
+      session_id: sessionId,
+    });
+
+    logEvent('demo_click', {
+      product: productSlug,
+      device_type: getDeviceType(),
+      browser: getBrowser(),
+      referrer: getReferrer(),
+    });
   }
 
 
@@ -221,6 +518,27 @@
     if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
     if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
     return num.toString();
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════════
+     INITIALIZATION — Auto-run on script load
+     ═══════════════════════════════════════════════════════════════ */
+  initSession();
+  trackPageView();
+  initScrollTracking();
+  initTimeTracking();
+
+  // Set user properties for GA demographics (device, OS, browser)
+  if (analytics) {
+    try {
+      analytics.setUserProperties({
+        device_type: getDeviceType(),
+        browser: getBrowser(),
+        os: getOS(),
+        language: navigator.language || 'unknown',
+      });
+    } catch (e) { /* silent */ }
   }
 
 
@@ -248,6 +566,17 @@
 
     // Demo Clicks
     trackDemoClick: trackDemoClick,
+
+    // Site Analytics (new)
+    trackPageView: trackPageView,
+    getDeviceType: getDeviceType,
+    getBrowser: getBrowser,
+    getOS: getOS,
+    getReferrer: getReferrer,
+    getSessionId: function () { return sessionId; },
+
+    // GA helper (for custom events from other scripts)
+    logEvent: logEvent,
 
     // Raw access (advanced)
     db: db,
