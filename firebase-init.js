@@ -59,7 +59,13 @@
       firebase.initializeApp(firebaseConfig);
     }
     if (typeof firebase.analytics === 'function') {
+      // CRITICAL: Disable automatic page_view measurement from Firebase Analytics
+      // We let gtag.js handle page_view tracking as the primary source.
+      // Without this, Firebase Analytics sends its own page_view which conflicts
+      // with gtag's page_view, causing GA4 dashboard to show no data.
       analytics = firebase.analytics();
+      // The config below is set via gtag('config', ...) with send_page_view: true
+      // Firebase Analytics auto-collection is handled by the gtag config.
     }
   } catch (e) {
     console.warn('[MortApps Firebase] Init error:', e.message);
@@ -68,15 +74,30 @@
   var db = firebase.database();
 
   // ═══════════════════════════════════════════════════════════════
-  // GOOGLE ANALYTICS HELPER
-  // Safe wrapper that silently fails if analytics not available
+  // GOOGLE ANALYTICS HELPER (DUAL-CHANNEL)
+  // Sends events to BOTH Firebase Analytics AND gtag.js (GA4)
+  // - Firebase Analytics: for Firebase Console real-time & audiences
+  // - gtag.js: for GA4 dashboard cards (page views, engagement, etc.)
+  // This ensures ALL analytics dashboard cards populate correctly.
   // ═══════════════════════════════════════════════════════════════
   function logEvent(eventName, params) {
-    if (!analytics) return;
-    try {
-      analytics.logEvent(eventName, params || {});
-    } catch (e) {
-      // Silent — never break the site for analytics
+    // Channel 1: Firebase Analytics SDK
+    if (analytics) {
+      try {
+        analytics.logEvent(eventName, params || {});
+      } catch (e) {
+        // Silent — never break the site for analytics
+      }
+    }
+    // Channel 2: gtag.js (GA4) — this is what powers the GA4 dashboard!
+    // Many GA4 dashboard cards ONLY populate from gtag events, not from
+    // Firebase Analytics SDK events. Dual-channel fixes "No data available".
+    if (typeof gtag === 'function') {
+      try {
+        gtag('event', eventName, params || {});
+      } catch (e) {
+        // Silent
+      }
     }
   }
 
@@ -157,6 +178,36 @@
 
       db.ref('site_analytics/sessions').push(sessionData);
       incrementCounter('site_analytics/total_sessions');
+
+      // Log first_visit for new sessions — GA4 uses this for the
+      // "New vs Returning" and user acquisition reports
+      var isFirstVisit = !localStorage.getItem('mas_returning_visitor');
+      if (isFirstVisit) {
+        try { localStorage.setItem('mas_returning_visitor', '1'); } catch (e) { /* silent */ }
+        logEvent('first_visit', {
+          device_type: getDeviceType(),
+          browser: getBrowser(),
+          os: getOS(),
+          referrer: getReferrer(),
+          language: navigator.language,
+        });
+      }
+
+      // Log via gtag directly for GA4 session tracking
+      // GA4 dashboard needs this for "Engaged sessions" and "Engagement time"
+      if (typeof gtag === 'function') {
+        try {
+          gtag('event', 'session_start', {
+            device_type: getDeviceType(),
+            browser: getBrowser(),
+            os: getOS(),
+            referrer: getReferrer(),
+            language: navigator.language,
+          });
+        } catch (e) { /* silent */ }
+      }
+
+      // Firebase Analytics session logging
       logEvent('session_start', {
         device_type: getDeviceType(),
         browser: getBrowser(),
@@ -191,17 +242,25 @@
 
     incrementCounter('site_analytics/page_views_total');
 
-    // GA event — this is what powers the Analytics dashboard
-    logEvent('page_view', {
-      page_title: document.title,
-      page_location: window.location.href,
-      page_path: window.location.pathname,
-      device_type: getDeviceType(),
-      browser: getBrowser(),
-      os: getOS(),
-      referrer: getReferrer(),
-      language: navigator.language,
-    });
+    // NOTE: We do NOT send page_view via gtag here because gtag's config
+    // already has send_page_view: true, which fires automatically on page load.
+    // Sending another page_view here would create duplicates in GA4.
+
+    // Log via Firebase Analytics for Firebase Console (this is separate from gtag)
+    if (analytics) {
+      try {
+        analytics.logEvent('page_view', {
+          page_title: document.title,
+          page_location: window.location.href,
+          page_path: window.location.pathname,
+          device_type: getDeviceType(),
+          browser: getBrowser(),
+          os: getOS(),
+          referrer: getReferrer(),
+          language: navigator.language,
+        });
+      } catch (e) { /* silent */ }
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -239,6 +298,7 @@
   function initTimeTracking() {
     var page = window.location.pathname;
     var intervals = [10, 30, 60, 120, 300]; // seconds
+    var engagementTracked = false;
 
     intervals.forEach(function (sec) {
       setTimeout(function () {
@@ -248,12 +308,53 @@
           device_type: getDeviceType(),
         });
         incrementCounter('site_analytics/time_' + sec + 's');
+
+        // After 10 seconds on page, fire user_engagement event
+        // This is CRITICAL for GA4's "Average engagement time" card
+        if (sec === 10 && !engagementTracked) {
+          engagementTracked = true;
+          if (typeof gtag === 'function') {
+            try {
+              gtag('event', 'user_engagement', {
+                engagement_time_msec: 10000,
+                page_path: page,
+              });
+            } catch (e) { /* silent */ }
+          }
+          if (analytics) {
+            try {
+              analytics.logEvent('user_engagement', {
+                engagement_time_msec: 10000,
+                page_path: page,
+              });
+            } catch (e) { /* silent */ }
+          }
+        }
       }, sec * 1000);
     });
 
     // Track session duration on page leave
     window.addEventListener('beforeunload', function () {
       var duration = Math.round((Date.now() - sessionStart) / 1000);
+
+      // Fire final user_engagement with total time — populates GA4 engagement metrics
+      if (typeof gtag === 'function') {
+        try {
+          gtag('event', 'user_engagement', {
+            engagement_time_msec: duration * 1000,
+            page_path: page,
+          });
+        } catch (e) { /* silent */ }
+      }
+      if (analytics) {
+        try {
+          analytics.logEvent('user_engagement', {
+            engagement_time_msec: duration * 1000,
+            page_path: page,
+          });
+        } catch (e) { /* silent */ }
+      }
+
       logEvent('session_end', {
         duration_seconds: duration,
         page_path: page,
@@ -533,9 +634,21 @@
   initTimeTracking();
 
   // Set user properties for GA demographics (device, OS, browser)
+  // This populates the "Tech" and "Demographics" reports in GA4
   if (analytics) {
     try {
       analytics.setUserProperties({
+        device_type: getDeviceType(),
+        browser: getBrowser(),
+        os: getOS(),
+        language: navigator.language || 'unknown',
+      });
+    } catch (e) { /* silent */ }
+  }
+  // Also set user properties via gtag for GA4 dashboard
+  if (typeof gtag === 'function') {
+    try {
+      gtag('set', 'user_properties', {
         device_type: getDeviceType(),
         browser: getBrowser(),
         os: getOS(),
