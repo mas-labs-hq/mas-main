@@ -54,7 +54,10 @@
   // ── Initialize Firebase (compat SDK) ─────────────────────────────
   var analytics = null;
   try {
-    firebase.initializeApp(firebaseConfig);
+    // Guard against double-initialization (e.g., page already has its own init)
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     if (typeof firebase.analytics === 'function') {
       analytics = firebase.analytics();
     }
