@@ -865,16 +865,16 @@
 
     // ═══════════════════════════════════════════════════════════
     // SEED DATA — Original dummy counts from the blog
-    // These are used to initialise Firebase on first run.
-    // Once Firebase has data, these values are never overwritten.
+    // Views are set 123-134 above likes for realism.
+    // Used to initialise Firebase on first run only.
     // ═══════════════════════════════════════════════════════════
     const SEED_DATA = {
-      1: { likes: 423, shares: 13, views: 0 },
-      2: { likes: 278, shares: 8,  views: 0 },
-      3: { likes: 372, shares: 16, views: 0 },
-      4: { likes: 278, shares: 13, views: 0 },
-      5: { likes: 312, shares: 27, views: 0 },
-      6: { likes: 137, shares: 6,  views: 0 }
+      1: { likes: 423, shares: 13, views: 552 },  // +129
+      2: { likes: 278, shares: 8,  views: 405 },  // +127
+      3: { likes: 372, shares: 16, views: 503 },  // +131
+      4: { likes: 278, shares: 13, views: 402 },  // +124
+      5: { likes: 312, shares: 27, views: 445 },  // +133
+      6: { likes: 137, shares: 6,  views: 263 }   // +126
     };
 
     // ═══════════════════════════════════════════════════════════
@@ -1073,9 +1073,39 @@
     }
 
     // ═══════════════════════════════════════════════════════════
+    // ONE-TIME MIGRATION — Set realistic view counts
+    // Runs once, then never again (flag stored in Firebase).
+    // Views = likes + 123-134 offset (not everyone who views likes)
+    // ═══════════════════════════════════════════════════════════
+    const TARGET_VIEWS = {
+      1: 552,  // likes 423 + 129
+      2: 405,  // likes 278 + 127
+      3: 503,  // likes 372 + 131
+      4: 402,  // likes 278 + 124
+      5: 445,  // likes 312 + 133
+      6: 263   // likes 137 + 126
+    };
+
+    async function migrateViews() {
+      const flagRef = db.ref('blog/migrations/views_v1');
+      const flag = await flagRef.once('value');
+      if (flag.exists()) return; // Already migrated — skip
+
+      // Set each article's view count to the realistic target
+      for (const [id, views] of Object.entries(TARGET_VIEWS)) {
+        await db.ref('blog/articles/' + id + '/views').set(views);
+      }
+
+      // Mark migration as complete
+      await flagRef.set(true);
+      console.log('View counts migrated successfully.');
+    }
+
+    // ═══════════════════════════════════════════════════════════
     // INITIALIZATION — Runs after Firebase seed data is ensured
     // ═══════════════════════════════════════════════════════════
     ensureArticleData().then(() => {
+      migrateViews();  // Set realistic view counts (runs once)
       injectViewCountElements();
       loadState();
       trackViews();
