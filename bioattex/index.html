@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bioattex | Professional Biometric Attendance System</title>
+    
+    <link rel="icon" type="image/x-icon" href="bioattex-icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="bioattex-icons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="bioattex-icons/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="bioattex-icons/apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Bioattex">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Bioattex">
+    <meta name="msapplication-TileColor" content="#0f172a">
+    <meta name="msapplication-tap-highlight" content="no">
+
+    <meta property="og:title" content="Bioattex | Professional Biometric Attendance">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="bioattex-icons/android-chrome-512x512.png">
+    <meta property="og:url" content="https://www.ipsforum.com/">
+    <meta property="og:description" content="Enterprise-grade biometric attendance tracking with face recognition technology">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Bioattex | Professional Biometric Attendance">
+    <meta name="twitter:image" content="bioattex-icons/android-chrome-512x512.png">
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- External Libraries -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body oncontextmenu="return false;">
+
+    <!-- Hex Glows -->
+    <div class="hex-glow hex-glow-1"></div>
+    <div class="hex-glow hex-glow-2"></div>
+    <div class="hex-shine" id="hex-shine"></div>
+    <div class="hex-pulse" id="hex-pulse"></div>
+    
+    <!-- Confetti Container -->
+    <div id="confetti-container"></div>
+
+    <!-- License Screen (VISIBLE BY DEFAULT - hidden only when valid license confirmed) -->
+    <div id="license-screen" style="display: flex;">
+        <div class="license-card">
+            <div class="license-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/></svg>
+                Bioattex
+            </div>
+            <div class="license-sub">Software Activation Required</div>
+            <input type="text" id="license-key" class="license-input" placeholder="License Key (e.g., PR-BKXY78-MN90P)" autocomplete="off" maxlength="20">
+            <input type="text" id="company-name" class="license-input company-input" placeholder="Company Name" autocomplete="off">
+            <div id="license-error" style="color:var(--danger); font-size:0.85rem; min-height:1.2em; margin-bottom:0.5rem;"></div>
+            
+            <div class="license-info-box" id="license-info-box">
+                <h4>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    License Validated
+                </h4>
+                <p id="license-tier-info"></p>
+                <p id="license-duration-info"></p>
+                <div class="license-warning-box" id="license-warning-box"></div>
+            </div>
+            
+            <button id="btn-verify-license" type="button" class="btn-launch">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Activate License
+            </button>
+            
+            <div class="license-footer">Powered by <a href="https://mortappsstudios.com" target="_blank">MortApps Studios</a></div>
+        </div>
+    </div>
+
+    <!-- Install Popup -->
+    <div id="install-popup-overlay">
+        <div class="install-popup">
+            <div class="install-popup-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+            </div>
+            <h3>Install Bioattex</h3>
+            <p class="install-subtitle">Get the full experience directly on your device — faster performance, offline access, and a home screen icon.</p>
+            
+            <div class="install-features">
+                <div class="install-feature">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <span>Lightning fast</span>
+                </div>
+                <div class="install-feature">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>Works offline</span>
+                </div>
+                <div class="install-feature">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                    <span>Home screen icon</span>
+                </div>
+            </div>
+            
+            <!-- Native Install button (Chrome/Edge/Samsung) -->
+            <button id="btn-install-now" class="install-btn install-btn-primary">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Install
+            </button>
+            
+            <!-- iOS Instructions (shown only on iOS where native prompt isn't available) -->
+            <div id="ios-install-instructions" class="install-ios-steps" style="display:none;">
+                <div class="ios-step">
+                    <span class="ios-step-num">1</span>
+                    <span>Tap the <strong>Share</strong> button <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> at the bottom</span>
+                </div>
+                <div class="ios-step">
+                    <span class="ios-step-num">2</span>
+                    <span>Scroll down, tap <strong>Add to Home Screen</strong></span>
+                </div>
+                <div class="ios-step">
+                    <span class="ios-step-num">3</span>
+                    <span>Tap <strong>Add</strong> — that's it!</span>
+                </div>
+            </div>
+            
+            <!-- Desktop fallback instructions (Firefox etc.) -->
+            <div id="desktop-install-instructions" class="install-ios-steps" style="display:none;">
+                <div class="ios-step">
+                    <span class="ios-step-num">1</span>
+                    <span>Click the <strong>three dots</strong> menu in your browser</span>
+                </div>
+                <div class="ios-step">
+                    <span class="ios-step-num">2</span>
+                    <span>Select <strong>Install page as app</strong></span>
+                </div>
+                <div class="ios-step">
+                    <span class="ios-step-num">3</span>
+                    <span>Click <strong>Install</strong> in the confirmation prompt</span>
+                </div>
+            </div>
+            
+            <button id="btn-install-later" class="install-btn install-btn-later">Not now</button>
+            
+            <div class="install-checkbox-wrapper">
+                <input type="checkbox" id="chk-never-remind">
+                <label for="chk-never-remind">Don't show this again</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" style="display:none">
+        <div class="loader-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><circle cx="8.5" cy="8.5" r="0.5"/><circle cx="16" cy="15.5" r="0.5"/><circle cx="12" cy="12" r="0.5"/></svg>
+            Bioattex
+        </div>
+        <div class="loader-tag">Powered By MortApps Studios</div>
+        <div class="spinner"></div>
+        <div id="loading-status" style="color: rgba(255,255,255,0.8); margin-top: 1rem; font-size: 0.9rem;">Initializing...</div>
+    </div>
+
+    <!-- Main Header -->
+    <header id="main-header" style="display: none;">
+        <div class="brand">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/></svg>
+            <span>Bioattex</span>
+        </div>
+        <nav class="nav-group" id="main-nav">
+            <div class="live-clock" id="live-clock">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <div>
+                    <div class="clock-time">--:--:--</div>
+                    <div class="clock-date">---</div>
+                </div>
+            </div>
+            <span class="license-badge" id="header-license-badge"></span>
+            <button class="nav-btn active" data-screen="home">Home</button>
+            <button class="nav-btn hidden" id="nav-calendar" data-screen="calendar">Calendar</button>
+            <button class="nav-btn hidden" id="nav-records" data-screen="records">Records</button>
+            <button class="nav-btn" id="nav-admin" data-screen="admin-login">Admin</button>
+            <button class="nav-btn hidden" id="nav-dark-mode" style="padding: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" style="display: none;">
+        <!-- Home Screen -->
+        <div id="home" class="screen active">
+            <div class="warning-box" id="warning-box">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span>Failure to check in will be recorded as unexcused absence.</span>
+            </div>
+            
+            <div class="registration-mode-overlay" id="registration-banner">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <span>REGISTRATION MODE - Capturing Face Data</span>
+            </div>
+            
+            <div class="scanner-wrapper">
+                <video id="video-feed" autoplay playsinline muted></video>
+                <canvas id="hud-canvas"></canvas>
+                
+                <!-- Camera Flip Button -->
+                <button id="btn-cam-flip" class="cam-flip-btn" style="display:none;" title="Flip Camera">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4"/><polyline points="12 12 12 12"/><path d="M20 8v-4a2 2 0 00-2-2H4a2 2 0 00-2 2v4"/><path d="M12 2v4"/><path d="M12 18v4"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+
+                <!-- Sci-Fi HUD Overlay -->
+                <div class="hud-overlay" id="hud-overlay">
+                    <div class="hud-corner top-left"></div>
+                    <div class="hud-corner top-right"></div>
+                    <div class="hud-corner bottom-left"></div>
+                    <div class="hud-corner bottom-right"></div>
+                    
+                    <div class="hud-status-bar" id="hud-status-bar">BIOMETRIC SCANNER</div>
+                    
+                    <div class="scan-line" id="scan-line"></div>
+                    <div class="hud-grid"></div>
+                    
+                    <div class="target-circle outer"></div>
+                    <div class="target-circle middle"></div>
+                    <div class="target-circle inner"></div>
+                    <div class="crosshair"></div>
+                    
+                    <div class="hud-data-stream left" id="hud-data-left">
+                        <div>FACE ID: SCANNING</div>
+                        <div>CONFIDENCE: --</div>
+                        <div>LANDMARKS: 68</div>
+                    </div>
+                    
+                    <div class="hud-data-stream right" id="hud-data-right">
+                        <div>NEURAL NET: ACTIVE</div>
+                        <div>DESCRIPTOR: 128-D</div>
+                        <div>STATUS: READY</div>
+                    </div>
+                </div>
+                
+                <div id="cam-off-msg" class="cam-off-overlay">
+                    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    <span class="cam-title">Camera Inactive</span>
+                    <span class="cam-sub">Tap "Turn Camera On" to start</span>
+                </div>
+            </div>
+            
+            <div class="control-panel">
+                <button id="btn-cam-toggle" class="btn btn-primary">Turn Camera On</button>
+                <div class="checkin-group">
+                    <button id="btn-checkin" class="btn btn-checkin" style="flex:2" disabled>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                        Check In
+                    </button>
+                    <button id="btn-checkout" class="btn btn-checkout" style="flex:2" disabled>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        Check Out
+                    </button>
+                </div>
+                <button id="btn-refresh" class="btn btn-secondary">Refresh</button>
+            </div>
+            <div id="status-msg"></div>
+        </div>
+
+        <!-- Admin Login Screen -->
+        <div id="admin-login" class="screen">
+            <div class="panel" style="max-width: 380px; text-align: center;">
+                <div style="margin-bottom: 1.5rem;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" style="margin: 0 auto;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                </div>
+                <h2 style="margin-bottom: 1.25rem; color: var(--primary);">Admin Access</h2>
+                <input type="password" id="pin-input" placeholder="Enter Password" autocomplete="off">
+                <button id="btn-admin-login" class="btn btn-primary btn-lg" style="margin-top: 1rem;">Authenticate</button>
+                <p id="back-to-home" style="margin-top: 1rem; color: var(--text-muted); cursor: pointer; font-size: 0.9rem;">Back to Home</p>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard" class="screen">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Admin Dashboard</h2>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button id="btn-station-mode" class="btn btn-secondary">Station Mode</button>
+                        <button id="btn-admin-logout" class="btn btn-primary">Logout</button>
+                    </div>
+                </div>
+                
+                <!-- Backup Reminder Banner -->
+                <div id="backup-reminder-banner" class="backup-banner" style="display: none;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span id="backup-reminder-text">It's been 14+ days since your last backup. Export now to keep your records safe.</span>
+                    <button id="btn-backup-now" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; min-height: auto;">Export Now</button>
+                    <button id="btn-dismiss-backup" class="backup-dismiss" title="Dismiss">&times;</button>
+                </div>
+                <!-- New Monthly Report Notification -->
+                <div id="new-report-banner" class="report-banner" style="display: none;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                    <span id="new-report-text">New monthly report available!</span>
+                    <button id="btn-view-report" class="btn btn-success" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; min-height: auto;">View Report</button>
+                    <button id="btn-dismiss-report" class="backup-dismiss" title="Dismiss">&times;</button>
+                </div>
+                
+                <!-- Stats Summary -->
+                <div class="stats-grid">
+                    <div class="stat-card"><span class="stat-num" id="stat-total-emp">0</span><span class="stat-label">Employees</span></div>
+                    <div class="stat-card"><span class="stat-num" id="stat-today">0</span><span class="stat-label">Today's Check-ins</span></div>
+                    <div class="stat-card"><span class="stat-num" id="stat-late">0</span><span class="stat-label">Late Today</span></div>
+                    <div class="stat-card"><span class="stat-num" id="stat-overtime">0</span><span class="stat-label">Overtime</span></div>
+                </div>
+                
+                <!-- Charts -->
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                            Weekly Attendance
+                        </h3>
+                        <div class="chart-wrapper">
+                            <canvas id="weekly-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            Punctuality Trend
+                        </h3>
+                        <div class="chart-wrapper">
+                            <canvas id="punctuality-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chronic Latecomers Warning -->
+                <div class="latecomers-warning" id="latecomers-section" style="display: none;">
+                    <h3>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        Chronic Latecomers (3+ late arrivals)
+                    </h3>
+                    <div id="latecomers-list"></div>
+                </div>
+                
+                <!-- Monthly Report Section -->
+                <div class="panel" id="monthly-report-panel" style="display:block;">
+                    <h3 style="margin-bottom: 0.75rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                        Monthly Report
+                    </h3>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center;">
+                        <select id="report-month-select" style="flex: 1; min-width: 150px; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text-main); font-size: 0.9rem;">
+                        </select>
+                        <button id="btn-get-report" class="btn btn-primary" style="min-width: 120px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V4"/><path d="M6 20v-6"/><path d="M18 20V10"/></svg>
+                            Get Report
+                        </button>
+                    </div>
+                    <div id="report-content" style="display:none;"></div>
+                    <div id="report-actions" style="display:none; margin-top: 1rem; gap: 0.5rem; flex-wrap: wrap;">
+                        <button id="btn-download-report-pdf" class="btn btn-accent" style="flex: 1; min-width: 140px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Download PDF
+                        </button>
+                        <button id="btn-clear-report" class="btn btn-danger" style="flex: 1; min-width: 140px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            Clear Report
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Settings Grid -->
+                <div class="settings-grid">
+                    <div class="settings-box">
+                        <h3>Settings</h3>
+                        <div class="input-group">
+                            <label>Update Password</label>
+                            <input type="text" id="new-pin" placeholder="New Password" autocomplete="off">
+                        </div>
+                        <div class="input-group">
+                            <label>Late Arrival Threshold</label>
+                            <input type="time" id="late-threshold" value="09:00">
+                        </div>
+                        <div class="input-group">
+                            <label>Work End Time</label>
+                            <input type="time" id="work-end-time" value="17:00">
+                        </div>
+                        <div class="input-group">
+                            <label>Overtime Threshold (hours)</label>
+                            <input type="number" id="overtime-threshold" value="8" min="1" max="24">
+                        </div>
+                        <div class="toggle-wrapper">
+                            <span class="toggle-label">Sound Effects</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="sound-toggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <button id="btn-save-settings" class="btn btn-primary btn-lg">Save Settings</button>
+                    </div>
+                    
+                    <div class="settings-box">
+                        <h3>Data Management</h3>
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+                            <button id="btn-export" class="btn btn-success" style="flex: 1;">Export</button>
+                            <button id="btn-import-trigger" class="btn btn-secondary" style="flex: 1;">Import</button>
+                        </div>
+                        <input type="file" id="import-file" style="display:none" accept=".json">
+                        <button id="btn-clear-all-data" class="btn btn-danger btn-lg">Clear All Data</button>
+                        <button id="btn-nuke" class="btn btn-nuke btn-lg" style="margin-top: 0.5rem; width: 100%; background: #dc2626; color: white; border: 2px solid #b91c1c; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">NUKE</button>
+                    </div>
+                    
+                    <div class="settings-box">
+                        <h3>Register Staff</h3>
+                        <div class="input-group">
+                            <input type="text" id="reg-name" placeholder="Full Name" maxlength="100">
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="reg-id" placeholder="Employee ID" maxlength="20">
+                        </div>
+                        <button id="btn-reg-face" class="btn btn-success btn-lg">1. Capture Face Data</button>
+                        <button id="btn-reg-save" class="btn btn-primary btn-lg" style="margin-top: 0.5rem;" disabled>2. Save Employee</button>
+                        <p id="reg-status" style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--accent); min-height: 1.2em;"></p>
+                    </div>
+                    
+                    <div class="settings-box">
+                        <h3>Need Help?</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">Contact our support team for assistance.</p>
+                        <a href="mailto:mortapps.studios@gmail.com?subject=Bioattex%20Support" class="contact-link" style="display: flex; justify-content: center;">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            Contact Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Employee Gallery -->
+            <div class="panel">
+                <h3 style="margin-bottom: 0.75rem; font-size: 1rem;">Employee Gallery</h3>
+                <div class="employee-gallery" id="employee-gallery">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+            
+            <!-- Manage Employees Table -->
+            <div class="panel">
+                <h3 style="margin-bottom: 0.75rem; font-size: 1rem;">Manage Employees</h3>
+                <div class="table-wrapper">
+                    <table id="emp-table">
+                        <thead><tr><th>ID</th><th>Name</th><th>Biometrics</th><th>Action</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Records Screen -->
+        <div id="records" class="screen">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Attendance Records</h2>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button id="btn-clear-records" class="btn btn-danger">Clear All</button>
+                        <button id="btn-download-pdf" class="btn btn-primary">Download PDF</button>
+                    </div>
+                </div>
+                
+                <!-- Search Box -->
+                <div class="search-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="search-records" placeholder="Search by name or ID...">
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card"><span class="stat-num" id="best-emp">--</span><span class="stat-label">Most Punctual</span></div>
+                    <div class="stat-card"><span class="stat-num" id="worst-emp">--</span><span class="stat-label">Needs Improvement</span></div>
+                </div>
+                <div class="table-wrapper">
+                    <table id="records-table">
+                        <thead><tr><th>Photo</th><th>Name</th><th>ID</th><th>Date</th><th>Time</th><th>Type</th><th>Duration</th><th>Status</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Screen -->
+        <div id="calendar" class="screen">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Attendance Calendar</h2>
+                    <button class="btn btn-secondary" onclick="app.nav('dashboard')">Back to Dashboard</button>
+                </div>
+                
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <h3 id="calendar-month-year">January 2024</h3>
+                        <div class="calendar-nav">
+                            <button id="btn-prev-month">&lt;</button>
+                            <button id="btn-next-month">&gt;</button>
+                            <button id="btn-today">Today</button>
+                        </div>
+                    </div>
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--success);"></div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Present</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--warning);"></div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Late</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--danger);"></div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Absent</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="main-footer" style="display: none;">
+        <div class="footer-main">2026 BioAttex. Attendance Tracker</div>
+        <div class="footer-powered">Powered by <a href="https://mortappsstudios.com" target="_blank">MortApps Studios</a></div>
+        <div class="footer-tagline">Advanced AI-Powered Technology</div>
+    </footer>
+
+    <!-- Verify Modal -->
+    <div id="modal-verify" class="modal-overlay">
+        <div class="modal modal-verify-lg">
+            <h3 style="text-align: center;">Confirm Identity</h3>
+            <img id="verify-img" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); display: block; margin: 1rem auto;">
+            <p id="verify-checkin-info" class="verify-checkin-info"></p>
+            <p style="margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.85rem;">Select your name:</p>
+            <select id="verify-select" class="verify-select-lg"></select>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                <button id="btn-cancel-verify" class="btn btn-secondary btn-verify-lg" style="flex: 1;">Cancel</button>
+                <button id="btn-confirm-identity" class="btn btn-primary btn-verify-lg" style="flex: 1;">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Modal -->
+    <div id="modal-delete" class="modal-overlay">
+        <div class="modal" style="border-top: 4px solid var(--danger);">
+            <h3 style="color: var(--danger);">Warning</h3>
+            <p style="margin-bottom: 1rem; color: var(--text-main);">You are about to permanently delete all attendance records.</p>
+            <p style="margin-bottom: 1.5rem; font-weight: 600;">This action cannot be undone. Continue?</p>
+            <div style="display: flex; gap: 0.5rem;">
+                <button id="btn-cancel-delete" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+                <button id="btn-confirm-delete" class="btn btn-danger" style="flex: 1;">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Clear Data Modal -->
+    <div id="modal-clear-data" class="modal-overlay">
+        <div class="modal" style="border-top: 4px solid var(--danger);">
+            <h3 style="color: var(--danger);">Critical Warning</h3>
+            <p style="margin-bottom: 1rem; color: var(--text-main);">This will delete all attendance records and free up storage space.</p>
+            <p style="margin-bottom: 0.5rem; color: var(--success); font-weight: 600; font-size: 0.85rem;">Your employee biometrics and monthly report archives will be preserved.</p>
+            <p style="margin-bottom: 1.5rem; font-weight: 600;">This action cannot be undone. Continue?</p>
+            <div style="display: flex; gap: 0.5rem;">
+                <button id="btn-cancel-clear-data" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+                <button id="btn-confirm-clear-data" class="btn btn-danger" style="flex: 1;">Yes, Clear All</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Nuke Modal -->
+    <div id="modal-nuke" class="modal-overlay">
+        <div class="modal modal-nuke-danger">
+            <div class="nuke-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h3 style="color: #dc2626; text-align: center; font-size: 1.2rem;">NUCLEAR OPTION</h3>
+            <p style="color: var(--text-main); margin: 0.75rem 0; font-size: 0.9rem; text-align: center;"><strong>This will PERMANENTLY delete:</strong></p>
+            <ul class="nuke-list">
+                <li>All employee face data &amp; biometrics</li>
+                <li>All attendance records &amp; logs</li>
+                <li>All monthly reports &amp; archives</li>
+                <li>All settings &amp; preferences</li>
+                <li>Everything. Fresh start.</li>
+            </ul>
+            <p style="color: var(--danger); font-weight: 600; text-align: center; margin: 0.75rem 0;">Every employee must re-register. This CANNOT be undone.</p>
+            <div class="input-group" style="margin-top: 1rem;">
+                <label style="color: var(--danger); font-weight: 700;">Enter your Password to confirm:</label>
+                <input type="password" id="nuke-pin-input" placeholder="Enter admin password" autocomplete="off" style="border-color: #fca5a5;">
+            </div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                <button id="btn-cancel-nuke" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+                <button id="btn-confirm-nuke" class="btn btn-nuke" style="flex: 1; background: #dc2626; color: white;">Destroy Everything</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Day Detail Modal -->
+    <div id="modal-day-detail" class="modal-overlay">
+        <div class="modal">
+            <h3 style="text-align: center;" id="day-detail-title">Attendance Details</h3>
+            <div class="day-detail-list" id="day-detail-list">
+                <!-- Populated by JS -->
+            </div>
+            <button class="btn btn-secondary btn-lg" style="margin-top: 1rem;" onclick="document.getElementById('modal-day-detail').style.display='none'">Close</button>
+        </div>
+    </div>
+    
+    <div id="toast"></div>
+    
+    <div class="connection-status" id="connection-status">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Connected</span>
+    </div>
+
+    <!-- BioAttex Modular JS - LOAD ORDER MATTERS -->
+    <script src="bio-utils.js"></script>
+    <script src="storage.js"></script>
+    <script src="bio-engine.js"></script>
+    <script src="bio-features.js"></script>
+    <script src="bio-ui.js"></script>
+</body>
+</html>
