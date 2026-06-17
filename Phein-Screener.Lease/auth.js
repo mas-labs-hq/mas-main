@@ -86,7 +86,7 @@
 window.AUTHORIZED_CLIENTS = [
   // --- LIVE SEED ENTRIES (safe to keep or delete) ---
   // These let you test the full flow end-to-end. Remove them before going live.
-  { company: "Acme Corp",    code: "ACME-7X9K-2024",  duration: 7,  status: "inactive" },
+  { company: "Acme Corp",    code: "ACME-7X9K-2024",  duration: 7,  status: "active" },
   { company: "Beta LLC",     code: "BETA-4M2P-2024",  duration: 14, status: "inactive" },
   { company: "Gamma Inc",    code: "GAMMA-9R3T-2024", duration: 30, status: "inactive" },
 
