@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <title>PSF.Manager — Phein Screener Lease Management</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0f1e">
+  <link rel="apple-touch-icon" sizes="180x180" href="phein-icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="phein-icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="phein-icons/favicon-16x16.png">
+  <link rel="shortcut icon" href="phein-icons/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="styles.css">
+  <script src="db.js" defer></script>
+  <script src="reader.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+
+  <!-- ============ SIDEBAR ============ -->
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+      PSF <span class="brand-sep">·</span> <span class="brand-sub">Manager</span>
+    </div>
+    <div class="sidebar-nav">
+      <a class="nav-item active" data-view="dashboard" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" data-view="reader" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <span>Reader</span>
+      </a>
+      <a class="nav-item" data-view="clients" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Clients</span>
+      </a>
+      <a class="nav-item" data-view="guide" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Guide</span>
+      </a>
+    </div>
+    <div class="sidebar-footer">
+      <label><input type="checkbox" id="sound-toggle" checked> <span>Sound Alerts</span></label>
+    </div>
+  </nav>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="view active" id="view-dashboard">
+      <div class="view-header">
+        <h1>Dashboard</h1>
+        <p>Overview of your Phein Screener lease operations.</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card blue"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total Clients</div></div>
+        <div class="stat-card green"><div class="stat-num" id="stat-active">0</div><div class="stat-label">Active</div></div>
+        <div class="stat-card amber"><div class="stat-num" id="stat-expiring">0</div><div class="stat-label">Expiring Soon</div></div>
+        <div class="stat-card red"><div class="stat-num" id="stat-expired">0</div><div class="stat-label">Expired</div></div>
+        <div class="stat-card gray"><div class="stat-num" id="stat-paused">0</div><div class="stat-label">Paused</div></div>
+      </div>
+      <h2 class="section-title">Recent Alerts</h2>
+      <div id="recent-alerts">
+        <p class="empty-state">No alerts parsed yet. Use the Reader to paste Formspree emails.</p>
+      </div>
+    </div>
+
+    <!-- ===== READER ===== -->
+    <div class="view" id="view-reader">
+      <div class="view-header">
+        <h1>Formspree Reader</h1>
+        <p>Paste any Formspree email content below. The system will parse it, explain what happened, and generate professional response templates.</p>
+      </div>
+      <textarea class="reader-input" id="reader-input" placeholder="Paste the entire Formspree email content here..."></textarea>
+      <div style="margin-top:1rem;">
+        <button class="btn btn-primary" id="parse-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          Parse &amp; Analyze
+        </button>
+      </div>
+      <div class="reader-results" id="reader-results"></div>
+    </div>
+
+    <!-- ===== CLIENTS ===== -->
+    <div class="view" id="view-clients">
+      <div class="view-header">
+        <h1>Client Manager</h1>
+        <p>Track active leases with live countdowns. Pause, resume, or remove clients. Export and import backups.</p>
+      </div>
+
+      <!-- Add Client Form -->
+      <form class="add-client-form" id="add-client-form">
+        <h2 class="section-title" style="margin-bottom:1rem;">Add New Client</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Contact Name *</label>
+            <input type="text" id="client-name" placeholder="John Doe" required>
+          </div>
+          <div class="form-group">
+            <label>Company Name *</label>
+            <input type="text" id="client-company" placeholder="Acme Corp" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="client-email" placeholder="john@acme.com">
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" id="client-phone" placeholder="+254 712 345 678">
+          </div>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="client-location" placeholder="Nairobi, Kenya">
+          </div>
+          <div class="form-group">
+            <label>License Type</label>
+            <select id="client-license-type">
+              <option value="7-day">7 Day (Lite)</option>
+              <option value="14-day">14 Day (Lite)</option>
+              <option value="30-day">30 Day (Lite)</option>
+              <option value="3-month">3 Month (Standard)</option>
+              <option value="1-year">1 Year (Standard)</option>
+              <option value="Perpetual">Perpetual (Elite)</option>
+              <option value="Enterprise Plus">Enterprise Plus (Elite)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Duration (days)</label>
+            <input type="number" id="client-duration" value="7" min="1" max="36500">
+          </div>
+          <div class="form-group">
+            <label>Access Code</label>
+            <div style="display:flex;gap:0.5rem;">
+              <input type="text" id="client-code" placeholder="PHEIN-XXXX-XXXX-2026" style="flex:1;">
+              <button type="button" class="btn btn-ghost" id="gen-code-btn" style="white-space:nowrap;padding:0.65rem 1rem;font-size:0.8rem;">Generate</button>
+            </div>
+          </div>
+          <div class="form-group" style="grid-column:span 3;">
+            <label>Notes</label>
+            <textarea id="client-notes" placeholder="Internal notes about this client..." rows="2"></textarea>
+          </div>
+        </div>
+        <div style="margin-top:0.5rem;">
+          <button type="submit" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Client
+          </button>
+        </div>
+      </form>
+
+      <!-- Toolbar -->
+      <div class="clients-toolbar">
+        <input type="text" class="search-input" id="client-search" placeholder="Search by name, company, code, or email...">
+        <button class="btn btn-ghost" id="export-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <button class="btn btn-ghost" id="import-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Import
+        </button>
+        <input type="file" id="import-file" accept=".json" style="display:none;">
+      </div>
+
+      <!-- Client List -->
+      <div id="client-list">
+        <p class="empty-state">No clients yet. Add your first client above.</p>
+      </div>
+    </div>
+
+    <!-- ===== GUIDE ===== -->
+    <div class="view" id="view-guide">
+      <div class="view-header">
+        <h1>Guide</h1>
+        <p>Everything you need to know about PSF.Manager.</p>
+      </div>
+
+      <div class="guide-section">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>What is PSF.Manager?</h3>
+        <p>PSF.Manager is your personal command center for the Phein Screener Lease platform. It does three things:</p>
+        <ul>
+          <li><strong>Reader:</strong> Paste any Formspree alert email and the system instantly decodes it, tells you what happened, who did it, and generates professional response templates you can copy and send.</li>
+          <li><strong>Client Manager:</strong> Track every active lease with live countdown timers. Get sound and desktop notifications when leases are about to expire. Pause and resume clients without losing their remaining time.</li>
+          <li><strong>Backup:</strong> Export and import all your data as a JSON file. Your data is stored in IndexedDB, which persists even if you clear your browser cache.</li>
+        </ul>
+      </div>
+
+      <div class="guide-section">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>How to Use the Reader</h3>
+        <p>When you receive a Formspree email (activation, security alert, reuse blocked, etc.):</p>
+        <ul>
+          <li>Open the email and copy the entire content (from "New form submission" to the bottom).</li>
+          <li>Go to the <strong>Reader</strong> tab in PSF.Manager.</li>
+          <li>Paste the content into the text area.</li>
+          <li>Click <strong>Parse &amp; Analyze</strong>.</li>
+          <li>The system will display: the alert type (color coded), a plain English explanation of what happened, all extracted information (company, phone, email, device details, etc.), and 3 professional response templates.</li>
+          <li>Click <strong>Copy</strong> on any template to copy it to your clipboard, then paste it into your email client and send.</li>
+        </ul>
+        <p><strong>Tip:</strong> All parsed alerts are saved to your alert history automatically. You can see them on the Dashboard under "Recent Alerts".</p>
+      </div>
+
+      <div class="guide-section">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>How to Manage Clients</h3>
+        <p>When someone pays for a lease, add them to the Client Manager:</p>
+        <ul>
+          <li>Go to the <strong>Clients</strong> tab and fill in the "Add New Client" form.</li>
+          <li>Enter their name, company, email, phone, location, and license type.</li>
+          <li>Click <strong>Generate</strong> to create a unique access code, or type your own.</li>
+          <li>Click <strong>Add Client</strong>. The countdown starts immediately.</li>
+          <li>You can search clients by name, company, code, or email using the search bar.</li>
+          <li>Each client card shows a live countdown (days, hours, minutes, seconds remaining).</li>
+          <li>The progress bar shows what percentage of the lease has been used.</li>
+        </ul>
+        <p><strong>Color coding:</strong> Green = healthy, Yellow = expiring within 7 days, Amber = expiring within 1 day, Red = expired.</p>
+      </div>
+
+      <div class="guide-section">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>How Pause and Resume Works</h3>
+        <p>Sometimes you need to put a client's lease on hold (non-payment, vacation, investigation, etc.):</p>
+        <ul>
+          <li>Click the <strong>Pause</strong> button (two vertical bars) on the client card.</li>
+          <li>The countdown <strong>freezes</strong> immediately. The client's remaining time is preserved.</li>
+          <li>The status badge changes to "PAUSED" and the countdown stops ticking.</li>
+          <li>When you click <strong>Resume</strong> (play button), the countdown continues from exactly where it left off.</li>
+          <li>The time the client was paused is <strong>added back</strong> to their lease. They do not lose any time.</li>
+        </ul>
+        <p><strong>Example:</strong> A client has 5 days remaining. You pause them for 2 days. When you resume, they still have 5 days remaining. The 2 pause days are added to their expiry date automatically.</p>
+      </div>
+
+      <div class="guide-section">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>How Notifications Work</h3>
+        <p>PSF.Manager monitors your clients and alerts you when action is needed:</p>
+        <ul>
+          <li><strong>Sound alerts:</strong> A pleasant two tone notification plays when a client's lease enters the warning threshold (default: 1 day remaining). Toggle sound on or off in the sidebar.</li>
+          <li><strong>Desktop notifications:</strong> A system notification appears on your desktop. You will be asked for permission on first load.</li>
+          <li><strong>Toast notifications:</strong> A small popup appears in the bottom right corner of the app.</li>
+          <li><strong>Expiration alerts:</strong> When a client's lease expires, you get all three notification types simultaneously.</li>
+        </ul>
+        <p><strong>Note:</strong> Notifications only fire once per client per day to avoid spam. Keep PSF.Manager open in a browser tab for real time monitoring.</p>
+      </div>
+
+      <div class="guide-section">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>How to Export and Import</h3>
+        <p>Your data is stored locally in your browser's IndexedDB. To back it up or transfer it:</p>
+        <ul>
+          <li><strong>Export:</strong> Click the <strong>Export</strong> button on the Clients page. A JSON file will download containing all your clients and alert history.</li>
+          <li><strong>Import:</strong> Click the <strong>Import</strong> button and select a previously exported JSON file. This will <strong>replace</strong> all existing data, so use with caution.</li>
+          <li><strong>Recommendation:</strong> Export a backup at least once a week. Store the file in a secure location (cloud drive, encrypted folder, etc.).</li>
+        </ul>
+        <p><strong>Persistence:</strong> IndexedDB data survives browser restarts, cache clears, and even browser updates. It is only lost if you manually clear site data or if your browser profile is deleted.</p>
+      </div>
+
+      <div class="guide-section">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>How to Use Templates</h3>
+        <p>Each parsed alert generates 3 professional response templates tailored to the scenario:</p>
+        <ul>
+          <li><strong>Activation:</strong> Welcome messages with lease details, device lock explanation, and quick start tips.</li>
+          <li><strong>Security (Strike 1):</strong> Friendly reminders, technical support offers, and lease agreement references.</li>
+          <li><strong>Security (Strike 2):</strong> Stern warnings, final notices, and direct contact offers.</li>
+          <li><strong>Security (Strike 3):</strong> Access revocation notices, legal notices, and appeal process information.</li>
+          <li><strong>Reuse Blocked:</strong> Code sharing detection notices, security advisories, and code rotation offers.</li>
+          <li><strong>Device Mismatch:</strong> Device change alerts, authorization instructions, and security protocol explanations.</li>
+          <li><strong>Purchase:</strong> Thank you messages, payment instructions, and welcome aboard messages with access codes.</li>
+          <li><strong>Review:</strong> Thank you messages, follow ups, and testimonial requests.</li>
+        </ul>
+        <p>Click <strong>Copy</strong> on any template to copy it to your clipboard. Paste it into your professional email client, personalize if needed, and send. Templates are pre filled with the client's company name, code, phone, email, and other details from the alert.</p>
+      </div>
+
+      <div class="guide-section">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>The Phein Screener Ecosystem</h3>
+        <p>PSF.Manager is part of a larger system. Here is how everything connects:</p>
+        <ul>
+          <li><strong>Phein Screener Lease</strong> (the main project) sends Formspree alerts when users activate, tamper, or try to reuse codes.</li>
+          <li><strong>PSF.Manager</strong> (this app) reads those alerts, helps you respond, and tracks client leases.</li>
+          <li><strong>auth.js</strong> (in the main project) is the source of truth for who can access the software. You edit it manually based on what PSF.Manager tells you.</li>
+          <li><strong>Formspree</strong> is the bridge. Every alert from the main project arrives in your email, and you paste it into PSF.Manager's Reader.</li>
+        </ul>
+        <p><strong>Workflow:</strong> Receive Formspree email → Paste into Reader → Read the explanation → Copy a template → Email the client → Update auth.js if needed → Track the client in Client Manager.</p>
+      </div>
+
+      <div class="guide-section">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Tips and Best Practices</h3>
+        <ul>
+          <li>Check PSF.Manager at least once a day. The countdown timers and notifications will tell you what needs attention.</li>
+          <li>When you receive an ACTIVATION alert, immediately flip the status in auth.js from "inactive" to "active" to lock the code.</li>
+          <li>When you receive a REUSE BLOCKED alert, contact the original user to verify they did not share their code.</li>
+          <li>When you receive a SECURITY ALERT (Strike 3), add the code to BLACKLISTED_CODES in auth.js to enforce the block globally.</li>
+          <li>Export a backup every week. Store it somewhere safe.</li>
+          <li>Keep PSF.Manager open in a browser tab while you work. The notifications and countdowns only work while the app is open.</li>
+          <li>Use the <strong>Generate</strong> button to create access codes. The format is <code>PHEIN-XXXX-XXXX-2026</code> with no confusing characters (no O, 0, I, 1).</li>
+          <li>When adding a client, the system generates an auth.js entry and copies it to your clipboard. Paste it directly into your auth.js file.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TOAST -->
+  <div id="psf-toast"></div>
+
+</body>
+</html>
