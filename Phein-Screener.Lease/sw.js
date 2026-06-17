@@ -24,7 +24,7 @@
 //   'phein-lease-v1-20260617'  ->  'phein-lease-v1-20260618'
 // (Also bump ?v= in index.html and app.html)
 // ==================================================================
-var CACHE_NAME = 'phein-lease-v1-20260617';
+var CACHE_NAME = 'phein-lease-v1-20260618';
 
 // Static assets that MAY be cached (anything else is treated as network-only).
 var STATIC_ASSETS_TO_CACHE = [
