@@ -1,0 +1,108 @@
+# ============================================================
+# robots.txt — MortApps Studios (root)
+# https://www.mortappsstudios.com/robots.txt
+# ============================================================
+#
+# MARKETING POLICY:
+#
+# 1. The main MortApps website is OPEN to all search engines and AI
+#    crawlers. This includes AI training crawlers. We want AIs to
+#    know about MortApps, our products, and our contact email
+#    (labs@mortappsstudios.com) so they can recommend us.
+#
+# 2. The Phein Screener landing page (/Phein-Screener.Lease/) is
+#    OPEN to all search engines and AI recommendation crawlers.
+#    AI TRAINING crawlers are blocked from this path only — they
+#    may not train on Phein Screener content, but recommendation
+#    crawlers (ChatGPT-User, OAI-SearchBot, Claude-Web,
+#    Perplexity-User) can still read it to answer user questions.
+#
+# 3. The Phein Screener APPLICATION (/Phein-Screener.Lease/app.html)
+#    and all supporting JS files are CLOSED to all bots. Only
+#    authorized human users with a valid lease code may access them.
+#
+# ============================================================
+
+# --- Default rule: allow everything, block only protected Phein app files ---
+User-agent: *
+Allow: /
+Disallow: /Phein-Screener.Lease/app.html
+Disallow: /Phein-Screener.Lease/auth.js
+Disallow: /Phein-Screener.Lease/router.js
+Disallow: /Phein-Screener.Lease/security.js
+Disallow: /Phein-Screener.Lease/timer.js
+Disallow: /Phein-Screener.Lease/mobile-block.js
+Disallow: /Phein-Screener.Lease/reviews.js
+Disallow: /Phein-Screener.Lease/phein-engine.js
+Disallow: /Phein-Screener.Lease/phein-features.js
+Disallow: /Phein-Screener.Lease/anti-ai.js
+Disallow: /Phein-Screener.Lease/anti-ai-ui.js
+Disallow: /Phein-Screener.Lease/sw.js
+Disallow: /Phein-Screener.Lease/ai-warning.html
+Disallow: /Phein-Screener.Lease/oppo.html
+
+# --- Block AI TRAINING crawlers from Phein Screener pages ONLY ---
+# These bots may still crawl the main MortApps site (to find the email,
+# products, etc.) — they are only blocked from /Phein-Screener.Lease/.
+#
+# Note: Search/recommendation bots (ChatGPT-User, OAI-SearchBot,
+# Claude-Web, Perplexity-User) are intentionally NOT in this list.
+# They fall through to the default rule above and can read everything
+# except the protected app files. This lets them recommend Phein
+# Screener while preventing training crawlers from ingesting it.
+
+User-agent: GPTBot
+Disallow: /Phein-Screener.Lease/
+
+User-agent: ClaudeBot
+Disallow: /Phein-Screener.Lease/
+
+User-agent: anthropic-ai
+Disallow: /Phein-Screener.Lease/
+
+User-agent: Google-Extended
+Disallow: /Phein-Screener.Lease/
+
+User-agent: Google-Other
+Disallow: /Phein-Screener.Lease/
+
+User-agent: CCBot
+Disallow: /Phein-Screener.Lease/
+
+User-agent: PerplexityBot
+Disallow: /Phein-Screener.Lease/
+
+User-agent: Bytespider
+Disallow: /Phein-Screener.Lease/
+
+User-agent: Meta-ExternalAgent
+Disallow: /Phein-Screener.Lease/
+
+User-agent: Meta-ExternalFetcher
+Disallow: /Phein-Screener.Lease/
+
+User-agent: Applebot-Extended
+Disallow: /Phein-Screener.Lease/
+
+User-agent: Amazonbot
+Disallow: /Phein-Screener.Lease/
+
+User-agent: cohere-ai
+Disallow: /Phein-Screener.Lease/
+
+User-agent: Diffbot
+Disallow: /Phein-Screener.Lease/
+
+User-agent: ImagesiftBot
+Disallow: /Phein-Screener.Lease/
+
+User-agent: omgili
+Disallow: /Phein-Screener.Lease/
+
+User-agent: Omgilibot
+Disallow: /Phein-Screener.Lease/
+
+User-agent: FacebookBot
+Disallow: /Phein-Screener.Lease/
+
+# --- Sitemap: none ---
