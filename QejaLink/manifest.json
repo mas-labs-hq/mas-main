@@ -1,0 +1,96 @@
+{
+    "name": "QejaLink - Houses for Rent & Sale in Kenya",
+    "short_name": "QejaLink",
+    "description": "Find houses for rent and sale across Kenya. Browse listings in Kiserian, Ngong, Rongai, Birika, Matasia. Powered By MortApps Studios.",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
+    "background_color": "#1B2A3E",
+    "theme_color": "#1B2A3E",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "image-logo/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "image-logo/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "image-logo/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "image-logo/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png"
+        },
+        {
+            "src": "image-logo/favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
+        {
+            "src": "image-logo/favicon-16x16.png",
+            "sizes": "16x16",
+            "type": "image/png"
+        }
+    ],
+    "categories": ["lifestyle", "houseandhome", "productivity"],
+    "shortcuts": [
+        {
+            "name": "Browse Houses",
+            "short_name": "Browse",
+            "description": "View all available houses",
+            "url": "./index.html?tab=browse",
+            "icons": [{ "src": "image-logo/android-chrome-192x192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Saved Listings",
+            "short_name": "Saved",
+            "description": "View your saved houses",
+            "url": "./index.html?tab=saved",
+            "icons": [{ "src": "image-logo/android-chrome-192x192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "About QejaLink",
+            "short_name": "About",
+            "description": "About the platform",
+            "url": "./index.html?tab=about",
+            "icons": [{ "src": "image-logo/android-chrome-192x192.png", "sizes": "192x192" }]
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "image-logo/wide-screenshot.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "QejaLink on Desktop"
+        },
+        {
+            "src": "image-logo/narrow-screenshot.png",
+            "sizes": "720x1280",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "QejaLink on Mobile"
+        }
+    ],
+    "share_target": {
+        "action": "./index.html",
+        "method": "GET",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url"
+        }
+    }
+}
