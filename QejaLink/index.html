@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#1B2A3E">
+    <meta name="description" content="QejaLink - Find houses for rent and sale in Kenya. Browse listings in Kiserian, Ngong, Rongai, Birika, Matasia. Powered By MortApps Studios.">
+
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="QejaLink">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="QejaLink">
+    <meta name="msapplication-TileColor" content="#1B2A3E">
+    <meta name="msapplication-tap-highlight" content="no">
+
+    <!-- Open Graph / Social Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="QejaLink - Houses for Rent & Sale in Kenya">
+    <meta property="og:description" content="Find houses for rent and sale across Kenya. Powered By MortApps Studios.">
+    <meta property="og:image" content="image-logo/apple-touch-icon.png">
+
+    <link rel="manifest" href="manifest.json">
+    <title>QejaLink - Houses for Rent & Sale in Kenya</title>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="image-logo/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="image-logo/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="image-logo/favicon-16x16.png">
+    <link rel="shortcut icon" href="image-logo/favicon.ico">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Satisfy&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=25">
+
+    <!-- Code Protection -->
+    <script>
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) || (e.ctrlKey && (e.key === 'U' || e.key === 'u'))) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</head>
+<body>
+    <!-- ==================== LOADING SCREEN ==================== -->
+    <div id="loadingScreen" class="loader">
+        <div class="loader-brand">
+            <div class="loader-logo">
+                <img src="image-logo/main-logo.png" alt="QejaLink" onerror="this.outerHTML='<svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#C9A84C\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\'></path><polyline points=\'9 22 9 12 15 12 15 22\'></polyline></svg>'">
+            </div>
+            <h1 class="loader-title">QejaLink</h1>
+            <p class="loader-motto">Find your perfect home</p>
+            <div class="loader-divider"></div>
+            <p class="loader-tagline">Powered By MortApps Studios</p>
+        </div>
+        <div class="loader-bar-track">
+            <div class="loader-bar-fill"></div>
+        </div>
+    </div>
+
+    <!-- ==================== APP ==================== -->
+    <div id="app" class="app hidden">
+
+        <!-- ===== NAVIGATION ===== -->
+        <nav id="mainNav" class="nav">
+            <a href="#" class="nav-logo" onclick="switchTab('browse'); return false;">
+                <img src="image-logo/main-logo.png" alt="QejaLink" class="nav-logo-img" onerror="this.style.display='none'">
+                <span class="nav-logo-text">QejaLink</span>
+            </a>
+            <button class="nav-cta" id="installBtn" aria-label="Install QejaLink">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Install</span>
+            </button>
+        </nav>
+
+        <!-- ===== HERO SECTION ===== -->
+        <section class="hero">
+            <div class="hero-bg-hex"></div>
+            <div class="hero-glow"></div>
+            <div class="hero-content">
+                <p class="section-label reveal">Kenya Property Listings</p>
+                <h1 class="hero-brand-title reveal">Qeja<span class="gold-shimmer">Link</span></h1>
+                <p class="hero-motto reveal">Find your perfect home</p>
+                <p class="hero-subtitle reveal">Browse verified houses for rent and sale across Kiserian, Ngong, Rongai, Birika, and Matasia. Contact landlords directly.</p>
+
+                <!-- Search Bar -->
+                <div class="hero-search reveal">
+                    <svg class="hero-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search by town, name, or keyword..." autocomplete="off">
+                    <button class="hero-filter-toggle" id="filterToggle" aria-label="Filters">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="4" y1="6" x2="20" y2="6"></line>
+                            <line x1="7" y1="12" x2="17" y2="12"></line>
+                            <line x1="10" y1="18" x2="14" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="hero-stats reveal">
+                    <div class="hero-stat">
+                        <div class="hero-stat-value" id="statTotal">12</div>
+                        <div class="hero-stat-label">Houses</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">5</div>
+                        <div class="hero-stat-label">Towns</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">100%</div>
+                        <div class="hero-stat-label">Verified</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FILTERS PANEL ===== -->
+        <section class="filters-section">
+            <div class="filters-panel hidden" id="filtersPanel">
+                <div class="filter-row">
+                    <label class="filter-label">Location</label>
+                    <div class="filter-chips" id="locationChips">
+                        <button class="filter-chip active" data-location="">All</button>
+                        <button class="filter-chip" data-location="Kiserian">Kiserian</button>
+                        <button class="filter-chip" data-location="Ngong">Ngong</button>
+                        <button class="filter-chip" data-location="Rongai">Rongai</button>
+                        <button class="filter-chip" data-location="Birika">Birika</button>
+                        <button class="filter-chip" data-location="Matasia">Matasia</button>
+                    </div>
+                </div>
+
+                <div class="filter-row">
+                    <label class="filter-label">Listing Type</label>
+                    <div class="filter-chips">
+                        <button class="filter-chip active" data-status="">All</button>
+                        <button class="filter-chip" data-status="rent">For Rent</button>
+                        <button class="filter-chip" data-status="sale">For Sale</button>
+                    </div>
+                </div>
+
+                <div class="filter-row">
+                    <label class="filter-label">Price Range (KES)</label>
+                    <div class="price-range">
+                        <input type="number" id="filterPriceMin" placeholder="Min" min="0">
+                        <span class="range-sep">to</span>
+                        <input type="number" id="filterPriceMax" placeholder="Max" min="0">
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn-outline" id="clearFilters">Clear All</button>
+                    <button class="btn-primary" id="applyFilters">Apply Filters</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== RESULTS META ===== -->
+        <section class="results-meta" id="resultsMeta">
+            <p id="resultsCount" class="results-count">Loading houses...</p>
+            <select id="sortBy" class="sort-select">
+                <option value="default">Sort: Latest</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="location">Location: A to Z</option>
+            </select>
+        </section>
+
+        <!-- ===== MAIN CONTENT (Tabs) ===== -->
+        <main class="main-content">
+
+            <!-- BROWSE TAB -->
+            <section class="tab-panel active" id="tab-browse">
+                <div id="houseGrid" class="house-grid">
+                    <!-- Houses + ad slots rendered by app.js -->
+                </div>
+                <div id="emptyState" class="empty-state hidden">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <h3>No houses found</h3>
+                    <p>Try adjusting your search or filters</p>
+                    <button class="btn-primary" onclick="resetAll()">Reset filters</button>
+                </div>
+            </section>
+
+            <!-- SAVED TAB -->
+            <section class="tab-panel" id="tab-saved">
+                <div class="section-header">
+                    <p class="section-label">Your Collection</p>
+                    <h2 class="section-heading">Saved Listings</h2>
+                    <p class="section-desc">Houses you've bookmarked for later</p>
+                </div>
+                <div id="savedGrid" class="house-grid"></div>
+                <div id="savedEmpty" class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <h3>No saved houses yet</h3>
+                    <p>Tap the bookmark icon on any house to save it here</p>
+                </div>
+            </section>
+
+            <!-- ABOUT TAB -->
+            <section class="tab-panel" id="tab-about">
+                <div class="about-wrap">
+                    <div class="about-card reveal">
+                        <div class="about-logo-wrap">
+                            <img src="image-logo/main-logo.png" alt="QejaLink" class="about-logo" onerror="this.style.display='none'">
+                        </div>
+                        <p class="section-label">About Us</p>
+                        <h2 class="about-title">QejaLink</h2>
+                        <p class="about-tagline">Houses for Rent & Sale in Kenya</p>
+                        <div class="about-divider"></div>
+                        <p class="about-desc">
+                            QejaLink connects renters and buyers with available houses across Kenya. We're launching in Kiserian, Ngong, Rongai, Birika, and Matasia, and expanding to more towns soon.
+                        </p>
+                        <p class="about-desc">
+                            Browse listings, view up to 3 photos per property, filter by location and price, and contact landlords directly via call or WhatsApp. No middlemen, no commission fees.
+                        </p>
+
+                        <div class="about-features">
+                            <div class="about-feature">
+                                <div class="about-feature-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>Verified Listings</h4>
+                                    <p>Direct from landlords and agents</p>
+                                </div>
+                            </div>
+                            <div class="about-feature">
+                                <div class="about-feature-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>Direct Contact</h4>
+                                    <p>Call or WhatsApp landlords instantly</p>
+                                </div>
+                            </div>
+                            <div class="about-feature">
+                                <div class="about-feature-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>Instant Alerts</h4>
+                                    <p>Get notified when new houses are listed</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="about-notif">
+                            <h4>Notifications</h4>
+                            <p class="notif-status default" id="notifStatus">Checking status...</p>
+                            <div class="notif-actions">
+                                <button class="btn-outline" id="testNotifBtn">Send Test Notification</button>
+                                <button class="btn-primary" id="enableNotifBtn">Enable Notifications</button>
+                            </div>
+                        </div>
+
+                        <div class="about-footer">
+                            <div class="about-footer-divider"></div>
+                            <p class="about-footer-label">Powered By</p>
+                            <a href="https://www.mortappsstudios.com" target="_blank" rel="noopener" class="about-mortapps">
+                                <strong>MortApps Studios</strong>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                            </a>
+                            <p class="version-tag">Version 2.2.0</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ===== HOUSE DETAIL MODAL ===== -->
+        <div class="modal hidden" id="houseModal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeHouseModal()" aria-label="Close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                <div class="modal-body" id="modalBody"></div>
+            </div>
+        </div>
+
+        <!-- ===== NOTIFICATIONS PROMPT ===== -->
+        <div class="notif-prompt hidden" id="notifPrompt">
+            <div class="notif-prompt-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+            </div>
+            <div class="notif-prompt-text">
+                <div class="notif-prompt-title">Never miss a listing</div>
+                <div class="notif-prompt-desc">Get notified the moment new houses are listed in your area</div>
+            </div>
+            <div class="notif-prompt-actions">
+                <button class="notif-prompt-later" id="notifLater">Later</button>
+                <button class="notif-prompt-enable" id="notifEnable">Enable</button>
+            </div>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <footer class="footer">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <img src="image-logo/main-logo.png" alt="QejaLink" class="footer-logo" onerror="this.style.display='none'">
+                    <span class="footer-brand-text">QejaLink</span>
+                </div>
+                <p class="footer-tagline">Powered By <a href="https://www.mortappsstudios.com" target="_blank" rel="noopener">MortApps Studios</a></p>
+                <p class="footer-copy">© 2026 QejaLink. All rights reserved.</p>
+            </div>
+        </footer>
+
+        <!-- ===== BOTTOM NAVIGATION ===== -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-tab="browse">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>Browse</span>
+            </button>
+            <button class="nav-item" data-tab="saved">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>Saved</span>
+                <span class="nav-badge hidden" id="savedBadge">0</span>
+            </button>
+            <button class="nav-item" data-tab="about">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>About</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="app.js?v=25"></script>
+</body>
+</html>
